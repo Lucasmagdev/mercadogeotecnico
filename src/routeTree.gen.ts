@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as PainelRouteImport } from './routes/painel'
 import { Route as FornecedoresRouteImport } from './routes/fornecedores'
 import { Route as EquipamentosRouteImport } from './routes/equipamentos'
 import { Route as EmpresasRouteImport } from './routes/empresas'
@@ -16,6 +17,11 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as EquipamentosSlugRouteImport } from './routes/equipamentos.$slug'
 import { Route as EmpresasSlugRouteImport } from './routes/empresas.$slug'
 
+const PainelRoute = PainelRouteImport.update({
+  id: '/painel',
+  path: '/painel',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const FornecedoresRoute = FornecedoresRouteImport.update({
   id: '/fornecedores',
   path: '/fornecedores',
@@ -52,6 +58,7 @@ export interface FileRoutesByFullPath {
   '/empresas': typeof EmpresasRouteWithChildren
   '/equipamentos': typeof EquipamentosRouteWithChildren
   '/fornecedores': typeof FornecedoresRoute
+  '/painel': typeof PainelRoute
   '/empresas/$slug': typeof EmpresasSlugRoute
   '/equipamentos/$slug': typeof EquipamentosSlugRoute
 }
@@ -60,6 +67,7 @@ export interface FileRoutesByTo {
   '/empresas': typeof EmpresasRouteWithChildren
   '/equipamentos': typeof EquipamentosRouteWithChildren
   '/fornecedores': typeof FornecedoresRoute
+  '/painel': typeof PainelRoute
   '/empresas/$slug': typeof EmpresasSlugRoute
   '/equipamentos/$slug': typeof EquipamentosSlugRoute
 }
@@ -69,6 +77,7 @@ export interface FileRoutesById {
   '/empresas': typeof EmpresasRouteWithChildren
   '/equipamentos': typeof EquipamentosRouteWithChildren
   '/fornecedores': typeof FornecedoresRoute
+  '/painel': typeof PainelRoute
   '/empresas/$slug': typeof EmpresasSlugRoute
   '/equipamentos/$slug': typeof EquipamentosSlugRoute
 }
@@ -79,6 +88,7 @@ export interface FileRouteTypes {
     | '/empresas'
     | '/equipamentos'
     | '/fornecedores'
+    | '/painel'
     | '/empresas/$slug'
     | '/equipamentos/$slug'
   fileRoutesByTo: FileRoutesByTo
@@ -87,6 +97,7 @@ export interface FileRouteTypes {
     | '/empresas'
     | '/equipamentos'
     | '/fornecedores'
+    | '/painel'
     | '/empresas/$slug'
     | '/equipamentos/$slug'
   id:
@@ -95,6 +106,7 @@ export interface FileRouteTypes {
     | '/empresas'
     | '/equipamentos'
     | '/fornecedores'
+    | '/painel'
     | '/empresas/$slug'
     | '/equipamentos/$slug'
   fileRoutesById: FileRoutesById
@@ -104,10 +116,18 @@ export interface RootRouteChildren {
   EmpresasRoute: typeof EmpresasRouteWithChildren
   EquipamentosRoute: typeof EquipamentosRouteWithChildren
   FornecedoresRoute: typeof FornecedoresRoute
+  PainelRoute: typeof PainelRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/painel': {
+      id: '/painel'
+      path: '/painel'
+      fullPath: '/painel'
+      preLoaderRoute: typeof PainelRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/fornecedores': {
       id: '/fornecedores'
       path: '/fornecedores'
@@ -182,6 +202,7 @@ const rootRouteChildren: RootRouteChildren = {
   EmpresasRoute: EmpresasRouteWithChildren,
   EquipamentosRoute: EquipamentosRouteWithChildren,
   FornecedoresRoute: FornecedoresRoute,
+  PainelRoute: PainelRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

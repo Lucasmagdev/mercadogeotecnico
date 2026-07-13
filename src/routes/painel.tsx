@@ -36,7 +36,7 @@ function PainelLayout() {
       <aside className="lg:sticky lg:top-24 lg:self-start">
         <nav className="flex gap-2 overflow-x-auto lg:flex-col lg:overflow-visible">
           {nav.map((n) => {
-            const active = n.exact ? pathname === n.to : pathname.startsWith(n.to);
+            const active = "exact" in n && n.exact ? pathname === n.to : pathname.startsWith(n.to);
             return (
               <Link
                 key={n.to}
