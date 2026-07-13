@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as PublicarRouteImport } from './routes/publicar'
 import { Route as PainelRouteImport } from './routes/painel'
 import { Route as NotificacoesRouteImport } from './routes/notificacoes'
@@ -24,6 +25,11 @@ import { Route as PainelConfiguracoesRouteImport } from './routes/painel.configu
 import { Route as EquipamentosSlugRouteImport } from './routes/equipamentos.$slug'
 import { Route as EmpresasSlugRouteImport } from './routes/empresas.$slug'
 
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PublicarRoute = PublicarRouteImport.update({
   id: '/publicar',
   path: '/publicar',
@@ -104,6 +110,7 @@ export interface FileRoutesByFullPath {
   '/notificacoes': typeof NotificacoesRoute
   '/painel': typeof PainelRouteWithChildren
   '/publicar': typeof PublicarRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/empresas/$slug': typeof EmpresasSlugRoute
   '/equipamentos/$slug': typeof EquipamentosSlugRoute
   '/painel/configuracoes': typeof PainelConfiguracoesRoute
@@ -119,6 +126,7 @@ export interface FileRoutesByTo {
   '/mensagens': typeof MensagensRoute
   '/notificacoes': typeof NotificacoesRoute
   '/publicar': typeof PublicarRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/empresas/$slug': typeof EmpresasSlugRoute
   '/equipamentos/$slug': typeof EquipamentosSlugRoute
   '/painel/configuracoes': typeof PainelConfiguracoesRoute
@@ -136,6 +144,7 @@ export interface FileRoutesById {
   '/notificacoes': typeof NotificacoesRoute
   '/painel': typeof PainelRouteWithChildren
   '/publicar': typeof PublicarRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/empresas/$slug': typeof EmpresasSlugRoute
   '/equipamentos/$slug': typeof EquipamentosSlugRoute
   '/painel/configuracoes': typeof PainelConfiguracoesRoute
@@ -154,6 +163,7 @@ export interface FileRouteTypes {
     | '/notificacoes'
     | '/painel'
     | '/publicar'
+    | '/sitemap.xml'
     | '/empresas/$slug'
     | '/equipamentos/$slug'
     | '/painel/configuracoes'
@@ -169,6 +179,7 @@ export interface FileRouteTypes {
     | '/mensagens'
     | '/notificacoes'
     | '/publicar'
+    | '/sitemap.xml'
     | '/empresas/$slug'
     | '/equipamentos/$slug'
     | '/painel/configuracoes'
@@ -185,6 +196,7 @@ export interface FileRouteTypes {
     | '/notificacoes'
     | '/painel'
     | '/publicar'
+    | '/sitemap.xml'
     | '/empresas/$slug'
     | '/equipamentos/$slug'
     | '/painel/configuracoes'
@@ -202,10 +214,18 @@ export interface RootRouteChildren {
   NotificacoesRoute: typeof NotificacoesRoute
   PainelRoute: typeof PainelRouteWithChildren
   PublicarRoute: typeof PublicarRoute
+  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/publicar': {
       id: '/publicar'
       path: '/publicar'
@@ -357,6 +377,7 @@ const rootRouteChildren: RootRouteChildren = {
   NotificacoesRoute: NotificacoesRoute,
   PainelRoute: PainelRouteWithChildren,
   PublicarRoute: PublicarRoute,
+  SitemapDotxmlRoute: SitemapDotxmlRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
