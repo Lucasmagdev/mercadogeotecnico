@@ -9,38 +9,272 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as PublicarRouteImport } from './routes/publicar'
+import { Route as PainelRouteImport } from './routes/painel'
+import { Route as NotificacoesRouteImport } from './routes/notificacoes'
+import { Route as MensagensRouteImport } from './routes/mensagens'
+import { Route as FornecedoresRouteImport } from './routes/fornecedores'
+import { Route as EquipamentosRouteImport } from './routes/equipamentos'
+import { Route as EmpresasRouteImport } from './routes/empresas'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as PainelIndexRouteImport } from './routes/painel.index'
+import { Route as PainelFavoritosRouteImport } from './routes/painel.favoritos'
+import { Route as PainelEquipamentosRouteImport } from './routes/painel.equipamentos'
+import { Route as PainelConfiguracoesRouteImport } from './routes/painel.configuracoes'
+import { Route as EquipamentosSlugRouteImport } from './routes/equipamentos.$slug'
+import { Route as EmpresasSlugRouteImport } from './routes/empresas.$slug'
 
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PublicarRoute = PublicarRouteImport.update({
+  id: '/publicar',
+  path: '/publicar',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PainelRoute = PainelRouteImport.update({
+  id: '/painel',
+  path: '/painel',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const NotificacoesRoute = NotificacoesRouteImport.update({
+  id: '/notificacoes',
+  path: '/notificacoes',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MensagensRoute = MensagensRouteImport.update({
+  id: '/mensagens',
+  path: '/mensagens',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FornecedoresRoute = FornecedoresRouteImport.update({
+  id: '/fornecedores',
+  path: '/fornecedores',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EquipamentosRoute = EquipamentosRouteImport.update({
+  id: '/equipamentos',
+  path: '/equipamentos',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EmpresasRoute = EmpresasRouteImport.update({
+  id: '/empresas',
+  path: '/empresas',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PainelIndexRoute = PainelIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => PainelRoute,
+} as any)
+const PainelFavoritosRoute = PainelFavoritosRouteImport.update({
+  id: '/favoritos',
+  path: '/favoritos',
+  getParentRoute: () => PainelRoute,
+} as any)
+const PainelEquipamentosRoute = PainelEquipamentosRouteImport.update({
+  id: '/equipamentos',
+  path: '/equipamentos',
+  getParentRoute: () => PainelRoute,
+} as any)
+const PainelConfiguracoesRoute = PainelConfiguracoesRouteImport.update({
+  id: '/configuracoes',
+  path: '/configuracoes',
+  getParentRoute: () => PainelRoute,
+} as any)
+const EquipamentosSlugRoute = EquipamentosSlugRouteImport.update({
+  id: '/$slug',
+  path: '/$slug',
+  getParentRoute: () => EquipamentosRoute,
+} as any)
+const EmpresasSlugRoute = EmpresasSlugRouteImport.update({
+  id: '/$slug',
+  path: '/$slug',
+  getParentRoute: () => EmpresasRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/empresas': typeof EmpresasRouteWithChildren
+  '/equipamentos': typeof EquipamentosRouteWithChildren
+  '/fornecedores': typeof FornecedoresRoute
+  '/mensagens': typeof MensagensRoute
+  '/notificacoes': typeof NotificacoesRoute
+  '/painel': typeof PainelRouteWithChildren
+  '/publicar': typeof PublicarRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/empresas/$slug': typeof EmpresasSlugRoute
+  '/equipamentos/$slug': typeof EquipamentosSlugRoute
+  '/painel/configuracoes': typeof PainelConfiguracoesRoute
+  '/painel/equipamentos': typeof PainelEquipamentosRoute
+  '/painel/favoritos': typeof PainelFavoritosRoute
+  '/painel/': typeof PainelIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/empresas': typeof EmpresasRouteWithChildren
+  '/equipamentos': typeof EquipamentosRouteWithChildren
+  '/fornecedores': typeof FornecedoresRoute
+  '/mensagens': typeof MensagensRoute
+  '/notificacoes': typeof NotificacoesRoute
+  '/publicar': typeof PublicarRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/empresas/$slug': typeof EmpresasSlugRoute
+  '/equipamentos/$slug': typeof EquipamentosSlugRoute
+  '/painel/configuracoes': typeof PainelConfiguracoesRoute
+  '/painel/equipamentos': typeof PainelEquipamentosRoute
+  '/painel/favoritos': typeof PainelFavoritosRoute
+  '/painel': typeof PainelIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/empresas': typeof EmpresasRouteWithChildren
+  '/equipamentos': typeof EquipamentosRouteWithChildren
+  '/fornecedores': typeof FornecedoresRoute
+  '/mensagens': typeof MensagensRoute
+  '/notificacoes': typeof NotificacoesRoute
+  '/painel': typeof PainelRouteWithChildren
+  '/publicar': typeof PublicarRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/empresas/$slug': typeof EmpresasSlugRoute
+  '/equipamentos/$slug': typeof EquipamentosSlugRoute
+  '/painel/configuracoes': typeof PainelConfiguracoesRoute
+  '/painel/equipamentos': typeof PainelEquipamentosRoute
+  '/painel/favoritos': typeof PainelFavoritosRoute
+  '/painel/': typeof PainelIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/empresas'
+    | '/equipamentos'
+    | '/fornecedores'
+    | '/mensagens'
+    | '/notificacoes'
+    | '/painel'
+    | '/publicar'
+    | '/sitemap.xml'
+    | '/empresas/$slug'
+    | '/equipamentos/$slug'
+    | '/painel/configuracoes'
+    | '/painel/equipamentos'
+    | '/painel/favoritos'
+    | '/painel/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/empresas'
+    | '/equipamentos'
+    | '/fornecedores'
+    | '/mensagens'
+    | '/notificacoes'
+    | '/publicar'
+    | '/sitemap.xml'
+    | '/empresas/$slug'
+    | '/equipamentos/$slug'
+    | '/painel/configuracoes'
+    | '/painel/equipamentos'
+    | '/painel/favoritos'
+    | '/painel'
+  id:
+    | '__root__'
+    | '/'
+    | '/empresas'
+    | '/equipamentos'
+    | '/fornecedores'
+    | '/mensagens'
+    | '/notificacoes'
+    | '/painel'
+    | '/publicar'
+    | '/sitemap.xml'
+    | '/empresas/$slug'
+    | '/equipamentos/$slug'
+    | '/painel/configuracoes'
+    | '/painel/equipamentos'
+    | '/painel/favoritos'
+    | '/painel/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  EmpresasRoute: typeof EmpresasRouteWithChildren
+  EquipamentosRoute: typeof EquipamentosRouteWithChildren
+  FornecedoresRoute: typeof FornecedoresRoute
+  MensagensRoute: typeof MensagensRoute
+  NotificacoesRoute: typeof NotificacoesRoute
+  PainelRoute: typeof PainelRouteWithChildren
+  PublicarRoute: typeof PublicarRoute
+  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/publicar': {
+      id: '/publicar'
+      path: '/publicar'
+      fullPath: '/publicar'
+      preLoaderRoute: typeof PublicarRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/painel': {
+      id: '/painel'
+      path: '/painel'
+      fullPath: '/painel'
+      preLoaderRoute: typeof PainelRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/notificacoes': {
+      id: '/notificacoes'
+      path: '/notificacoes'
+      fullPath: '/notificacoes'
+      preLoaderRoute: typeof NotificacoesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/mensagens': {
+      id: '/mensagens'
+      path: '/mensagens'
+      fullPath: '/mensagens'
+      preLoaderRoute: typeof MensagensRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/fornecedores': {
+      id: '/fornecedores'
+      path: '/fornecedores'
+      fullPath: '/fornecedores'
+      preLoaderRoute: typeof FornecedoresRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/equipamentos': {
+      id: '/equipamentos'
+      path: '/equipamentos'
+      fullPath: '/equipamentos'
+      preLoaderRoute: typeof EquipamentosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/empresas': {
+      id: '/empresas'
+      path: '/empresas'
+      fullPath: '/empresas'
+      preLoaderRoute: typeof EmpresasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -48,22 +282,103 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/painel/': {
+      id: '/painel/'
+      path: '/'
+      fullPath: '/painel/'
+      preLoaderRoute: typeof PainelIndexRouteImport
+      parentRoute: typeof PainelRoute
+    }
+    '/painel/favoritos': {
+      id: '/painel/favoritos'
+      path: '/favoritos'
+      fullPath: '/painel/favoritos'
+      preLoaderRoute: typeof PainelFavoritosRouteImport
+      parentRoute: typeof PainelRoute
+    }
+    '/painel/equipamentos': {
+      id: '/painel/equipamentos'
+      path: '/equipamentos'
+      fullPath: '/painel/equipamentos'
+      preLoaderRoute: typeof PainelEquipamentosRouteImport
+      parentRoute: typeof PainelRoute
+    }
+    '/painel/configuracoes': {
+      id: '/painel/configuracoes'
+      path: '/configuracoes'
+      fullPath: '/painel/configuracoes'
+      preLoaderRoute: typeof PainelConfiguracoesRouteImport
+      parentRoute: typeof PainelRoute
+    }
+    '/equipamentos/$slug': {
+      id: '/equipamentos/$slug'
+      path: '/$slug'
+      fullPath: '/equipamentos/$slug'
+      preLoaderRoute: typeof EquipamentosSlugRouteImport
+      parentRoute: typeof EquipamentosRoute
+    }
+    '/empresas/$slug': {
+      id: '/empresas/$slug'
+      path: '/$slug'
+      fullPath: '/empresas/$slug'
+      preLoaderRoute: typeof EmpresasSlugRouteImport
+      parentRoute: typeof EmpresasRoute
+    }
   }
 }
 
+interface EmpresasRouteChildren {
+  EmpresasSlugRoute: typeof EmpresasSlugRoute
+}
+
+const EmpresasRouteChildren: EmpresasRouteChildren = {
+  EmpresasSlugRoute: EmpresasSlugRoute,
+}
+
+const EmpresasRouteWithChildren = EmpresasRoute._addFileChildren(
+  EmpresasRouteChildren,
+)
+
+interface EquipamentosRouteChildren {
+  EquipamentosSlugRoute: typeof EquipamentosSlugRoute
+}
+
+const EquipamentosRouteChildren: EquipamentosRouteChildren = {
+  EquipamentosSlugRoute: EquipamentosSlugRoute,
+}
+
+const EquipamentosRouteWithChildren = EquipamentosRoute._addFileChildren(
+  EquipamentosRouteChildren,
+)
+
+interface PainelRouteChildren {
+  PainelConfiguracoesRoute: typeof PainelConfiguracoesRoute
+  PainelEquipamentosRoute: typeof PainelEquipamentosRoute
+  PainelFavoritosRoute: typeof PainelFavoritosRoute
+  PainelIndexRoute: typeof PainelIndexRoute
+}
+
+const PainelRouteChildren: PainelRouteChildren = {
+  PainelConfiguracoesRoute: PainelConfiguracoesRoute,
+  PainelEquipamentosRoute: PainelEquipamentosRoute,
+  PainelFavoritosRoute: PainelFavoritosRoute,
+  PainelIndexRoute: PainelIndexRoute,
+}
+
+const PainelRouteWithChildren =
+  PainelRoute._addFileChildren(PainelRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  EmpresasRoute: EmpresasRouteWithChildren,
+  EquipamentosRoute: EquipamentosRouteWithChildren,
+  FornecedoresRoute: FornecedoresRoute,
+  MensagensRoute: MensagensRoute,
+  NotificacoesRoute: NotificacoesRoute,
+  PainelRoute: PainelRouteWithChildren,
+  PublicarRoute: PublicarRoute,
+  SitemapDotxmlRoute: SitemapDotxmlRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
