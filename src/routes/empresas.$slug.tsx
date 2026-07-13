@@ -102,7 +102,7 @@ function CompanyProfile() {
               </TabsContent>
               <TabsContent value="servicos" className="mt-6">
                 <div className="grid gap-3 sm:grid-cols-2">
-                  {company.services.map((s) => (
+                  {company.services.map((s: string) => (
                     <div key={s} className="rounded-xl border border-border bg-card p-4 font-medium">{s}</div>
                   ))}
                 </div>

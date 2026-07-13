@@ -13,6 +13,7 @@ import { Route as EquipamentosRouteImport } from './routes/equipamentos'
 import { Route as EmpresasRouteImport } from './routes/empresas'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as EquipamentosSlugRouteImport } from './routes/equipamentos.$slug'
+import { Route as EmpresasSlugRouteImport } from './routes/empresas.$slug'
 
 const EquipamentosRoute = EquipamentosRouteImport.update({
   id: '/equipamentos',
@@ -34,37 +35,61 @@ const EquipamentosSlugRoute = EquipamentosSlugRouteImport.update({
   path: '/$slug',
   getParentRoute: () => EquipamentosRoute,
 } as any)
+const EmpresasSlugRoute = EmpresasSlugRouteImport.update({
+  id: '/$slug',
+  path: '/$slug',
+  getParentRoute: () => EmpresasRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/empresas': typeof EmpresasRoute
+  '/empresas': typeof EmpresasRouteWithChildren
   '/equipamentos': typeof EquipamentosRouteWithChildren
+  '/empresas/$slug': typeof EmpresasSlugRoute
   '/equipamentos/$slug': typeof EquipamentosSlugRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/empresas': typeof EmpresasRoute
+  '/empresas': typeof EmpresasRouteWithChildren
   '/equipamentos': typeof EquipamentosRouteWithChildren
+  '/empresas/$slug': typeof EmpresasSlugRoute
   '/equipamentos/$slug': typeof EquipamentosSlugRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/empresas': typeof EmpresasRoute
+  '/empresas': typeof EmpresasRouteWithChildren
   '/equipamentos': typeof EquipamentosRouteWithChildren
+  '/empresas/$slug': typeof EmpresasSlugRoute
   '/equipamentos/$slug': typeof EquipamentosSlugRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/empresas' | '/equipamentos' | '/equipamentos/$slug'
+  fullPaths:
+    | '/'
+    | '/empresas'
+    | '/equipamentos'
+    | '/empresas/$slug'
+    | '/equipamentos/$slug'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/empresas' | '/equipamentos' | '/equipamentos/$slug'
-  id: '__root__' | '/' | '/empresas' | '/equipamentos' | '/equipamentos/$slug'
+  to:
+    | '/'
+    | '/empresas'
+    | '/equipamentos'
+    | '/empresas/$slug'
+    | '/equipamentos/$slug'
+  id:
+    | '__root__'
+    | '/'
+    | '/empresas'
+    | '/equipamentos'
+    | '/empresas/$slug'
+    | '/equipamentos/$slug'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  EmpresasRoute: typeof EmpresasRoute
+  EmpresasRoute: typeof EmpresasRouteWithChildren
   EquipamentosRoute: typeof EquipamentosRouteWithChildren
 }
 
@@ -98,8 +123,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EquipamentosSlugRouteImport
       parentRoute: typeof EquipamentosRoute
     }
+    '/empresas/$slug': {
+      id: '/empresas/$slug'
+      path: '/$slug'
+      fullPath: '/empresas/$slug'
+      preLoaderRoute: typeof EmpresasSlugRouteImport
+      parentRoute: typeof EmpresasRoute
+    }
   }
 }
+
+interface EmpresasRouteChildren {
+  EmpresasSlugRoute: typeof EmpresasSlugRoute
+}
+
+const EmpresasRouteChildren: EmpresasRouteChildren = {
+  EmpresasSlugRoute: EmpresasSlugRoute,
+}
+
+const EmpresasRouteWithChildren = EmpresasRoute._addFileChildren(
+  EmpresasRouteChildren,
+)
 
 interface EquipamentosRouteChildren {
   EquipamentosSlugRoute: typeof EquipamentosSlugRoute
@@ -115,7 +159,7 @@ const EquipamentosRouteWithChildren = EquipamentosRoute._addFileChildren(
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  EmpresasRoute: EmpresasRoute,
+  EmpresasRoute: EmpresasRouteWithChildren,
   EquipamentosRoute: EquipamentosRouteWithChildren,
 }
 export const routeTree = rootRouteImport
