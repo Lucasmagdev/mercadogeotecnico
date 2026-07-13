@@ -6,10 +6,14 @@ import {
   useRouter,
   HeadContent,
   Scripts,
+  useRouterState,
 } from "@tanstack/react-router";
 import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
+import { ThemeProvider } from "@/components/theme-provider";
+import { SiteHeader } from "@/components/site-header";
+import { SiteFooter } from "@/components/site-footer";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 
 function NotFoundComponent() {
