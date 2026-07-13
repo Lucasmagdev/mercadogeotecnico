@@ -17,6 +17,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as PainelIndexRouteImport } from './routes/painel.index'
 import { Route as PainelFavoritosRouteImport } from './routes/painel.favoritos'
 import { Route as PainelEquipamentosRouteImport } from './routes/painel.equipamentos'
+import { Route as PainelConfiguracoesRouteImport } from './routes/painel.configuracoes'
 import { Route as EquipamentosSlugRouteImport } from './routes/equipamentos.$slug'
 import { Route as EmpresasSlugRouteImport } from './routes/empresas.$slug'
 
@@ -60,6 +61,11 @@ const PainelEquipamentosRoute = PainelEquipamentosRouteImport.update({
   path: '/equipamentos',
   getParentRoute: () => PainelRoute,
 } as any)
+const PainelConfiguracoesRoute = PainelConfiguracoesRouteImport.update({
+  id: '/configuracoes',
+  path: '/configuracoes',
+  getParentRoute: () => PainelRoute,
+} as any)
 const EquipamentosSlugRoute = EquipamentosSlugRouteImport.update({
   id: '/$slug',
   path: '/$slug',
@@ -79,6 +85,7 @@ export interface FileRoutesByFullPath {
   '/painel': typeof PainelRouteWithChildren
   '/empresas/$slug': typeof EmpresasSlugRoute
   '/equipamentos/$slug': typeof EquipamentosSlugRoute
+  '/painel/configuracoes': typeof PainelConfiguracoesRoute
   '/painel/equipamentos': typeof PainelEquipamentosRoute
   '/painel/favoritos': typeof PainelFavoritosRoute
   '/painel/': typeof PainelIndexRoute
@@ -90,6 +97,7 @@ export interface FileRoutesByTo {
   '/fornecedores': typeof FornecedoresRoute
   '/empresas/$slug': typeof EmpresasSlugRoute
   '/equipamentos/$slug': typeof EquipamentosSlugRoute
+  '/painel/configuracoes': typeof PainelConfiguracoesRoute
   '/painel/equipamentos': typeof PainelEquipamentosRoute
   '/painel/favoritos': typeof PainelFavoritosRoute
   '/painel': typeof PainelIndexRoute
@@ -103,6 +111,7 @@ export interface FileRoutesById {
   '/painel': typeof PainelRouteWithChildren
   '/empresas/$slug': typeof EmpresasSlugRoute
   '/equipamentos/$slug': typeof EquipamentosSlugRoute
+  '/painel/configuracoes': typeof PainelConfiguracoesRoute
   '/painel/equipamentos': typeof PainelEquipamentosRoute
   '/painel/favoritos': typeof PainelFavoritosRoute
   '/painel/': typeof PainelIndexRoute
@@ -117,6 +126,7 @@ export interface FileRouteTypes {
     | '/painel'
     | '/empresas/$slug'
     | '/equipamentos/$slug'
+    | '/painel/configuracoes'
     | '/painel/equipamentos'
     | '/painel/favoritos'
     | '/painel/'
@@ -128,6 +138,7 @@ export interface FileRouteTypes {
     | '/fornecedores'
     | '/empresas/$slug'
     | '/equipamentos/$slug'
+    | '/painel/configuracoes'
     | '/painel/equipamentos'
     | '/painel/favoritos'
     | '/painel'
@@ -140,6 +151,7 @@ export interface FileRouteTypes {
     | '/painel'
     | '/empresas/$slug'
     | '/equipamentos/$slug'
+    | '/painel/configuracoes'
     | '/painel/equipamentos'
     | '/painel/favoritos'
     | '/painel/'
@@ -211,6 +223,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PainelEquipamentosRouteImport
       parentRoute: typeof PainelRoute
     }
+    '/painel/configuracoes': {
+      id: '/painel/configuracoes'
+      path: '/configuracoes'
+      fullPath: '/painel/configuracoes'
+      preLoaderRoute: typeof PainelConfiguracoesRouteImport
+      parentRoute: typeof PainelRoute
+    }
     '/equipamentos/$slug': {
       id: '/equipamentos/$slug'
       path: '/$slug'
@@ -253,12 +272,14 @@ const EquipamentosRouteWithChildren = EquipamentosRoute._addFileChildren(
 )
 
 interface PainelRouteChildren {
+  PainelConfiguracoesRoute: typeof PainelConfiguracoesRoute
   PainelEquipamentosRoute: typeof PainelEquipamentosRoute
   PainelFavoritosRoute: typeof PainelFavoritosRoute
   PainelIndexRoute: typeof PainelIndexRoute
 }
 
 const PainelRouteChildren: PainelRouteChildren = {
+  PainelConfiguracoesRoute: PainelConfiguracoesRoute,
   PainelEquipamentosRoute: PainelEquipamentosRoute,
   PainelFavoritosRoute: PainelFavoritosRoute,
   PainelIndexRoute: PainelIndexRoute,
