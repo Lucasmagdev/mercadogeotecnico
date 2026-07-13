@@ -160,7 +160,7 @@ function EquipmentDetail() {
         <div>
           <h2 className="text-xl font-bold">Especificações técnicas</h2>
           <div className="mt-3 overflow-hidden rounded-2xl border border-border">
-            {item.specs.map((s, i) => (
+            {item.specs.map((s: { label: string; value: string }, i: number) => (
               <div key={i} className={`flex justify-between px-4 py-3 text-sm ${i % 2 ? "bg-card" : "bg-background"}`}>
                 <span className="text-muted-foreground">{s.label}</span>
                 <span className="font-medium">{s.value}</span>
