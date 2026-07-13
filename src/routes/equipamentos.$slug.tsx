@@ -52,7 +52,7 @@ function EquipmentDetail() {
   const company = getCompany(item.companyId);
   const [fav, setFav] = useState(false);
   const [active, setActive] = useState(0);
-  const gallery = [item.image, "excavator", "crane", "generator"] as const;
+  const gallery: (keyof typeof equipmentImages)[] = [item.image, "excavator", "crane", "generator"];
   const related = equipment.filter((e) => e.category === item.category && e.id !== item.id).slice(0, 4);
 
   return (
