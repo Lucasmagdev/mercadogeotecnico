@@ -77,8 +77,12 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Lovable App" },
-      { name: "description", content: "Lovable Generated Project" },
+      { title: "EngiMercado — A plataforma que conecta empresas de engenharia" },
+      {
+        name: "description",
+        content:
+          "Compre, venda, alugue equipamentos e encontre fornecedores de engenharia em um único lugar. A plataforma SaaS premium para o setor.",
+      },
       { name: "author", content: "EngiMercado" },
       { property: "og:title", content: "EngiMercado — Plataforma de equipamentos de engenharia" },
       {
