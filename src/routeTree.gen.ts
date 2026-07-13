@@ -10,12 +10,18 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as EquipamentosRouteImport } from './routes/equipamentos'
+import { Route as EmpresasRouteImport } from './routes/empresas'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as EquipamentosSlugRouteImport } from './routes/equipamentos.$slug'
 
 const EquipamentosRoute = EquipamentosRouteImport.update({
   id: '/equipamentos',
   path: '/equipamentos',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EmpresasRoute = EmpresasRouteImport.update({
+  id: '/empresas',
+  path: '/empresas',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -31,30 +37,34 @@ const EquipamentosSlugRoute = EquipamentosSlugRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/empresas': typeof EmpresasRoute
   '/equipamentos': typeof EquipamentosRouteWithChildren
   '/equipamentos/$slug': typeof EquipamentosSlugRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/empresas': typeof EmpresasRoute
   '/equipamentos': typeof EquipamentosRouteWithChildren
   '/equipamentos/$slug': typeof EquipamentosSlugRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/empresas': typeof EmpresasRoute
   '/equipamentos': typeof EquipamentosRouteWithChildren
   '/equipamentos/$slug': typeof EquipamentosSlugRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/equipamentos' | '/equipamentos/$slug'
+  fullPaths: '/' | '/empresas' | '/equipamentos' | '/equipamentos/$slug'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/equipamentos' | '/equipamentos/$slug'
-  id: '__root__' | '/' | '/equipamentos' | '/equipamentos/$slug'
+  to: '/' | '/empresas' | '/equipamentos' | '/equipamentos/$slug'
+  id: '__root__' | '/' | '/empresas' | '/equipamentos' | '/equipamentos/$slug'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  EmpresasRoute: typeof EmpresasRoute
   EquipamentosRoute: typeof EquipamentosRouteWithChildren
 }
 
@@ -65,6 +75,13 @@ declare module '@tanstack/react-router' {
       path: '/equipamentos'
       fullPath: '/equipamentos'
       preLoaderRoute: typeof EquipamentosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/empresas': {
+      id: '/empresas'
+      path: '/empresas'
+      fullPath: '/empresas'
+      preLoaderRoute: typeof EmpresasRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -98,6 +115,7 @@ const EquipamentosRouteWithChildren = EquipamentosRoute._addFileChildren(
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  EmpresasRoute: EmpresasRoute,
   EquipamentosRoute: EquipamentosRouteWithChildren,
 }
 export const routeTree = rootRouteImport
