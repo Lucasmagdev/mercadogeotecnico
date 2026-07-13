@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as PublicarRouteImport } from './routes/publicar'
 import { Route as PainelRouteImport } from './routes/painel'
+import { Route as MensagensRouteImport } from './routes/mensagens'
 import { Route as FornecedoresRouteImport } from './routes/fornecedores'
 import { Route as EquipamentosRouteImport } from './routes/equipamentos'
 import { Route as EmpresasRouteImport } from './routes/empresas'
@@ -30,6 +31,11 @@ const PublicarRoute = PublicarRouteImport.update({
 const PainelRoute = PainelRouteImport.update({
   id: '/painel',
   path: '/painel',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MensagensRoute = MensagensRouteImport.update({
+  id: '/mensagens',
+  path: '/mensagens',
   getParentRoute: () => rootRouteImport,
 } as any)
 const FornecedoresRoute = FornecedoresRouteImport.update({
@@ -88,6 +94,7 @@ export interface FileRoutesByFullPath {
   '/empresas': typeof EmpresasRouteWithChildren
   '/equipamentos': typeof EquipamentosRouteWithChildren
   '/fornecedores': typeof FornecedoresRoute
+  '/mensagens': typeof MensagensRoute
   '/painel': typeof PainelRouteWithChildren
   '/publicar': typeof PublicarRoute
   '/empresas/$slug': typeof EmpresasSlugRoute
@@ -102,6 +109,7 @@ export interface FileRoutesByTo {
   '/empresas': typeof EmpresasRouteWithChildren
   '/equipamentos': typeof EquipamentosRouteWithChildren
   '/fornecedores': typeof FornecedoresRoute
+  '/mensagens': typeof MensagensRoute
   '/publicar': typeof PublicarRoute
   '/empresas/$slug': typeof EmpresasSlugRoute
   '/equipamentos/$slug': typeof EquipamentosSlugRoute
@@ -116,6 +124,7 @@ export interface FileRoutesById {
   '/empresas': typeof EmpresasRouteWithChildren
   '/equipamentos': typeof EquipamentosRouteWithChildren
   '/fornecedores': typeof FornecedoresRoute
+  '/mensagens': typeof MensagensRoute
   '/painel': typeof PainelRouteWithChildren
   '/publicar': typeof PublicarRoute
   '/empresas/$slug': typeof EmpresasSlugRoute
@@ -132,6 +141,7 @@ export interface FileRouteTypes {
     | '/empresas'
     | '/equipamentos'
     | '/fornecedores'
+    | '/mensagens'
     | '/painel'
     | '/publicar'
     | '/empresas/$slug'
@@ -146,6 +156,7 @@ export interface FileRouteTypes {
     | '/empresas'
     | '/equipamentos'
     | '/fornecedores'
+    | '/mensagens'
     | '/publicar'
     | '/empresas/$slug'
     | '/equipamentos/$slug'
@@ -159,6 +170,7 @@ export interface FileRouteTypes {
     | '/empresas'
     | '/equipamentos'
     | '/fornecedores'
+    | '/mensagens'
     | '/painel'
     | '/publicar'
     | '/empresas/$slug'
@@ -174,6 +186,7 @@ export interface RootRouteChildren {
   EmpresasRoute: typeof EmpresasRouteWithChildren
   EquipamentosRoute: typeof EquipamentosRouteWithChildren
   FornecedoresRoute: typeof FornecedoresRoute
+  MensagensRoute: typeof MensagensRoute
   PainelRoute: typeof PainelRouteWithChildren
   PublicarRoute: typeof PublicarRoute
 }
@@ -192,6 +205,13 @@ declare module '@tanstack/react-router' {
       path: '/painel'
       fullPath: '/painel'
       preLoaderRoute: typeof PainelRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/mensagens': {
+      id: '/mensagens'
+      path: '/mensagens'
+      fullPath: '/mensagens'
+      preLoaderRoute: typeof MensagensRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/fornecedores': {
@@ -313,6 +333,7 @@ const rootRouteChildren: RootRouteChildren = {
   EmpresasRoute: EmpresasRouteWithChildren,
   EquipamentosRoute: EquipamentosRouteWithChildren,
   FornecedoresRoute: FornecedoresRoute,
+  MensagensRoute: MensagensRoute,
   PainelRoute: PainelRouteWithChildren,
   PublicarRoute: PublicarRoute,
 }
