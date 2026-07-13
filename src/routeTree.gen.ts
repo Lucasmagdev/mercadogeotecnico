@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as PublicarRouteImport } from './routes/publicar'
 import { Route as PainelRouteImport } from './routes/painel'
+import { Route as NotificacoesRouteImport } from './routes/notificacoes'
 import { Route as MensagensRouteImport } from './routes/mensagens'
 import { Route as FornecedoresRouteImport } from './routes/fornecedores'
 import { Route as EquipamentosRouteImport } from './routes/equipamentos'
@@ -31,6 +32,11 @@ const PublicarRoute = PublicarRouteImport.update({
 const PainelRoute = PainelRouteImport.update({
   id: '/painel',
   path: '/painel',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const NotificacoesRoute = NotificacoesRouteImport.update({
+  id: '/notificacoes',
+  path: '/notificacoes',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MensagensRoute = MensagensRouteImport.update({
@@ -95,6 +101,7 @@ export interface FileRoutesByFullPath {
   '/equipamentos': typeof EquipamentosRouteWithChildren
   '/fornecedores': typeof FornecedoresRoute
   '/mensagens': typeof MensagensRoute
+  '/notificacoes': typeof NotificacoesRoute
   '/painel': typeof PainelRouteWithChildren
   '/publicar': typeof PublicarRoute
   '/empresas/$slug': typeof EmpresasSlugRoute
@@ -110,6 +117,7 @@ export interface FileRoutesByTo {
   '/equipamentos': typeof EquipamentosRouteWithChildren
   '/fornecedores': typeof FornecedoresRoute
   '/mensagens': typeof MensagensRoute
+  '/notificacoes': typeof NotificacoesRoute
   '/publicar': typeof PublicarRoute
   '/empresas/$slug': typeof EmpresasSlugRoute
   '/equipamentos/$slug': typeof EquipamentosSlugRoute
@@ -125,6 +133,7 @@ export interface FileRoutesById {
   '/equipamentos': typeof EquipamentosRouteWithChildren
   '/fornecedores': typeof FornecedoresRoute
   '/mensagens': typeof MensagensRoute
+  '/notificacoes': typeof NotificacoesRoute
   '/painel': typeof PainelRouteWithChildren
   '/publicar': typeof PublicarRoute
   '/empresas/$slug': typeof EmpresasSlugRoute
@@ -142,6 +151,7 @@ export interface FileRouteTypes {
     | '/equipamentos'
     | '/fornecedores'
     | '/mensagens'
+    | '/notificacoes'
     | '/painel'
     | '/publicar'
     | '/empresas/$slug'
@@ -157,6 +167,7 @@ export interface FileRouteTypes {
     | '/equipamentos'
     | '/fornecedores'
     | '/mensagens'
+    | '/notificacoes'
     | '/publicar'
     | '/empresas/$slug'
     | '/equipamentos/$slug'
@@ -171,6 +182,7 @@ export interface FileRouteTypes {
     | '/equipamentos'
     | '/fornecedores'
     | '/mensagens'
+    | '/notificacoes'
     | '/painel'
     | '/publicar'
     | '/empresas/$slug'
@@ -187,6 +199,7 @@ export interface RootRouteChildren {
   EquipamentosRoute: typeof EquipamentosRouteWithChildren
   FornecedoresRoute: typeof FornecedoresRoute
   MensagensRoute: typeof MensagensRoute
+  NotificacoesRoute: typeof NotificacoesRoute
   PainelRoute: typeof PainelRouteWithChildren
   PublicarRoute: typeof PublicarRoute
 }
@@ -205,6 +218,13 @@ declare module '@tanstack/react-router' {
       path: '/painel'
       fullPath: '/painel'
       preLoaderRoute: typeof PainelRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/notificacoes': {
+      id: '/notificacoes'
+      path: '/notificacoes'
+      fullPath: '/notificacoes'
+      preLoaderRoute: typeof NotificacoesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/mensagens': {
@@ -334,6 +354,7 @@ const rootRouteChildren: RootRouteChildren = {
   EquipamentosRoute: EquipamentosRouteWithChildren,
   FornecedoresRoute: FornecedoresRoute,
   MensagensRoute: MensagensRoute,
+  NotificacoesRoute: NotificacoesRoute,
   PainelRoute: PainelRouteWithChildren,
   PublicarRoute: PublicarRoute,
 }
