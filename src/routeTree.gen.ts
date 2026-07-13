@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as EquipamentosRouteImport } from './routes/equipamentos'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as EquipamentosSlugRouteImport } from './routes/equipamentos.$slug'
 
 const EquipamentosRoute = EquipamentosRouteImport.update({
   id: '/equipamentos',
@@ -22,31 +23,39 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const EquipamentosSlugRoute = EquipamentosSlugRouteImport.update({
+  id: '/$slug',
+  path: '/$slug',
+  getParentRoute: () => EquipamentosRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/equipamentos': typeof EquipamentosRoute
+  '/equipamentos': typeof EquipamentosRouteWithChildren
+  '/equipamentos/$slug': typeof EquipamentosSlugRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/equipamentos': typeof EquipamentosRoute
+  '/equipamentos': typeof EquipamentosRouteWithChildren
+  '/equipamentos/$slug': typeof EquipamentosSlugRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/equipamentos': typeof EquipamentosRoute
+  '/equipamentos': typeof EquipamentosRouteWithChildren
+  '/equipamentos/$slug': typeof EquipamentosSlugRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/equipamentos'
+  fullPaths: '/' | '/equipamentos' | '/equipamentos/$slug'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/equipamentos'
-  id: '__root__' | '/' | '/equipamentos'
+  to: '/' | '/equipamentos' | '/equipamentos/$slug'
+  id: '__root__' | '/' | '/equipamentos' | '/equipamentos/$slug'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  EquipamentosRoute: typeof EquipamentosRoute
+  EquipamentosRoute: typeof EquipamentosRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
@@ -65,12 +74,31 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/equipamentos/$slug': {
+      id: '/equipamentos/$slug'
+      path: '/$slug'
+      fullPath: '/equipamentos/$slug'
+      preLoaderRoute: typeof EquipamentosSlugRouteImport
+      parentRoute: typeof EquipamentosRoute
+    }
   }
 }
 
+interface EquipamentosRouteChildren {
+  EquipamentosSlugRoute: typeof EquipamentosSlugRoute
+}
+
+const EquipamentosRouteChildren: EquipamentosRouteChildren = {
+  EquipamentosSlugRoute: EquipamentosSlugRoute,
+}
+
+const EquipamentosRouteWithChildren = EquipamentosRoute._addFileChildren(
+  EquipamentosRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  EquipamentosRoute: EquipamentosRoute,
+  EquipamentosRoute: EquipamentosRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
