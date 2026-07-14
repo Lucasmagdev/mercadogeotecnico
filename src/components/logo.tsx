@@ -13,7 +13,7 @@ export function Logo({ className = "" }: { className?: string }) {
         </svg>
       </span>
       <span className="text-lg font-bold tracking-tight">
-        Engi<span className="text-primary">Mercado</span>
+        Mercado <span className="text-primary">Geotécnico</span>
       </span>
     </span>
   );

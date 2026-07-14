@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import type {} from "@tanstack/react-start";
-import { companies, equipment } from "@/lib/mock-data";
+import { fetchApprovedCompanies, fetchEquipmentList } from "@/lib/queries";
 
 const BASE_URL = "";
 
@@ -14,6 +14,7 @@ export const Route = createFileRoute("/sitemap.xml")({
   server: {
     handlers: {
       GET: async () => {
+        const [equipment, companies] = await Promise.all([fetchEquipmentList(), fetchApprovedCompanies()]);
         const entries: SitemapEntry[] = [
           { path: "/", changefreq: "weekly", priority: "1.0" },
           { path: "/equipamentos", changefreq: "daily", priority: "0.9" },

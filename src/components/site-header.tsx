@@ -1,4 +1,6 @@
-import { Link, useRouterState } from "@tanstack/react-router";
+import { useState } from "react";
+import { Link, useRouterState, useNavigate } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
 import {
   Search,
   MessageSquare,
@@ -11,7 +13,6 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
 import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
@@ -23,6 +24,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useTheme } from "@/components/theme-provider";
+import { useAuth } from "@/components/auth-provider";
+import { fetchNotifications } from "@/lib/queries";
 import { Logo } from "@/components/logo";
 import { categories } from "@/lib/mock-data";
 
@@ -35,7 +38,25 @@ const nav = [
 
 export function SiteHeader() {
   const { theme, toggle } = useTheme();
+  const { session, profile, signOut } = useAuth();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const navigate = useNavigate();
+  const initials = (profile?.full_name ?? session?.user.email ?? "?").slice(0, 2).toUpperCase();
+  const [headerQuery, setHeaderQuery] = useState("");
+
+  const { data: notifications = [] } = useQuery({
+    queryKey: ["notifications", session?.user.id],
+    queryFn: () => fetchNotifications(session!.user.id),
+    enabled: !!session,
+    refetchInterval: 8000,
+  });
+  const unreadCount = notifications.filter((n) => !n.read).length;
+  const unreadMessages = notifications.filter((n) => !n.read && n.type === "mensagem").length;
+
+  function submitSearch(e: React.FormEvent) {
+    e.preventDefault();
+    navigate({ to: "/equipamentos", search: headerQuery ? { q: headerQuery } : {} });
+  }
 
   return (
     <header className="sticky top-0 z-50 border-b border-border bg-background/85 backdrop-blur-md">
@@ -44,13 +65,15 @@ export function SiteHeader() {
           <Logo />
         </Link>
 
-        <div className="relative hidden flex-1 max-w-md lg:block">
+        <form onSubmit={submitSearch} className="relative hidden flex-1 max-w-md lg:block">
           <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
             placeholder="Qual equipamento você procura?"
             className="h-10 rounded-full bg-muted pl-10"
+            value={headerQuery}
+            onChange={(e) => setHeaderQuery(e.target.value)}
           />
-        </div>
+        </form>
 
         <nav className="hidden items-center gap-1 xl:flex">
           <DropdownMenu>
@@ -91,15 +114,19 @@ export function SiteHeader() {
           <Button variant="ghost" size="icon" asChild className="relative hidden sm:inline-flex">
             <Link to="/mensagens" aria-label="Mensagens">
               <MessageSquare className="h-5 w-5" />
-              <span className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-accent" />
+              {unreadMessages > 0 && (
+                <span className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-accent" />
+              )}
             </Link>
           </Button>
           <Button variant="ghost" size="icon" asChild className="relative hidden sm:inline-flex">
             <Link to="/notificacoes" aria-label="Notificações">
               <Bell className="h-5 w-5" />
-              <span className="absolute right-1 top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-accent px-1 text-[10px] font-bold text-accent-foreground">
-                3
-              </span>
+              {unreadCount > 0 && (
+                <span className="absolute right-1 top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-accent px-1 text-[10px] font-bold text-accent-foreground">
+                  {unreadCount}
+                </span>
+              )}
             </Link>
           </Button>
 
@@ -109,27 +136,43 @@ export function SiteHeader() {
             </Link>
           </Button>
 
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <button className="hidden sm:block">
-                <Avatar className="h-9 w-9 border border-border">
-                  <AvatarFallback className="bg-secondary text-secondary-foreground text-xs font-semibold">
-                    TM
-                  </AvatarFallback>
-                </Avatar>
-              </button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-52">
-              <DropdownMenuLabel>TecnoMáquinas Eng.</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem asChild><Link to="/painel">Painel</Link></DropdownMenuItem>
-              <DropdownMenuItem asChild><Link to="/painel/equipamentos">Meus Equipamentos</Link></DropdownMenuItem>
-              <DropdownMenuItem asChild><Link to="/painel/favoritos">Favoritos</Link></DropdownMenuItem>
-              <DropdownMenuItem asChild><Link to="/painel/configuracoes">Configurações</Link></DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem>Sair</DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          {session ? (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button className="hidden sm:block">
+                  <Avatar className="h-9 w-9 border border-border">
+                    <AvatarFallback className="bg-secondary text-secondary-foreground text-xs font-semibold">
+                      {initials}
+                    </AvatarFallback>
+                  </Avatar>
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-52">
+                <DropdownMenuLabel className="truncate">
+                  {profile?.full_name ?? session.user.email}
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                {profile?.role === "admin" && (
+                  <DropdownMenuItem asChild><Link to="/admin">Painel admin</Link></DropdownMenuItem>
+                )}
+                {profile?.role === "company" && (
+                  <>
+                    <DropdownMenuItem asChild><Link to="/painel">Painel</Link></DropdownMenuItem>
+                    <DropdownMenuItem asChild><Link to="/painel/equipamentos">Meus Equipamentos</Link></DropdownMenuItem>
+                  </>
+                )}
+                <DropdownMenuItem asChild><Link to="/favoritos">Favoritos</Link></DropdownMenuItem>
+                <DropdownMenuItem asChild><Link to="/configuracoes">Configurações</Link></DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => signOut()}>Sair</DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : (
+            <div className="hidden items-center gap-1 sm:flex">
+              <Button variant="ghost" asChild><Link to="/entrar">Entrar</Link></Button>
+              <Button variant="outline" asChild><Link to="/cadastro">Cadastrar</Link></Button>
+            </div>
+          )}
 
           <Sheet>
             <SheetTrigger asChild>
@@ -147,9 +190,26 @@ export function SiteHeader() {
                     <Link to={item.to}>{item.label}</Link>
                   </Button>
                 ))}
-                <Button variant="ghost" asChild className="justify-start"><Link to="/painel">Painel</Link></Button>
-                <Button variant="ghost" asChild className="justify-start"><Link to="/mensagens">Mensagens</Link></Button>
-                <Button variant="ghost" asChild className="justify-start"><Link to="/notificacoes">Notificações</Link></Button>
+                {session ? (
+                  <>
+                    {profile?.role === "admin" && (
+                      <Button variant="ghost" asChild className="justify-start"><Link to="/admin">Painel admin</Link></Button>
+                    )}
+                    {profile?.role === "company" && (
+                      <Button variant="ghost" asChild className="justify-start"><Link to="/painel">Painel</Link></Button>
+                    )}
+                    <Button variant="ghost" asChild className="justify-start"><Link to="/favoritos">Favoritos</Link></Button>
+                    <Button variant="ghost" asChild className="justify-start"><Link to="/mensagens">Mensagens</Link></Button>
+                    <Button variant="ghost" asChild className="justify-start"><Link to="/notificacoes">Notificações</Link></Button>
+                    <Button variant="ghost" asChild className="justify-start"><Link to="/configuracoes">Configurações</Link></Button>
+                    <Button variant="ghost" className="justify-start" onClick={() => signOut()}>Sair</Button>
+                  </>
+                ) : (
+                  <>
+                    <Button variant="ghost" asChild className="justify-start"><Link to="/entrar">Entrar</Link></Button>
+                    <Button variant="ghost" asChild className="justify-start"><Link to="/cadastro">Cadastrar</Link></Button>
+                  </>
+                )}
                 <Button asChild className="mt-4 gap-1.5"><Link to="/publicar"><Plus className="h-4 w-4" /> Anunciar</Link></Button>
               </div>
             </SheetContent>

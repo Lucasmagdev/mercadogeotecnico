@@ -8,13 +8,13 @@ import {
   Scripts,
   useRouterState,
 } from "@tanstack/react-router";
-import { useEffect, type ReactNode } from "react";
+import type { ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { ThemeProvider } from "@/components/theme-provider";
+import { AuthProvider } from "@/components/auth-provider";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
-import { reportLovableError } from "../lib/lovable-error-reporting";
 
 function NotFoundComponent() {
   return (
@@ -41,9 +41,6 @@ function NotFoundComponent() {
 function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   console.error(error);
   const router = useRouter();
-  useEffect(() => {
-    reportLovableError(error, { boundary: "tanstack_root_error_component" });
-  }, [error]);
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
@@ -81,14 +78,14 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "EngiMercado — A plataforma que conecta empresas de engenharia" },
+      { title: "Mercado Geotécnico — A plataforma que conecta empresas de engenharia" },
       {
         name: "description",
         content:
           "Compre, venda, alugue equipamentos e encontre fornecedores de engenharia em um único lugar. A plataforma SaaS premium para o setor.",
       },
-      { name: "author", content: "EngiMercado" },
-      { property: "og:title", content: "EngiMercado — Plataforma de equipamentos de engenharia" },
+      { name: "author", content: "Mercado Geotécnico" },
+      { property: "og:title", content: "Mercado Geotécnico — Plataforma de equipamentos de engenharia" },
       {
         property: "og:description",
         content:
@@ -131,19 +128,22 @@ function RootShell({ children }: { children: ReactNode }) {
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
-  const isApp = pathname.startsWith("/painel") || pathname.startsWith("/mensagens");
+  const isApp =
+    pathname.startsWith("/painel") || pathname.startsWith("/mensagens") || pathname.startsWith("/admin");
 
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider>
-        <div className="flex min-h-screen flex-col">
-          <SiteHeader />
-          <main className="flex-1">
-            {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-            <Outlet />
-          </main>
-          {!isApp && <SiteFooter />}
-        </div>
+        <AuthProvider>
+          <div className="flex min-h-screen flex-col">
+            <SiteHeader />
+            <main className="flex-1">
+              {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
+              <Outlet />
+            </main>
+            {!isApp && <SiteFooter />}
+          </div>
+        </AuthProvider>
       </ThemeProvider>
     </QueryClientProvider>
   );

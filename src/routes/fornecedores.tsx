@@ -1,14 +1,16 @@
+import { useMemo, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
 import { BadgeCheck, MapPin, Star, Search } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { companies } from "@/lib/mock-data";
+import { fetchApprovedCompanies } from "@/lib/queries";
 
 export const Route = createFileRoute("/fornecedores")({
   head: () => ({
     meta: [
-      { title: "Fornecedores — EngiMercado" },
+      { title: "Fornecedores — Mercado Geotécnico" },
       { name: "description", content: "Encontre fornecedores confiáveis de equipamentos, peças e serviços de engenharia." },
     ],
   }),
@@ -16,6 +18,13 @@ export const Route = createFileRoute("/fornecedores")({
 });
 
 function Suppliers() {
+  const [q, setQ] = useState("");
+  const { data: companies = [] } = useQuery({ queryKey: ["companies"], queryFn: fetchApprovedCompanies });
+  const filtered = useMemo(
+    () => companies.filter((c) => !q || c.name.toLowerCase().includes(q.toLowerCase())),
+    [companies, q],
+  );
+
   return (
     <div className="container-page py-8">
       <div className="mb-6">
@@ -24,11 +33,13 @@ function Suppliers() {
       </div>
       <div className="relative mb-8 max-w-md">
         <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-        <Input placeholder="Buscar fornecedor..." className="pl-10" />
+        <Input placeholder="Buscar fornecedor..." className="pl-10" value={q} onChange={(e) => setQ(e.target.value)} />
       </div>
 
+      {filtered.length === 0 && <p className="text-sm text-muted-foreground">Nenhum fornecedor encontrado.</p>}
+
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {companies.map((c) => (
+        {filtered.map((c) => (
           <Link
             key={c.id}
             to="/empresas/$slug"

@@ -10,24 +10,56 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as ServicosRouteImport } from './routes/servicos'
+import { Route as RedefinirSenhaRouteImport } from './routes/redefinir-senha'
+import { Route as RecuperarSenhaRouteImport } from './routes/recuperar-senha'
 import { Route as PublicarRouteImport } from './routes/publicar'
 import { Route as PainelRouteImport } from './routes/painel'
 import { Route as NotificacoesRouteImport } from './routes/notificacoes'
 import { Route as MensagensRouteImport } from './routes/mensagens'
 import { Route as FornecedoresRouteImport } from './routes/fornecedores'
+import { Route as FavoritosRouteImport } from './routes/favoritos'
 import { Route as EquipamentosRouteImport } from './routes/equipamentos'
+import { Route as EntrarRouteImport } from './routes/entrar'
 import { Route as EmpresasRouteImport } from './routes/empresas'
+import { Route as ConfiguracoesRouteImport } from './routes/configuracoes'
+import { Route as CadastroRouteImport } from './routes/cadastro'
+import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as PainelIndexRouteImport } from './routes/painel.index'
-import { Route as PainelFavoritosRouteImport } from './routes/painel.favoritos'
+import { Route as EquipamentosIndexRouteImport } from './routes/equipamentos.index'
+import { Route as EmpresasIndexRouteImport } from './routes/empresas.index'
+import { Route as CadastroIndexRouteImport } from './routes/cadastro.index'
+import { Route as AdminIndexRouteImport } from './routes/admin.index'
+import { Route as PainelPedidosRouteImport } from './routes/painel.pedidos'
 import { Route as PainelEquipamentosRouteImport } from './routes/painel.equipamentos'
-import { Route as PainelConfiguracoesRouteImport } from './routes/painel.configuracoes'
+import { Route as PainelAnalyticsRouteImport } from './routes/painel.analytics'
 import { Route as EquipamentosSlugRouteImport } from './routes/equipamentos.$slug'
 import { Route as EmpresasSlugRouteImport } from './routes/empresas.$slug'
+import { Route as CadastroUsuarioRouteImport } from './routes/cadastro.usuario'
+import { Route as CadastroEmpresaRouteImport } from './routes/cadastro.empresa'
+import { Route as AdminEmpresasRouteImport } from './routes/admin.empresas'
+import { Route as PainelEquipamentosIndexRouteImport } from './routes/painel.equipamentos.index'
+import { Route as PainelEquipamentosIdRouteImport } from './routes/painel.equipamentos.$id'
 
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
   path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ServicosRoute = ServicosRouteImport.update({
+  id: '/servicos',
+  path: '/servicos',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RedefinirSenhaRoute = RedefinirSenhaRouteImport.update({
+  id: '/redefinir-senha',
+  path: '/redefinir-senha',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RecuperarSenhaRoute = RecuperarSenhaRouteImport.update({
+  id: '/recuperar-senha',
+  path: '/recuperar-senha',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PublicarRoute = PublicarRouteImport.update({
@@ -55,14 +87,39 @@ const FornecedoresRoute = FornecedoresRouteImport.update({
   path: '/fornecedores',
   getParentRoute: () => rootRouteImport,
 } as any)
+const FavoritosRoute = FavoritosRouteImport.update({
+  id: '/favoritos',
+  path: '/favoritos',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const EquipamentosRoute = EquipamentosRouteImport.update({
   id: '/equipamentos',
   path: '/equipamentos',
   getParentRoute: () => rootRouteImport,
 } as any)
+const EntrarRoute = EntrarRouteImport.update({
+  id: '/entrar',
+  path: '/entrar',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const EmpresasRoute = EmpresasRouteImport.update({
   id: '/empresas',
   path: '/empresas',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ConfiguracoesRoute = ConfiguracoesRouteImport.update({
+  id: '/configuracoes',
+  path: '/configuracoes',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CadastroRoute = CadastroRouteImport.update({
+  id: '/cadastro',
+  path: '/cadastro',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -75,9 +132,29 @@ const PainelIndexRoute = PainelIndexRouteImport.update({
   path: '/',
   getParentRoute: () => PainelRoute,
 } as any)
-const PainelFavoritosRoute = PainelFavoritosRouteImport.update({
-  id: '/favoritos',
-  path: '/favoritos',
+const EquipamentosIndexRoute = EquipamentosIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => EquipamentosRoute,
+} as any)
+const EmpresasIndexRoute = EmpresasIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => EmpresasRoute,
+} as any)
+const CadastroIndexRoute = CadastroIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => CadastroRoute,
+} as any)
+const AdminIndexRoute = AdminIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AdminRoute,
+} as any)
+const PainelPedidosRoute = PainelPedidosRouteImport.update({
+  id: '/pedidos',
+  path: '/pedidos',
   getParentRoute: () => PainelRoute,
 } as any)
 const PainelEquipamentosRoute = PainelEquipamentosRouteImport.update({
@@ -85,9 +162,9 @@ const PainelEquipamentosRoute = PainelEquipamentosRouteImport.update({
   path: '/equipamentos',
   getParentRoute: () => PainelRoute,
 } as any)
-const PainelConfiguracoesRoute = PainelConfiguracoesRouteImport.update({
-  id: '/configuracoes',
-  path: '/configuracoes',
+const PainelAnalyticsRoute = PainelAnalyticsRouteImport.update({
+  id: '/analytics',
+  path: '/analytics',
   getParentRoute: () => PainelRoute,
 } as any)
 const EquipamentosSlugRoute = EquipamentosSlugRouteImport.update({
@@ -100,120 +177,245 @@ const EmpresasSlugRoute = EmpresasSlugRouteImport.update({
   path: '/$slug',
   getParentRoute: () => EmpresasRoute,
 } as any)
+const CadastroUsuarioRoute = CadastroUsuarioRouteImport.update({
+  id: '/usuario',
+  path: '/usuario',
+  getParentRoute: () => CadastroRoute,
+} as any)
+const CadastroEmpresaRoute = CadastroEmpresaRouteImport.update({
+  id: '/empresa',
+  path: '/empresa',
+  getParentRoute: () => CadastroRoute,
+} as any)
+const AdminEmpresasRoute = AdminEmpresasRouteImport.update({
+  id: '/empresas',
+  path: '/empresas',
+  getParentRoute: () => AdminRoute,
+} as any)
+const PainelEquipamentosIndexRoute = PainelEquipamentosIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => PainelEquipamentosRoute,
+} as any)
+const PainelEquipamentosIdRoute = PainelEquipamentosIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => PainelEquipamentosRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRouteWithChildren
+  '/cadastro': typeof CadastroRouteWithChildren
+  '/configuracoes': typeof ConfiguracoesRoute
   '/empresas': typeof EmpresasRouteWithChildren
+  '/entrar': typeof EntrarRoute
   '/equipamentos': typeof EquipamentosRouteWithChildren
+  '/favoritos': typeof FavoritosRoute
   '/fornecedores': typeof FornecedoresRoute
   '/mensagens': typeof MensagensRoute
   '/notificacoes': typeof NotificacoesRoute
   '/painel': typeof PainelRouteWithChildren
   '/publicar': typeof PublicarRoute
+  '/recuperar-senha': typeof RecuperarSenhaRoute
+  '/redefinir-senha': typeof RedefinirSenhaRoute
+  '/servicos': typeof ServicosRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/admin/empresas': typeof AdminEmpresasRoute
+  '/cadastro/empresa': typeof CadastroEmpresaRoute
+  '/cadastro/usuario': typeof CadastroUsuarioRoute
   '/empresas/$slug': typeof EmpresasSlugRoute
   '/equipamentos/$slug': typeof EquipamentosSlugRoute
-  '/painel/configuracoes': typeof PainelConfiguracoesRoute
-  '/painel/equipamentos': typeof PainelEquipamentosRoute
-  '/painel/favoritos': typeof PainelFavoritosRoute
+  '/painel/analytics': typeof PainelAnalyticsRoute
+  '/painel/equipamentos': typeof PainelEquipamentosRouteWithChildren
+  '/painel/pedidos': typeof PainelPedidosRoute
+  '/admin/': typeof AdminIndexRoute
+  '/cadastro/': typeof CadastroIndexRoute
+  '/empresas/': typeof EmpresasIndexRoute
+  '/equipamentos/': typeof EquipamentosIndexRoute
   '/painel/': typeof PainelIndexRoute
+  '/painel/equipamentos/$id': typeof PainelEquipamentosIdRoute
+  '/painel/equipamentos/': typeof PainelEquipamentosIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/empresas': typeof EmpresasRouteWithChildren
-  '/equipamentos': typeof EquipamentosRouteWithChildren
+  '/configuracoes': typeof ConfiguracoesRoute
+  '/entrar': typeof EntrarRoute
+  '/favoritos': typeof FavoritosRoute
   '/fornecedores': typeof FornecedoresRoute
   '/mensagens': typeof MensagensRoute
   '/notificacoes': typeof NotificacoesRoute
   '/publicar': typeof PublicarRoute
+  '/recuperar-senha': typeof RecuperarSenhaRoute
+  '/redefinir-senha': typeof RedefinirSenhaRoute
+  '/servicos': typeof ServicosRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/admin/empresas': typeof AdminEmpresasRoute
+  '/cadastro/empresa': typeof CadastroEmpresaRoute
+  '/cadastro/usuario': typeof CadastroUsuarioRoute
   '/empresas/$slug': typeof EmpresasSlugRoute
   '/equipamentos/$slug': typeof EquipamentosSlugRoute
-  '/painel/configuracoes': typeof PainelConfiguracoesRoute
-  '/painel/equipamentos': typeof PainelEquipamentosRoute
-  '/painel/favoritos': typeof PainelFavoritosRoute
+  '/painel/analytics': typeof PainelAnalyticsRoute
+  '/painel/pedidos': typeof PainelPedidosRoute
+  '/admin': typeof AdminIndexRoute
+  '/cadastro': typeof CadastroIndexRoute
+  '/empresas': typeof EmpresasIndexRoute
+  '/equipamentos': typeof EquipamentosIndexRoute
   '/painel': typeof PainelIndexRoute
+  '/painel/equipamentos/$id': typeof PainelEquipamentosIdRoute
+  '/painel/equipamentos': typeof PainelEquipamentosIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/admin': typeof AdminRouteWithChildren
+  '/cadastro': typeof CadastroRouteWithChildren
+  '/configuracoes': typeof ConfiguracoesRoute
   '/empresas': typeof EmpresasRouteWithChildren
+  '/entrar': typeof EntrarRoute
   '/equipamentos': typeof EquipamentosRouteWithChildren
+  '/favoritos': typeof FavoritosRoute
   '/fornecedores': typeof FornecedoresRoute
   '/mensagens': typeof MensagensRoute
   '/notificacoes': typeof NotificacoesRoute
   '/painel': typeof PainelRouteWithChildren
   '/publicar': typeof PublicarRoute
+  '/recuperar-senha': typeof RecuperarSenhaRoute
+  '/redefinir-senha': typeof RedefinirSenhaRoute
+  '/servicos': typeof ServicosRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/admin/empresas': typeof AdminEmpresasRoute
+  '/cadastro/empresa': typeof CadastroEmpresaRoute
+  '/cadastro/usuario': typeof CadastroUsuarioRoute
   '/empresas/$slug': typeof EmpresasSlugRoute
   '/equipamentos/$slug': typeof EquipamentosSlugRoute
-  '/painel/configuracoes': typeof PainelConfiguracoesRoute
-  '/painel/equipamentos': typeof PainelEquipamentosRoute
-  '/painel/favoritos': typeof PainelFavoritosRoute
+  '/painel/analytics': typeof PainelAnalyticsRoute
+  '/painel/equipamentos': typeof PainelEquipamentosRouteWithChildren
+  '/painel/pedidos': typeof PainelPedidosRoute
+  '/admin/': typeof AdminIndexRoute
+  '/cadastro/': typeof CadastroIndexRoute
+  '/empresas/': typeof EmpresasIndexRoute
+  '/equipamentos/': typeof EquipamentosIndexRoute
   '/painel/': typeof PainelIndexRoute
+  '/painel/equipamentos/$id': typeof PainelEquipamentosIdRoute
+  '/painel/equipamentos/': typeof PainelEquipamentosIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/admin'
+    | '/cadastro'
+    | '/configuracoes'
     | '/empresas'
+    | '/entrar'
     | '/equipamentos'
+    | '/favoritos'
     | '/fornecedores'
     | '/mensagens'
     | '/notificacoes'
     | '/painel'
     | '/publicar'
+    | '/recuperar-senha'
+    | '/redefinir-senha'
+    | '/servicos'
     | '/sitemap.xml'
+    | '/admin/empresas'
+    | '/cadastro/empresa'
+    | '/cadastro/usuario'
     | '/empresas/$slug'
     | '/equipamentos/$slug'
-    | '/painel/configuracoes'
+    | '/painel/analytics'
     | '/painel/equipamentos'
-    | '/painel/favoritos'
+    | '/painel/pedidos'
+    | '/admin/'
+    | '/cadastro/'
+    | '/empresas/'
+    | '/equipamentos/'
     | '/painel/'
+    | '/painel/equipamentos/$id'
+    | '/painel/equipamentos/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/empresas'
-    | '/equipamentos'
+    | '/configuracoes'
+    | '/entrar'
+    | '/favoritos'
     | '/fornecedores'
     | '/mensagens'
     | '/notificacoes'
     | '/publicar'
+    | '/recuperar-senha'
+    | '/redefinir-senha'
+    | '/servicos'
     | '/sitemap.xml'
+    | '/admin/empresas'
+    | '/cadastro/empresa'
+    | '/cadastro/usuario'
     | '/empresas/$slug'
     | '/equipamentos/$slug'
-    | '/painel/configuracoes'
-    | '/painel/equipamentos'
-    | '/painel/favoritos'
+    | '/painel/analytics'
+    | '/painel/pedidos'
+    | '/admin'
+    | '/cadastro'
+    | '/empresas'
+    | '/equipamentos'
     | '/painel'
+    | '/painel/equipamentos/$id'
+    | '/painel/equipamentos'
   id:
     | '__root__'
     | '/'
+    | '/admin'
+    | '/cadastro'
+    | '/configuracoes'
     | '/empresas'
+    | '/entrar'
     | '/equipamentos'
+    | '/favoritos'
     | '/fornecedores'
     | '/mensagens'
     | '/notificacoes'
     | '/painel'
     | '/publicar'
+    | '/recuperar-senha'
+    | '/redefinir-senha'
+    | '/servicos'
     | '/sitemap.xml'
+    | '/admin/empresas'
+    | '/cadastro/empresa'
+    | '/cadastro/usuario'
     | '/empresas/$slug'
     | '/equipamentos/$slug'
-    | '/painel/configuracoes'
+    | '/painel/analytics'
     | '/painel/equipamentos'
-    | '/painel/favoritos'
+    | '/painel/pedidos'
+    | '/admin/'
+    | '/cadastro/'
+    | '/empresas/'
+    | '/equipamentos/'
     | '/painel/'
+    | '/painel/equipamentos/$id'
+    | '/painel/equipamentos/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AdminRoute: typeof AdminRouteWithChildren
+  CadastroRoute: typeof CadastroRouteWithChildren
+  ConfiguracoesRoute: typeof ConfiguracoesRoute
   EmpresasRoute: typeof EmpresasRouteWithChildren
+  EntrarRoute: typeof EntrarRoute
   EquipamentosRoute: typeof EquipamentosRouteWithChildren
+  FavoritosRoute: typeof FavoritosRoute
   FornecedoresRoute: typeof FornecedoresRoute
   MensagensRoute: typeof MensagensRoute
   NotificacoesRoute: typeof NotificacoesRoute
   PainelRoute: typeof PainelRouteWithChildren
   PublicarRoute: typeof PublicarRoute
+  RecuperarSenhaRoute: typeof RecuperarSenhaRoute
+  RedefinirSenhaRoute: typeof RedefinirSenhaRoute
+  ServicosRoute: typeof ServicosRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
 }
 
@@ -224,6 +426,27 @@ declare module '@tanstack/react-router' {
       path: '/sitemap.xml'
       fullPath: '/sitemap.xml'
       preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/servicos': {
+      id: '/servicos'
+      path: '/servicos'
+      fullPath: '/servicos'
+      preLoaderRoute: typeof ServicosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/redefinir-senha': {
+      id: '/redefinir-senha'
+      path: '/redefinir-senha'
+      fullPath: '/redefinir-senha'
+      preLoaderRoute: typeof RedefinirSenhaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/recuperar-senha': {
+      id: '/recuperar-senha'
+      path: '/recuperar-senha'
+      fullPath: '/recuperar-senha'
+      preLoaderRoute: typeof RecuperarSenhaRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/publicar': {
@@ -261,6 +484,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof FornecedoresRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/favoritos': {
+      id: '/favoritos'
+      path: '/favoritos'
+      fullPath: '/favoritos'
+      preLoaderRoute: typeof FavoritosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/equipamentos': {
       id: '/equipamentos'
       path: '/equipamentos'
@@ -268,11 +498,39 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EquipamentosRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/entrar': {
+      id: '/entrar'
+      path: '/entrar'
+      fullPath: '/entrar'
+      preLoaderRoute: typeof EntrarRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/empresas': {
       id: '/empresas'
       path: '/empresas'
       fullPath: '/empresas'
       preLoaderRoute: typeof EmpresasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/configuracoes': {
+      id: '/configuracoes'
+      path: '/configuracoes'
+      fullPath: '/configuracoes'
+      preLoaderRoute: typeof ConfiguracoesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/cadastro': {
+      id: '/cadastro'
+      path: '/cadastro'
+      fullPath: '/cadastro'
+      preLoaderRoute: typeof CadastroRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -289,11 +547,39 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PainelIndexRouteImport
       parentRoute: typeof PainelRoute
     }
-    '/painel/favoritos': {
-      id: '/painel/favoritos'
-      path: '/favoritos'
-      fullPath: '/painel/favoritos'
-      preLoaderRoute: typeof PainelFavoritosRouteImport
+    '/equipamentos/': {
+      id: '/equipamentos/'
+      path: '/'
+      fullPath: '/equipamentos/'
+      preLoaderRoute: typeof EquipamentosIndexRouteImport
+      parentRoute: typeof EquipamentosRoute
+    }
+    '/empresas/': {
+      id: '/empresas/'
+      path: '/'
+      fullPath: '/empresas/'
+      preLoaderRoute: typeof EmpresasIndexRouteImport
+      parentRoute: typeof EmpresasRoute
+    }
+    '/cadastro/': {
+      id: '/cadastro/'
+      path: '/'
+      fullPath: '/cadastro/'
+      preLoaderRoute: typeof CadastroIndexRouteImport
+      parentRoute: typeof CadastroRoute
+    }
+    '/admin/': {
+      id: '/admin/'
+      path: '/'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AdminIndexRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/painel/pedidos': {
+      id: '/painel/pedidos'
+      path: '/pedidos'
+      fullPath: '/painel/pedidos'
+      preLoaderRoute: typeof PainelPedidosRouteImport
       parentRoute: typeof PainelRoute
     }
     '/painel/equipamentos': {
@@ -303,11 +589,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PainelEquipamentosRouteImport
       parentRoute: typeof PainelRoute
     }
-    '/painel/configuracoes': {
-      id: '/painel/configuracoes'
-      path: '/configuracoes'
-      fullPath: '/painel/configuracoes'
-      preLoaderRoute: typeof PainelConfiguracoesRouteImport
+    '/painel/analytics': {
+      id: '/painel/analytics'
+      path: '/analytics'
+      fullPath: '/painel/analytics'
+      preLoaderRoute: typeof PainelAnalyticsRouteImport
       parentRoute: typeof PainelRoute
     }
     '/equipamentos/$slug': {
@@ -324,15 +610,80 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EmpresasSlugRouteImport
       parentRoute: typeof EmpresasRoute
     }
+    '/cadastro/usuario': {
+      id: '/cadastro/usuario'
+      path: '/usuario'
+      fullPath: '/cadastro/usuario'
+      preLoaderRoute: typeof CadastroUsuarioRouteImport
+      parentRoute: typeof CadastroRoute
+    }
+    '/cadastro/empresa': {
+      id: '/cadastro/empresa'
+      path: '/empresa'
+      fullPath: '/cadastro/empresa'
+      preLoaderRoute: typeof CadastroEmpresaRouteImport
+      parentRoute: typeof CadastroRoute
+    }
+    '/admin/empresas': {
+      id: '/admin/empresas'
+      path: '/empresas'
+      fullPath: '/admin/empresas'
+      preLoaderRoute: typeof AdminEmpresasRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/painel/equipamentos/': {
+      id: '/painel/equipamentos/'
+      path: '/'
+      fullPath: '/painel/equipamentos/'
+      preLoaderRoute: typeof PainelEquipamentosIndexRouteImport
+      parentRoute: typeof PainelEquipamentosRoute
+    }
+    '/painel/equipamentos/$id': {
+      id: '/painel/equipamentos/$id'
+      path: '/$id'
+      fullPath: '/painel/equipamentos/$id'
+      preLoaderRoute: typeof PainelEquipamentosIdRouteImport
+      parentRoute: typeof PainelEquipamentosRoute
+    }
   }
 }
 
+interface AdminRouteChildren {
+  AdminEmpresasRoute: typeof AdminEmpresasRoute
+  AdminIndexRoute: typeof AdminIndexRoute
+}
+
+const AdminRouteChildren: AdminRouteChildren = {
+  AdminEmpresasRoute: AdminEmpresasRoute,
+  AdminIndexRoute: AdminIndexRoute,
+}
+
+const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
+
+interface CadastroRouteChildren {
+  CadastroEmpresaRoute: typeof CadastroEmpresaRoute
+  CadastroUsuarioRoute: typeof CadastroUsuarioRoute
+  CadastroIndexRoute: typeof CadastroIndexRoute
+}
+
+const CadastroRouteChildren: CadastroRouteChildren = {
+  CadastroEmpresaRoute: CadastroEmpresaRoute,
+  CadastroUsuarioRoute: CadastroUsuarioRoute,
+  CadastroIndexRoute: CadastroIndexRoute,
+}
+
+const CadastroRouteWithChildren = CadastroRoute._addFileChildren(
+  CadastroRouteChildren,
+)
+
 interface EmpresasRouteChildren {
   EmpresasSlugRoute: typeof EmpresasSlugRoute
+  EmpresasIndexRoute: typeof EmpresasIndexRoute
 }
 
 const EmpresasRouteChildren: EmpresasRouteChildren = {
   EmpresasSlugRoute: EmpresasSlugRoute,
+  EmpresasIndexRoute: EmpresasIndexRoute,
 }
 
 const EmpresasRouteWithChildren = EmpresasRoute._addFileChildren(
@@ -341,27 +692,42 @@ const EmpresasRouteWithChildren = EmpresasRoute._addFileChildren(
 
 interface EquipamentosRouteChildren {
   EquipamentosSlugRoute: typeof EquipamentosSlugRoute
+  EquipamentosIndexRoute: typeof EquipamentosIndexRoute
 }
 
 const EquipamentosRouteChildren: EquipamentosRouteChildren = {
   EquipamentosSlugRoute: EquipamentosSlugRoute,
+  EquipamentosIndexRoute: EquipamentosIndexRoute,
 }
 
 const EquipamentosRouteWithChildren = EquipamentosRoute._addFileChildren(
   EquipamentosRouteChildren,
 )
 
+interface PainelEquipamentosRouteChildren {
+  PainelEquipamentosIdRoute: typeof PainelEquipamentosIdRoute
+  PainelEquipamentosIndexRoute: typeof PainelEquipamentosIndexRoute
+}
+
+const PainelEquipamentosRouteChildren: PainelEquipamentosRouteChildren = {
+  PainelEquipamentosIdRoute: PainelEquipamentosIdRoute,
+  PainelEquipamentosIndexRoute: PainelEquipamentosIndexRoute,
+}
+
+const PainelEquipamentosRouteWithChildren =
+  PainelEquipamentosRoute._addFileChildren(PainelEquipamentosRouteChildren)
+
 interface PainelRouteChildren {
-  PainelConfiguracoesRoute: typeof PainelConfiguracoesRoute
-  PainelEquipamentosRoute: typeof PainelEquipamentosRoute
-  PainelFavoritosRoute: typeof PainelFavoritosRoute
+  PainelAnalyticsRoute: typeof PainelAnalyticsRoute
+  PainelEquipamentosRoute: typeof PainelEquipamentosRouteWithChildren
+  PainelPedidosRoute: typeof PainelPedidosRoute
   PainelIndexRoute: typeof PainelIndexRoute
 }
 
 const PainelRouteChildren: PainelRouteChildren = {
-  PainelConfiguracoesRoute: PainelConfiguracoesRoute,
-  PainelEquipamentosRoute: PainelEquipamentosRoute,
-  PainelFavoritosRoute: PainelFavoritosRoute,
+  PainelAnalyticsRoute: PainelAnalyticsRoute,
+  PainelEquipamentosRoute: PainelEquipamentosRouteWithChildren,
+  PainelPedidosRoute: PainelPedidosRoute,
   PainelIndexRoute: PainelIndexRoute,
 }
 
@@ -370,15 +736,33 @@ const PainelRouteWithChildren =
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AdminRoute: AdminRouteWithChildren,
+  CadastroRoute: CadastroRouteWithChildren,
+  ConfiguracoesRoute: ConfiguracoesRoute,
   EmpresasRoute: EmpresasRouteWithChildren,
+  EntrarRoute: EntrarRoute,
   EquipamentosRoute: EquipamentosRouteWithChildren,
+  FavoritosRoute: FavoritosRoute,
   FornecedoresRoute: FornecedoresRoute,
   MensagensRoute: MensagensRoute,
   NotificacoesRoute: NotificacoesRoute,
   PainelRoute: PainelRouteWithChildren,
   PublicarRoute: PublicarRoute,
+  RecuperarSenhaRoute: RecuperarSenhaRoute,
+  RedefinirSenhaRoute: RedefinirSenhaRoute,
+  ServicosRoute: ServicosRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}

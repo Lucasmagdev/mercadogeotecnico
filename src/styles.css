@@ -55,6 +55,7 @@
 }
 
 :root {
+  color-scheme: light;
   --radius: 0.75rem;
   --background: #ffffff;
   --foreground: #111827;
@@ -93,6 +94,7 @@
 }
 
 .dark {
+  color-scheme: dark;
   --background: #071a2e;
   --foreground: #eef2f7;
   --card: #0d2740;
@@ -143,6 +145,30 @@
 
   h1, h2, h3, h4 {
     letter-spacing: -0.02em;
+  }
+
+  /* Themed thin scrollbars for inner scroll areas (filter lists, chat, etc.) */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: color-mix(in srgb, var(--color-muted-foreground) 35%, transparent) transparent;
+  }
+
+  *::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  *::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  *::-webkit-scrollbar-thumb {
+    background-color: color-mix(in srgb, var(--color-muted-foreground) 35%, transparent);
+    border-radius: 9999px;
+  }
+
+  *::-webkit-scrollbar-thumb:hover {
+    background-color: color-mix(in srgb, var(--color-muted-foreground) 55%, transparent);
   }
 }
 
