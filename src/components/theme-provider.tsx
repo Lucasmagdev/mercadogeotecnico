@@ -3,16 +3,14 @@ import { createContext, useContext, useEffect, useState, type ReactNode } from "
 type Theme = "light" | "dark";
 type ThemeContextValue = { theme: Theme; toggle: () => void };
 
-const ThemeContext = createContext<ThemeContextValue>({ theme: "light", toggle: () => {} });
+const ThemeContext = createContext<ThemeContextValue>({ theme: "dark", toggle: () => {} });
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
-  const [theme, setTheme] = useState<Theme>("light");
+  const [theme, setTheme] = useState<Theme>("dark");
 
   useEffect(() => {
     const stored = (typeof window !== "undefined" && localStorage.getItem("theme")) as Theme | null;
-    const initial =
-      stored ?? (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
-    setTheme(initial);
+    setTheme(stored ?? "dark");
   }, []);
 
   useEffect(() => {

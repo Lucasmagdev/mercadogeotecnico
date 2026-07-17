@@ -3,7 +3,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { CircleCheck, Clock, ShieldAlert } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { VerifiedSeal } from "@/components/verified-seal";
+import { GeoSelosVerification } from "@/components/geoselos-verification";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -175,7 +175,7 @@ function CompanySettings({ ownerId }: { ownerId: string }) {
       {company.status === "approved" && (
         <div className="flex items-center gap-2 text-sm font-medium text-success">
           {company.verified ? (
-            <VerifiedSeal className="h-4 w-4" />
+            <GeoSelosVerification variant="icon" />
           ) : (
             <CircleCheck className="h-4 w-4" aria-hidden />
           )}

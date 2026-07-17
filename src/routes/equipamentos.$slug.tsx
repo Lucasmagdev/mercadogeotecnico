@@ -18,10 +18,10 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { CompanyAvatar } from "@/components/company-avatar";
 import { Textarea } from "@/components/ui/textarea";
 import { EquipmentCard } from "@/components/equipment-card";
-import { VerifiedSeal } from "@/components/verified-seal";
+import { GeoSelosVerification } from "@/components/geoselos-verification";
 import { useAuth } from "@/components/auth-provider";
 import { useFavoriteToggle } from "@/hooks/use-favorite";
 import {
@@ -347,15 +347,11 @@ function EquipmentDetail() {
               params={{ slug: company.slug }}
               className="mt-4 flex items-center gap-3 rounded-2xl border border-border bg-card p-4 transition-colors hover:border-primary/40"
             >
-              <Avatar className="h-12 w-12">
-                <AvatarFallback className="bg-secondary text-secondary-foreground font-semibold">
-                  {company.name.slice(0, 2).toUpperCase()}
-                </AvatarFallback>
-              </Avatar>
+              <CompanyAvatar name={company.name} slug={company.slug} className="text-sm" />
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-1.5">
                   <p className="truncate font-semibold">{company.name}</p>
-                  {company.verified && <VerifiedSeal className="h-4 w-4" />}
+                  {company.verified && <GeoSelosVerification />}
                 </div>
                 <p className="text-sm text-muted-foreground">
                   {company.city}/{company.state} · {company.years_on_market} anos no mercado

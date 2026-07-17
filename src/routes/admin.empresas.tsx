@@ -3,7 +3,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { MapPin, Check, X } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { VerifiedSeal } from "@/components/verified-seal";
+import { GeoSelosVerification } from "@/components/geoselos-verification";
 import { fetchAllCompaniesAdmin, setCompanyStatus } from "@/lib/queries";
 
 export const Route = createFileRoute("/admin/empresas")({
@@ -50,7 +50,7 @@ function AdminEmpresas() {
             <div className="min-w-0 flex-1">
               <div className="flex flex-wrap items-center gap-2">
                 <p className="font-semibold">{c.name}</p>
-                {c.verified && <VerifiedSeal className="h-4 w-4" />}
+                {c.verified && <GeoSelosVerification />}
                 <Badge className={`border-0 ${statusClass[c.status]}`}>
                   {statusLabel[c.status]}
                 </Badge>

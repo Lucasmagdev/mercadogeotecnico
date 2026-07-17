@@ -23,6 +23,8 @@ import {
   Briefcase,
   UserPlus,
   Handshake,
+  ShieldCheck,
+  ExternalLink,
   Star,
   MapPin,
   CalendarClock,
@@ -32,9 +34,15 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { EquipmentCard } from "@/components/equipment-card";
 import { AnimatedCounter } from "@/components/animated-counter";
+import { GeoSelosVerification } from "@/components/geoselos-verification";
 import { VerifiedSeal } from "@/components/verified-seal";
+import { CompanyAvatar } from "@/components/company-avatar";
 import { fetchApprovedCompanies, fetchCategories, fetchEquipmentList } from "@/lib/queries";
 import { brands } from "@/lib/mock-data";
+import fundaffLogo from "@/assets/verified-companies/fundaff.jpg";
+import fastengeLogo from "@/assets/verified-companies/fastenge.png";
+import gontijoLogo from "@/assets/verified-companies/gontijo.png";
+import geotesteLogo from "@/assets/verified-companies/geoteste.jpg";
 
 export const Route = createFileRoute("/")({
   component: Home,
@@ -58,6 +66,13 @@ const categoryIcons: Record<string, LucideIcon> = {
   "equipamentos-laboratorio": FlaskConical,
   servicos: Briefcase,
 };
+
+const geoselosCompanies = [
+  { name: "Fundaff Engenharia", logo: fundaffLogo },
+  { name: "Fastenge Engenharia Civil", logo: fastengeLogo },
+  { name: "Gontijo Fundações", logo: gontijoLogo },
+  { name: "Geoteste", logo: geotesteLogo },
+];
 
 const stats = [
   { value: 9430, suffix: "+", label: "anúncios ativos" },
@@ -267,11 +282,26 @@ function Home() {
                 Empresas verificadas com reputação construída na plataforma.
               </p>
             </div>
-            <Button variant="ghost" asChild className="shrink-0 gap-1">
-              <Link to="/empresas">
-                Ver empresas <ArrowRight className="h-4 w-4" />
-              </Link>
-            </Button>
+            <div className="flex shrink-0 flex-col items-end gap-1 sm:flex-row sm:items-center">
+              <Button
+                variant="outline"
+                asChild
+                className="rounded-full border-amber-400/40 bg-amber-400/10 text-xs font-semibold text-[#14265C] hover:bg-amber-400/20 dark:text-amber-300 sm:text-sm"
+              >
+                <a
+                  href="https://solicitacao.geoselos.com.br/"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Solicite sua verificação GeoSelos
+                </a>
+              </Button>
+              <Button variant="ghost" asChild className="gap-1">
+                <Link to="/empresas">
+                  Ver empresas <ArrowRight className="h-4 w-4" />
+                </Link>
+              </Button>
+            </div>
           </div>
           <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
             {topCompanies.map((company, i) => (
@@ -288,14 +318,12 @@ function Home() {
                   className="group flex h-full flex-col rounded-2xl border border-border bg-card p-5 shadow-soft transition-all duration-300 hover:-translate-y-1 hover:border-primary/40 hover:shadow-lift"
                 >
                   <div className="flex items-center gap-3">
-                    <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-secondary text-sm font-bold text-secondary-foreground">
-                      {company.name.slice(0, 2).toUpperCase()}
-                    </span>
+                    <CompanyAvatar name={company.name} slug={company.slug} />
                     <span className="min-w-0">
                       <span className="flex items-center gap-1.5">
                         <span className="truncate font-semibold">{company.name}</span>
                         {company.verified && (
-                          <VerifiedSeal className="h-4 w-4" />
+                          <GeoSelosVerification />
                         )}
                       </span>
                       <span className="flex items-center gap-1 text-xs text-muted-foreground">
@@ -341,6 +369,125 @@ function Home() {
           </div>
         </section>
       )}
+
+      {/* GeoSelos verification CTA */}
+      <section className="container-page pb-10" aria-label="Verificação GeoSelos">
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-40px" }}
+          transition={{ duration: 0.4 }}
+          className="relative overflow-hidden rounded-3xl border border-amber-400/20 bg-[#0A1735] text-white shadow-2xl shadow-black/20"
+        >
+          <div
+            className="pointer-events-none absolute -right-20 -top-20 h-56 w-56 rounded-full bg-amber-400/20 blur-3xl"
+            aria-hidden
+          />
+          <div
+            className="pointer-events-none absolute -bottom-20 -left-20 h-56 w-56 rounded-full bg-primary/25 blur-3xl"
+            aria-hidden
+          />
+
+          <div className="relative grid gap-8 p-7 sm:p-10 lg:grid-cols-[1.15fr_0.85fr] lg:gap-12">
+            <div>
+              <div className="flex items-center gap-3">
+                <VerifiedSeal className="h-14 w-14 shrink-0" />
+                <div>
+                  <p className="text-xs font-bold uppercase tracking-[0.18em] text-amber-300">
+                    Reconhecimento técnico GeoSelos
+                  </p>
+                  <p className="mt-1 text-sm text-blue-100">
+                    Fundações especiais e geotecnia
+                  </p>
+                </div>
+              </div>
+
+              <h2 className="mt-6 max-w-xl text-2xl font-bold leading-tight sm:text-3xl">
+                Confiança técnica que diferencia sua empresa
+              </h2>
+              <p className="mt-3 max-w-2xl text-sm leading-relaxed text-blue-100">
+                A GeoSelos reconhece empresas tecnicamente qualificadas e comprometidas com
+                excelência, segurança e integridade no setor geotécnico.
+              </p>
+
+              <div className="mt-6 grid gap-3 sm:grid-cols-2">
+                {[
+                  "Reconhecimento técnico",
+                  "Credibilidade institucional",
+                  "Diferenciação competitiva",
+                  "Redução de riscos",
+                ].map((benefit) => (
+                  <span key={benefit} className="flex items-center gap-2 text-sm text-blue-50">
+                    <ShieldCheck className="h-4 w-4 shrink-0 text-amber-300" />
+                    {benefit}
+                  </span>
+                ))}
+              </div>
+
+              <div className="mt-7 flex flex-col gap-3 sm:flex-row">
+                <Button
+                  asChild
+                  size="lg"
+                  className="rounded-full bg-amber-400 font-bold text-[#14265C] hover:bg-amber-300"
+                >
+                  <a
+                    href="https://solicitacao.geoselos.com.br/"
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    Solicite sua verificação GeoSelos
+                    <ExternalLink className="h-4 w-4" />
+                  </a>
+                </Button>
+                <Button
+                  asChild
+                  size="lg"
+                  variant="outline"
+                  className="rounded-full border-white/20 bg-white/5 text-white hover:bg-white/10 hover:text-white"
+                >
+                  <a
+                    href="https://solicitacao.geoselos.com.br/buscar"
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    Consultar empresas reconhecidas
+                  </a>
+                </Button>
+              </div>
+            </div>
+
+            <div className="rounded-2xl border border-white/10 bg-white/[0.06] p-5 backdrop-blur-sm">
+              <p className="text-xs font-bold uppercase tracking-[0.16em] text-amber-300">
+                Empresas reconhecidas pela GeoSelos
+              </p>
+              <p className="mt-2 text-xs leading-relaxed text-blue-100">
+                Exemplos reais consultados em fontes oficiais.
+              </p>
+
+              <div className="mt-5 grid gap-3">
+                {geoselosCompanies.map((company) => (
+                  <div
+                    key={company.name}
+                    className="flex min-h-16 items-center gap-4 rounded-xl border border-white/10 bg-white p-3"
+                  >
+                    <img
+                      src={company.logo}
+                      alt={`Logo da ${company.name}`}
+                      className="h-9 min-w-0 flex-1 object-contain object-left"
+                    />
+                    <VerifiedSeal className="h-5 w-5 shrink-0" />
+                  </div>
+                ))}
+              </div>
+
+              <p className="mt-4 text-[11px] leading-relaxed text-blue-200">
+                Marcas exibidas apenas como exemplos públicos de reconhecimento GeoSelos. Não
+                representam parceria comercial com este marketplace.
+              </p>
+            </div>
+          </div>
+        </motion.div>
+      </section>
 
       {/* Brands marquee */}
       <section

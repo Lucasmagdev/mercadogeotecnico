@@ -40,7 +40,15 @@ values
   ('44444444-4444-4444-4444-444444444444','0c4e81f5-a44b-4f74-9b61-be90f4d4a3ae','Atlas Construção Pesada','atlas','Rio de Janeiro','RJ',true,24,4.8,421,
    'Referência em guindastes e içamento de cargas. Operadores certificados e planos de rigging completos.',
    '(21) 2555-3030','5521966665555','www.atlaspesada.com.br',
-   array['Içamento de cargas','Guindastes','Planos de rigging'],'approved');
+   array['Içamento de cargas','Guindastes','Planos de rigging'],'approved'),
+  ('55555555-5555-5555-5555-555555555555','4b2f1415-689b-46ce-bac4-e00117bb6a6b','Gontijo Fundações','gontijo-fundacoes','Belo Horizonte','MG',true,15,4.9,208,
+   'Empresa especializada em fundações profundas, estacas hélice contínua e contenções. Reconhecimento técnico GeoSelos em fundações especiais.',
+   '(31) 3333-4400','5531999994400','www.gontijofundacoes.com.br',
+   array['Fundações profundas','Estacas hélice contínua','Contenções'],'approved'),
+  ('66666666-6666-6666-6666-666666666666','a1f1aad2-b313-4b4b-a4da-bd1914ed7f13','Geoteste','geoteste','São Paulo','SP',true,20,4.8,176,
+   'Investigações geotécnicas, sondagens e ensaios de campo e laboratório. Reconhecimento técnico GeoSelos em geotecnia.',
+   '(11) 3777-2200','5511999992200','www.geoteste.com.br',
+   array['Sondagem SPT','Ensaios geotécnicos','Investigação de subsolo'],'approved');
 
 update public.profiles set role='company' where id in (
   '4b2f1415-689b-46ce-bac4-e00117bb6a6b','a1f1aad2-b313-4b4b-a4da-bd1914ed7f13',

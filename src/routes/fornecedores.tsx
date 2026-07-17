@@ -2,10 +2,10 @@ import { useMemo, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { MapPin, Star, Search } from "lucide-react";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { CompanyAvatar } from "@/components/company-avatar";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { VerifiedSeal } from "@/components/verified-seal";
+import { GeoSelosVerification } from "@/components/geoselos-verification";
 import { fetchApprovedCompanies } from "@/lib/queries";
 
 export const Route = createFileRoute("/fornecedores")({
@@ -63,14 +63,10 @@ function Suppliers() {
             params={{ slug: c.slug }}
             className="rounded-2xl border border-border bg-card p-5 text-center shadow-soft transition-all hover:-translate-y-0.5 hover:shadow-lift"
           >
-            <Avatar className="mx-auto h-16 w-16">
-              <AvatarFallback className="bg-secondary text-lg font-bold text-secondary-foreground">
-                {c.name.slice(0, 2).toUpperCase()}
-              </AvatarFallback>
-            </Avatar>
+            <CompanyAvatar name={c.name} slug={c.slug} className="mx-auto h-16 w-16 text-lg" />
             <div className="mt-3 flex items-center justify-center gap-1.5">
               <h3 className="font-semibold">{c.name}</h3>
-              {c.verified && <VerifiedSeal className="h-4 w-4" />}
+              {c.verified && <GeoSelosVerification />}
             </div>
             <p className="mt-1 flex items-center justify-center gap-1 text-sm text-muted-foreground">
               <MapPin className="h-3.5 w-3.5" /> {c.city}/{c.state}

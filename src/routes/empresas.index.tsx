@@ -2,9 +2,9 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
 import { MapPin, Star } from "lucide-react";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { VerifiedSeal } from "@/components/verified-seal";
+import { CompanyAvatar } from "@/components/company-avatar";
+import { GeoSelosVerification } from "@/components/geoselos-verification";
 import { fetchApprovedCompanies } from "@/lib/queries";
 
 export const Route = createFileRoute("/empresas/")({
@@ -51,15 +51,11 @@ function Companies() {
               params={{ slug: c.slug }}
               className="flex gap-4 rounded-2xl border border-border bg-card p-5 shadow-soft transition-all hover:-translate-y-0.5 hover:shadow-lift"
             >
-              <Avatar className="h-16 w-16 shrink-0">
-                <AvatarFallback className="bg-secondary text-lg font-bold text-secondary-foreground">
-                  {c.name.slice(0, 2).toUpperCase()}
-                </AvatarFallback>
-              </Avatar>
+              <CompanyAvatar name={c.name} slug={c.slug} className="h-16 w-16 text-lg" />
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-1.5">
                   <h3 className="truncate font-semibold">{c.name}</h3>
-                  {c.verified && <VerifiedSeal className="h-4 w-4" />}
+                  {c.verified && <GeoSelosVerification />}
                 </div>
                 <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-muted-foreground">
                   <span className="flex items-center gap-1">

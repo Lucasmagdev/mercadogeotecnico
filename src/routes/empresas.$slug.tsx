@@ -13,13 +13,13 @@ import {
   Send,
   Check,
 } from "lucide-react";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { CompanyAvatar } from "@/components/company-avatar";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { EquipmentCard } from "@/components/equipment-card";
 import { CompanyReviews } from "@/components/company-reviews";
-import { VerifiedSeal } from "@/components/verified-seal";
+import { GeoSelosVerification } from "@/components/geoselos-verification";
 import { useAuth } from "@/components/auth-provider";
 import {
   fetchCategories,
@@ -99,18 +99,16 @@ function CompanyProfile() {
         </Button>
 
         <div className="-mt-12 flex flex-col gap-4 sm:flex-row sm:items-end">
-          <Avatar className="h-24 w-24 border-4 border-background shadow-card">
-            <AvatarFallback className="bg-secondary text-2xl font-bold text-secondary-foreground">
-              {company.name.slice(0, 2).toUpperCase()}
-            </AvatarFallback>
-          </Avatar>
+          <CompanyAvatar
+            name={company.name}
+            slug={company.slug}
+            className="h-24 w-24 border-4 border-background text-2xl shadow-card"
+          />
           <div className="flex-1 pb-1">
             <div className="flex items-center gap-2">
               <h1 className="text-2xl font-bold">{company.name}</h1>
               {company.verified && (
-                <span className="inline-flex items-center gap-1 rounded-full bg-success/10 px-2 py-0.5 text-xs font-medium text-success">
-                  <VerifiedSeal className="h-3.5 w-3.5" /> Verificada pela GeoSelos
-                </span>
+                <GeoSelosVerification variant="full" />
               )}
             </div>
             <div className="mt-1 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-muted-foreground">
