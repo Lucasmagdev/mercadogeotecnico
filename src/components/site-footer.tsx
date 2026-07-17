@@ -29,17 +29,24 @@ const columns = [
       { to: "/mensagens", label: "Mensagens" },
     ],
   },
+  {
+    title: "Legal",
+    links: [
+      { to: "/termos", label: "Termos de Uso" },
+      { to: "/privacidade", label: "Política de Privacidade" },
+    ],
+  },
 ];
 
 export function SiteFooter() {
   return (
     <footer className="mt-24 border-t border-border bg-card">
-      <div className="container-page grid gap-10 py-14 md:grid-cols-[1.4fr_1fr_1fr_1fr]">
-        <div>
+      <div className="container-page grid grid-cols-2 gap-10 py-14 md:grid-cols-[1.4fr_1fr_1fr_1fr_1fr]">
+        <div className="col-span-2 md:col-span-1">
           <Logo />
           <p className="mt-4 max-w-xs text-sm text-muted-foreground">
-            O maior ecossistema digital para empresas de engenharia. Compre, venda,
-            alugue equipamentos e conecte-se com fornecedores confiáveis.
+            O maior ecossistema digital para empresas de engenharia. Compre, venda, alugue
+            equipamentos e conecte-se com fornecedores confiáveis.
           </p>
         </div>
         {columns.map((col) => (

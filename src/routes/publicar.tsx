@@ -25,10 +25,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  RadioGroup,
-  RadioGroupItem,
-} from "@/components/ui/radio-group";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useAuth } from "@/components/auth-provider";
 import { createEquipment, fetchCategories, fetchMyCompany } from "@/lib/queries";
 import { uploadEquipmentImages } from "@/lib/equipment-images";
@@ -39,7 +36,10 @@ export const Route = createFileRoute("/publicar")({
   head: () => ({
     meta: [
       { title: "Anunciar equipamento — Mercado Geotécnico" },
-      { name: "description", content: "Publique seu equipamento, peça ou serviço de engenharia em poucos passos." },
+      {
+        name: "description",
+        content: "Publique seu equipamento, peça ou serviço de engenharia em poucos passos.",
+      },
     ],
   }),
   component: Publicar,
@@ -57,7 +57,10 @@ function Publicar() {
     queryFn: () => fetchMyCompany(session!.user.id),
     enabled: !!session,
   });
-  const { data: categories = [] } = useQuery({ queryKey: ["categories"], queryFn: fetchCategories });
+  const { data: categories = [] } = useQuery({
+    queryKey: ["categories"],
+    queryFn: fetchCategories,
+  });
 
   const [step, setStep] = useState(0);
   const [form, setForm] = useState({
@@ -92,7 +95,8 @@ function Publicar() {
     mutationFn: async () => {
       const slug = `${slugify(form.title)}-${Math.random().toString(36).slice(2, 7)}`;
       const cleanSpecs = specs.filter((s) => s.label.trim() && s.value.trim());
-      const imagePaths = photos.length > 0 ? await uploadEquipmentImages(session!.user.id, photos) : [];
+      const imagePaths =
+        photos.length > 0 ? await uploadEquipmentImages(session!.user.id, photos) : [];
       await createEquipment({
         company_id: company!.id,
         slug,
@@ -119,15 +123,21 @@ function Publicar() {
   const progress = ((step + 1) / steps.length) * 100;
 
   if (loading || (session && companyLoading)) {
-    return <div className="container-page py-16 text-center text-muted-foreground">Carregando...</div>;
+    return (
+      <div className="container-page py-16 text-center text-muted-foreground">Carregando...</div>
+    );
   }
 
   if (!session) {
     return (
       <div className="container-page flex min-h-[60vh] flex-col items-center justify-center gap-3 text-center">
         <h1 className="text-xl font-bold">Entre para anunciar</h1>
-        <p className="text-muted-foreground">Você precisa de uma conta de empresa aprovada para publicar anúncios.</p>
-        <Button asChild><Link to="/entrar">Entrar</Link></Button>
+        <p className="text-muted-foreground">
+          Você precisa de uma conta de empresa aprovada para publicar anúncios.
+        </p>
+        <Button asChild>
+          <Link to="/entrar">Entrar</Link>
+        </Button>
       </div>
     );
   }
@@ -137,8 +147,12 @@ function Publicar() {
       <div className="container-page flex min-h-[60vh] flex-col items-center justify-center gap-3 text-center">
         <Building2 className="h-10 w-10 text-muted-foreground" />
         <h1 className="text-xl font-bold">Cadastre sua empresa</h1>
-        <p className="max-w-md text-muted-foreground">Somente empresas cadastradas e aprovadas podem anunciar equipamentos.</p>
-        <Button asChild><Link to="/cadastro/empresa">Cadastrar empresa</Link></Button>
+        <p className="max-w-md text-muted-foreground">
+          Somente empresas cadastradas e aprovadas podem anunciar equipamentos.
+        </p>
+        <Button asChild>
+          <Link to="/cadastro/empresa">Cadastrar empresa</Link>
+        </Button>
       </div>
     );
   }
@@ -158,7 +172,9 @@ function Publicar() {
           <>
             <ShieldAlert className="h-10 w-10 text-destructive" />
             <h1 className="text-xl font-bold">Cadastro não aprovado</h1>
-            <p className="max-w-md text-muted-foreground">Fale com o suporte para mais informações.</p>
+            <p className="max-w-md text-muted-foreground">
+              Fale com o suporte para mais informações.
+            </p>
           </>
         )}
       </div>
@@ -170,8 +186,12 @@ function Publicar() {
       <div className="container-page flex min-h-[60vh] flex-col items-center justify-center gap-3 text-center">
         <Sparkles className="h-10 w-10 text-success" />
         <h1 className="text-xl font-bold">Anúncio publicado!</h1>
-        <p className="text-muted-foreground">Seu equipamento já está visível para milhares de empresas.</p>
-        <Button asChild><Link to="/painel/equipamentos">Ver meus equipamentos</Link></Button>
+        <p className="text-muted-foreground">
+          Seu equipamento já está visível para milhares de empresas.
+        </p>
+        <Button asChild>
+          <Link to="/painel/equipamentos">Ver meus equipamentos</Link>
+        </Button>
       </div>
     );
   }
@@ -186,7 +206,9 @@ function Publicar() {
   return (
     <div className="container-page max-w-3xl py-8">
       <h1 className="text-2xl font-bold sm:text-3xl">Anunciar equipamento</h1>
-      <p className="mt-1 text-muted-foreground">Preencha as informações para publicar seu anúncio.</p>
+      <p className="mt-1 text-muted-foreground">
+        Preencha as informações para publicar seu anúncio.
+      </p>
 
       {/* Steps */}
       <div className="mt-8 flex items-center justify-between">
@@ -208,7 +230,11 @@ function Publicar() {
         ))}
       </div>
       <div className="mt-4 h-1.5 overflow-hidden rounded-full bg-muted">
-        <motion.div className="h-full bg-primary" animate={{ width: `${progress}%` }} transition={{ duration: 0.3 }} />
+        <motion.div
+          className="h-full bg-primary"
+          animate={{ width: `${progress}%` }}
+          transition={{ duration: 0.3 }}
+        />
       </div>
 
       <motion.div
@@ -241,30 +267,54 @@ function Publicar() {
             <h2 className="text-lg font-semibold">Detalhes do equipamento</h2>
             <div className="space-y-2">
               <Label>Título do anúncio</Label>
-              <Input placeholder="Ex: Escavadeira Hidráulica CAT 320" value={form.title} onChange={(e) => set("title", e.target.value)} />
+              <Input
+                placeholder="Ex: Escavadeira Hidráulica CAT 320"
+                value={form.title}
+                onChange={(e) => set("title", e.target.value)}
+              />
             </div>
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-2">
                 <Label>Marca</Label>
                 <Select value={form.brand} onValueChange={(v) => set("brand", v)}>
-                  <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecione" />
+                  </SelectTrigger>
                   <SelectContent>
-                    {brands.map((b) => <SelectItem key={b} value={b}>{b}</SelectItem>)}
+                    {brands.map((b) => (
+                      <SelectItem key={b} value={b}>
+                        {b}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>
               <div className="space-y-2">
                 <Label>Modelo</Label>
-                <Input placeholder="Ex: 320 GC" value={form.model} onChange={(e) => set("model", e.target.value)} />
+                <Input
+                  placeholder="Ex: 320 GC"
+                  value={form.model}
+                  onChange={(e) => set("model", e.target.value)}
+                />
               </div>
               <div className="space-y-2">
                 <Label>Ano</Label>
-                <Input type="number" placeholder="2021" value={form.year} onChange={(e) => set("year", e.target.value)} />
+                <Input
+                  type="number"
+                  placeholder="2021"
+                  value={form.year}
+                  onChange={(e) => set("year", e.target.value)}
+                />
               </div>
               <div className="space-y-2">
                 <Label>Condição</Label>
-                <Select value={form.condition} onValueChange={(v) => set("condition", v as typeof form.condition)}>
-                  <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
+                <Select
+                  value={form.condition}
+                  onValueChange={(v) => set("condition", v as typeof form.condition)}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecione" />
+                  </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="Novo">Novo</SelectItem>
                     <SelectItem value="Seminovo">Seminovo</SelectItem>
@@ -275,7 +325,12 @@ function Publicar() {
             </div>
             <div className="space-y-2">
               <Label>Descrição</Label>
-              <Textarea rows={4} placeholder="Descreva o estado, histórico de manutenção e diferenciais." value={form.description} onChange={(e) => set("description", e.target.value)} />
+              <Textarea
+                rows={4}
+                placeholder="Descreva o estado, histórico de manutenção e diferenciais."
+                value={form.description}
+                onChange={(e) => set("description", e.target.value)}
+              />
             </div>
 
             <div className="space-y-2 border-t border-border pt-4">
@@ -298,14 +353,18 @@ function Publicar() {
                       placeholder="Ex: Potência"
                       value={spec.label}
                       onChange={(e) =>
-                        setSpecs((s) => s.map((sp, j) => (j === i ? { ...sp, label: e.target.value } : sp)))
+                        setSpecs((s) =>
+                          s.map((sp, j) => (j === i ? { ...sp, label: e.target.value } : sp)),
+                        )
                       }
                     />
                     <Input
                       placeholder="Ex: 122 HP"
                       value={spec.value}
                       onChange={(e) =>
-                        setSpecs((s) => s.map((sp, j) => (j === i ? { ...sp, value: e.target.value } : sp)))
+                        setSpecs((s) =>
+                          s.map((sp, j) => (j === i ? { ...sp, value: e.target.value } : sp)),
+                        )
                       }
                     />
                     <Button
@@ -330,26 +389,49 @@ function Publicar() {
             <h2 className="text-lg font-semibold">Preço e localização</h2>
             <div className="space-y-2">
               <Label>Modalidade</Label>
-              <RadioGroup value={form.mode} onValueChange={(v) => set("mode", v as "venda" | "locacao")} className="flex gap-4">
-                <label className="flex items-center gap-2 text-sm"><RadioGroupItem value="venda" /> Venda</label>
-                <label className="flex items-center gap-2 text-sm"><RadioGroupItem value="locacao" /> Locação</label>
+              <RadioGroup
+                value={form.mode}
+                onValueChange={(v) => set("mode", v as "venda" | "locacao")}
+                className="flex gap-4"
+              >
+                <label className="flex items-center gap-2 text-sm">
+                  <RadioGroupItem value="venda" /> Venda
+                </label>
+                <label className="flex items-center gap-2 text-sm">
+                  <RadioGroupItem value="locacao" /> Locação
+                </label>
               </RadioGroup>
             </div>
             <div className="grid gap-4 sm:grid-cols-3">
               <div className="space-y-2 sm:col-span-1">
                 <Label>Valor (R$)</Label>
-                <Input type="number" placeholder="685000" value={form.price} onChange={(e) => set("price", e.target.value)} />
+                <Input
+                  type="number"
+                  placeholder="685000"
+                  value={form.price}
+                  onChange={(e) => set("price", e.target.value)}
+                />
               </div>
               <div className="space-y-2">
                 <Label>Cidade</Label>
-                <Input placeholder="São Paulo" value={form.city} onChange={(e) => set("city", e.target.value)} />
+                <Input
+                  placeholder="São Paulo"
+                  value={form.city}
+                  onChange={(e) => set("city", e.target.value)}
+                />
               </div>
               <div className="space-y-2">
                 <Label>Estado</Label>
                 <Select value={form.state} onValueChange={(v) => set("state", v)}>
-                  <SelectTrigger><SelectValue placeholder="UF" /></SelectTrigger>
+                  <SelectTrigger>
+                    <SelectValue placeholder="UF" />
+                  </SelectTrigger>
                   <SelectContent>
-                    {states.map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}
+                    {states.map((s) => (
+                      <SelectItem key={s} value={s}>
+                        {s}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>
@@ -383,14 +465,23 @@ function Publicar() {
             >
               <Upload className="h-8 w-8 text-muted-foreground" />
               <p className="mt-3 font-medium">Arraste as fotos aqui</p>
-              <p className="text-sm text-muted-foreground">ou clique para selecionar (até {MAX_PHOTOS} imagens)</p>
+              <p className="text-sm text-muted-foreground">
+                ou clique para selecionar (até {MAX_PHOTOS} imagens)
+              </p>
             </button>
 
             {photos.length > 0 && (
               <div className="grid grid-cols-3 gap-3 sm:grid-cols-4">
                 {photos.map((file, i) => (
-                  <div key={i} className="group relative aspect-[4/3] overflow-hidden rounded-xl border border-border">
-                    <img src={URL.createObjectURL(file)} alt="" className="h-full w-full object-cover" />
+                  <div
+                    key={i}
+                    className="group relative aspect-[4/3] overflow-hidden rounded-xl border border-border"
+                  >
+                    <img
+                      src={URL.createObjectURL(file)}
+                      alt=""
+                      className="h-full w-full object-cover"
+                    />
                     {i === 0 && (
                       <span className="absolute left-1.5 top-1.5 rounded-full bg-primary px-2 py-0.5 text-[10px] font-semibold text-primary-foreground">
                         Capa
@@ -426,8 +517,15 @@ function Publicar() {
               {photos.length > 0 ? `${photos.length} foto(s) serão enviadas. ` : ""}
               Revise as informações e publique seu anúncio para milhares de empresas.
             </p>
-            {submit.isError && <p className="text-sm text-destructive">Erro ao publicar. Tente novamente.</p>}
-            <Button size="lg" className="mt-2" onClick={() => submit.mutate()} disabled={submit.isPending}>
+            {submit.isError && (
+              <p className="text-sm text-destructive">Erro ao publicar. Tente novamente.</p>
+            )}
+            <Button
+              size="lg"
+              className="mt-2"
+              onClick={() => submit.mutate()}
+              disabled={submit.isPending}
+            >
               {submit.isPending ? "Publicando..." : "Publicar anúncio"}
             </Button>
           </div>
@@ -435,11 +533,20 @@ function Publicar() {
       </motion.div>
 
       <div className="mt-6 flex justify-between">
-        <Button variant="outline" onClick={() => setStep((s) => Math.max(0, s - 1))} disabled={step === 0} className="gap-1">
+        <Button
+          variant="outline"
+          onClick={() => setStep((s) => Math.max(0, s - 1))}
+          disabled={step === 0}
+          className="gap-1"
+        >
           <ChevronLeft className="h-4 w-4" /> Voltar
         </Button>
         {step < steps.length - 1 && (
-          <Button onClick={() => setStep((s) => Math.min(steps.length - 1, s + 1))} disabled={!canAdvance} className="gap-1">
+          <Button
+            onClick={() => setStep((s) => Math.min(steps.length - 1, s + 1))}
+            disabled={!canAdvance}
+            className="gap-1"
+          >
             Continuar <ChevronRight className="h-4 w-4" />
           </Button>
         )}

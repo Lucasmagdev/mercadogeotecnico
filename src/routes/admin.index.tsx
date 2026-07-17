@@ -8,7 +8,10 @@ export const Route = createFileRoute("/admin/")({
 });
 
 function AdminHome() {
-  const { data: companies } = useQuery({ queryKey: ["admin-companies"], queryFn: fetchAllCompaniesAdmin });
+  const { data: companies } = useQuery({
+    queryKey: ["admin-companies"],
+    queryFn: fetchAllCompaniesAdmin,
+  });
 
   const pending = companies?.filter((c) => c.status === "pending").length ?? 0;
   const approved = companies?.filter((c) => c.status === "approved").length ?? 0;

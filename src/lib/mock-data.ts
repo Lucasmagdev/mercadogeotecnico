@@ -30,7 +30,15 @@ export const categories: Category[] = [
   { slug: "servicos", name: "Serviços", count: 640 },
 ];
 
-export const brands = ["Caterpillar", "Komatsu", "Tadano", "Liebherr", "Bobcat", "Cummins", "Stemac"];
+export const brands = [
+  "Caterpillar",
+  "Komatsu",
+  "Tadano",
+  "Liebherr",
+  "Bobcat",
+  "Cummins",
+  "Stemac",
+];
 export const states = ["SP", "RJ", "MG", "PR", "RS", "SC", "BA", "GO"];
 
 export function formatPrice(value: number, mode: "venda" | "locacao") {
@@ -41,4 +49,3 @@ export function formatPrice(value: number, mode: "venda" | "locacao") {
   }).format(value);
   return mode === "locacao" ? `${formatted}/dia` : formatted;
 }
-

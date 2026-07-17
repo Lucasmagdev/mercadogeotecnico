@@ -9,11 +9,13 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as TermosRouteImport } from './routes/termos'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as ServicosRouteImport } from './routes/servicos'
 import { Route as RedefinirSenhaRouteImport } from './routes/redefinir-senha'
 import { Route as RecuperarSenhaRouteImport } from './routes/recuperar-senha'
 import { Route as PublicarRouteImport } from './routes/publicar'
+import { Route as PrivacidadeRouteImport } from './routes/privacidade'
 import { Route as PainelRouteImport } from './routes/painel'
 import { Route as NotificacoesRouteImport } from './routes/notificacoes'
 import { Route as MensagensRouteImport } from './routes/mensagens'
@@ -42,6 +44,11 @@ import { Route as AdminEmpresasRouteImport } from './routes/admin.empresas'
 import { Route as PainelEquipamentosIndexRouteImport } from './routes/painel.equipamentos.index'
 import { Route as PainelEquipamentosIdRouteImport } from './routes/painel.equipamentos.$id'
 
+const TermosRoute = TermosRouteImport.update({
+  id: '/termos',
+  path: '/termos',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
   path: '/sitemap.xml',
@@ -65,6 +72,11 @@ const RecuperarSenhaRoute = RecuperarSenhaRouteImport.update({
 const PublicarRoute = PublicarRouteImport.update({
   id: '/publicar',
   path: '/publicar',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrivacidadeRoute = PrivacidadeRouteImport.update({
+  id: '/privacidade',
+  path: '/privacidade',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PainelRoute = PainelRouteImport.update({
@@ -216,11 +228,13 @@ export interface FileRoutesByFullPath {
   '/mensagens': typeof MensagensRoute
   '/notificacoes': typeof NotificacoesRoute
   '/painel': typeof PainelRouteWithChildren
+  '/privacidade': typeof PrivacidadeRoute
   '/publicar': typeof PublicarRoute
   '/recuperar-senha': typeof RecuperarSenhaRoute
   '/redefinir-senha': typeof RedefinirSenhaRoute
   '/servicos': typeof ServicosRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/termos': typeof TermosRoute
   '/admin/empresas': typeof AdminEmpresasRoute
   '/cadastro/empresa': typeof CadastroEmpresaRoute
   '/cadastro/usuario': typeof CadastroUsuarioRoute
@@ -245,11 +259,13 @@ export interface FileRoutesByTo {
   '/fornecedores': typeof FornecedoresRoute
   '/mensagens': typeof MensagensRoute
   '/notificacoes': typeof NotificacoesRoute
+  '/privacidade': typeof PrivacidadeRoute
   '/publicar': typeof PublicarRoute
   '/recuperar-senha': typeof RecuperarSenhaRoute
   '/redefinir-senha': typeof RedefinirSenhaRoute
   '/servicos': typeof ServicosRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/termos': typeof TermosRoute
   '/admin/empresas': typeof AdminEmpresasRoute
   '/cadastro/empresa': typeof CadastroEmpresaRoute
   '/cadastro/usuario': typeof CadastroUsuarioRoute
@@ -279,11 +295,13 @@ export interface FileRoutesById {
   '/mensagens': typeof MensagensRoute
   '/notificacoes': typeof NotificacoesRoute
   '/painel': typeof PainelRouteWithChildren
+  '/privacidade': typeof PrivacidadeRoute
   '/publicar': typeof PublicarRoute
   '/recuperar-senha': typeof RecuperarSenhaRoute
   '/redefinir-senha': typeof RedefinirSenhaRoute
   '/servicos': typeof ServicosRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/termos': typeof TermosRoute
   '/admin/empresas': typeof AdminEmpresasRoute
   '/cadastro/empresa': typeof CadastroEmpresaRoute
   '/cadastro/usuario': typeof CadastroUsuarioRoute
@@ -315,11 +333,13 @@ export interface FileRouteTypes {
     | '/mensagens'
     | '/notificacoes'
     | '/painel'
+    | '/privacidade'
     | '/publicar'
     | '/recuperar-senha'
     | '/redefinir-senha'
     | '/servicos'
     | '/sitemap.xml'
+    | '/termos'
     | '/admin/empresas'
     | '/cadastro/empresa'
     | '/cadastro/usuario'
@@ -344,11 +364,13 @@ export interface FileRouteTypes {
     | '/fornecedores'
     | '/mensagens'
     | '/notificacoes'
+    | '/privacidade'
     | '/publicar'
     | '/recuperar-senha'
     | '/redefinir-senha'
     | '/servicos'
     | '/sitemap.xml'
+    | '/termos'
     | '/admin/empresas'
     | '/cadastro/empresa'
     | '/cadastro/usuario'
@@ -377,11 +399,13 @@ export interface FileRouteTypes {
     | '/mensagens'
     | '/notificacoes'
     | '/painel'
+    | '/privacidade'
     | '/publicar'
     | '/recuperar-senha'
     | '/redefinir-senha'
     | '/servicos'
     | '/sitemap.xml'
+    | '/termos'
     | '/admin/empresas'
     | '/cadastro/empresa'
     | '/cadastro/usuario'
@@ -412,15 +436,24 @@ export interface RootRouteChildren {
   MensagensRoute: typeof MensagensRoute
   NotificacoesRoute: typeof NotificacoesRoute
   PainelRoute: typeof PainelRouteWithChildren
+  PrivacidadeRoute: typeof PrivacidadeRoute
   PublicarRoute: typeof PublicarRoute
   RecuperarSenhaRoute: typeof RecuperarSenhaRoute
   RedefinirSenhaRoute: typeof RedefinirSenhaRoute
   ServicosRoute: typeof ServicosRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  TermosRoute: typeof TermosRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/termos': {
+      id: '/termos'
+      path: '/termos'
+      fullPath: '/termos'
+      preLoaderRoute: typeof TermosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/sitemap.xml': {
       id: '/sitemap.xml'
       path: '/sitemap.xml'
@@ -454,6 +487,13 @@ declare module '@tanstack/react-router' {
       path: '/publicar'
       fullPath: '/publicar'
       preLoaderRoute: typeof PublicarRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/privacidade': {
+      id: '/privacidade'
+      path: '/privacidade'
+      fullPath: '/privacidade'
+      preLoaderRoute: typeof PrivacidadeRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/painel': {
@@ -747,11 +787,13 @@ const rootRouteChildren: RootRouteChildren = {
   MensagensRoute: MensagensRoute,
   NotificacoesRoute: NotificacoesRoute,
   PainelRoute: PainelRouteWithChildren,
+  PrivacidadeRoute: PrivacidadeRoute,
   PublicarRoute: PublicarRoute,
   RecuperarSenhaRoute: RecuperarSenhaRoute,
   RedefinirSenhaRoute: RedefinirSenhaRoute,
   ServicosRoute: ServicosRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
+  TermosRoute: TermosRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

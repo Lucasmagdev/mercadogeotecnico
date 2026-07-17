@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { BadgeCheck, Clock, ShieldAlert } from "lucide-react";
+import { CircleCheck, Clock, ShieldAlert } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { VerifiedSeal } from "@/components/verified-seal";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -29,14 +30,18 @@ function Configuracoes() {
   const { session, profile, loading, refreshProfile } = useAuth();
 
   if (loading) {
-    return <div className="container-page py-16 text-center text-muted-foreground">Carregando...</div>;
+    return (
+      <div className="container-page py-16 text-center text-muted-foreground">Carregando...</div>
+    );
   }
 
   if (!session) {
     return (
       <div className="container-page flex min-h-[60vh] flex-col items-center justify-center gap-3 text-center">
         <h1 className="text-xl font-bold">Entre para gerenciar sua conta</h1>
-        <Button asChild><Link to="/entrar">Entrar</Link></Button>
+        <Button asChild>
+          <Link to="/entrar">Entrar</Link>
+        </Button>
       </div>
     );
   }
@@ -55,7 +60,13 @@ function Configuracoes() {
   );
 }
 
-function ProfileSettings({ userId, refreshProfile }: { userId: string; refreshProfile: () => Promise<void> }) {
+function ProfileSettings({
+  userId,
+  refreshProfile,
+}: {
+  userId: string;
+  refreshProfile: () => Promise<void>;
+}) {
   const { profile } = useAuth();
   const [fullName, setFullName] = useState(profile?.full_name ?? "");
   const [phone, setPhone] = useState(profile?.phone ?? "");
@@ -152,7 +163,9 @@ function CompanySettings({ ownerId }: { ownerId: string }) {
     return (
       <div className="mt-6 flex flex-col items-center gap-3 rounded-2xl border border-border bg-card p-8 text-center">
         <p className="text-muted-foreground">Você ainda não tem uma empresa cadastrada.</p>
-        <Button asChild><Link to="/cadastro/empresa">Cadastrar empresa</Link></Button>
+        <Button asChild>
+          <Link to="/cadastro/empresa">Cadastrar empresa</Link>
+        </Button>
       </div>
     );
   }
@@ -161,7 +174,12 @@ function CompanySettings({ ownerId }: { ownerId: string }) {
     <div className="mt-6 space-y-6 rounded-2xl border border-border bg-card p-6">
       {company.status === "approved" && (
         <div className="flex items-center gap-2 text-sm font-medium text-success">
-          <BadgeCheck className="h-4 w-4" /> Empresa aprovada{company.verified && " e verificada"}
+          {company.verified ? (
+            <VerifiedSeal className="h-4 w-4" />
+          ) : (
+            <CircleCheck className="h-4 w-4" aria-hidden />
+          )}
+          Empresa aprovada{company.verified && " e verificada pela GeoSelos"}
         </div>
       )}
       {company.status === "pending" && (
@@ -203,16 +221,26 @@ function CompanySettings({ ownerId }: { ownerId: string }) {
         <div className="space-y-2">
           <Label>Estado</Label>
           <Select value={form.state} onValueChange={(v) => set("state", v)}>
-            <SelectTrigger><SelectValue placeholder="UF" /></SelectTrigger>
+            <SelectTrigger>
+              <SelectValue placeholder="UF" />
+            </SelectTrigger>
             <SelectContent>
-              {states.map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}
+              {states.map((s) => (
+                <SelectItem key={s} value={s}>
+                  {s}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
         </div>
       </div>
       <div className="space-y-2">
         <Label>Descrição</Label>
-        <Textarea rows={4} value={form.description} onChange={(e) => set("description", e.target.value)} />
+        <Textarea
+          rows={4}
+          value={form.description}
+          onChange={(e) => set("description", e.target.value)}
+        />
       </div>
       <div className="flex items-center justify-end gap-3">
         {saved && <span className="text-sm text-success">Salvo!</span>}

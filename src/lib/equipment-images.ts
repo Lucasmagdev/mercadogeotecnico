@@ -6,7 +6,9 @@ const BUCKET = "equipment-images";
 /** All display URLs for a listing: uploaded photos first, stock fallback otherwise. */
 export function getEquipmentImageUrls(item: Pick<EquipmentRow, "images" | "image_key">): string[] {
   if (item.images && item.images.length > 0) {
-    return item.images.map((path) => supabase.storage.from(BUCKET).getPublicUrl(path).data.publicUrl);
+    return item.images.map(
+      (path) => supabase.storage.from(BUCKET).getPublicUrl(path).data.publicUrl,
+    );
   }
   const key = (item.image_key ?? "excavator") as keyof typeof equipmentImages;
   return [equipmentImages[key] ?? equipmentImages.excavator];

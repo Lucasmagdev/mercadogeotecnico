@@ -7,20 +7,21 @@ import {
   Phone,
   MessageCircle,
   Send,
-  BadgeCheck,
   MapPin,
   Calendar,
   Clock,
-  ChevronLeft,
+  ChevronRight,
   Lock,
   Eye,
   Check,
+  ShieldAlert,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Textarea } from "@/components/ui/textarea";
 import { EquipmentCard } from "@/components/equipment-card";
+import { VerifiedSeal } from "@/components/verified-seal";
 import { useAuth } from "@/components/auth-provider";
 import { useFavoriteToggle } from "@/hooks/use-favorite";
 import {
@@ -56,7 +57,10 @@ function EquipmentDetail() {
     queryKey: ["equipment", slug],
     queryFn: () => fetchEquipmentBySlug(slug),
   });
-  const { data: categories = [] } = useQuery({ queryKey: ["categories"], queryFn: fetchCategories });
+  const { data: categories = [] } = useQuery({
+    queryKey: ["categories"],
+    queryFn: fetchCategories,
+  });
   const { data: related = [] } = useQuery({
     queryKey: ["equipment-related", item?.category_slug, item?.id],
     queryFn: () => fetchRelatedEquipment(item!.category_slug!, item!.id),
@@ -69,6 +73,10 @@ function EquipmentDetail() {
     if (item) incrementEquipmentViews(item.id).catch(() => {});
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [item?.id]);
+
+  useEffect(() => {
+    if (item) document.title = `${item.title} — Mercado Geotécnico`;
+  }, [item]);
 
   const unlock = useMutation({
     mutationFn: () => unlockEquipmentContact(item!.id),
@@ -99,14 +107,35 @@ function EquipmentDetail() {
   }
 
   if (isLoading) {
-    return <div className="container-page py-24 text-center text-muted-foreground">Carregando...</div>;
+    return (
+      <div className="container-page py-8">
+        <div className="h-5 w-64 animate-pulse rounded bg-muted" />
+        <div className="mt-6 grid gap-10 lg:grid-cols-[1.3fr_1fr]">
+          <div className="aspect-[4/3] animate-pulse rounded-2xl bg-muted" />
+          <div className="space-y-4">
+            <div className="h-6 w-40 animate-pulse rounded bg-muted" />
+            <div className="h-9 w-3/4 animate-pulse rounded bg-muted" />
+            <div className="h-8 w-48 animate-pulse rounded bg-muted" />
+            <div className="grid grid-cols-3 gap-3">
+              {[0, 1, 2].map((i) => (
+                <div key={i} className="h-20 animate-pulse rounded-xl bg-muted" />
+              ))}
+            </div>
+            <div className="h-11 animate-pulse rounded-lg bg-muted" />
+            <div className="h-32 animate-pulse rounded-2xl bg-muted" />
+          </div>
+        </div>
+      </div>
+    );
   }
 
   if (!item) {
     return (
       <div className="container-page py-24 text-center">
         <h1 className="text-2xl font-bold">Equipamento não encontrado</h1>
-        <Button asChild className="mt-6"><Link to="/equipamentos">Ver equipamentos</Link></Button>
+        <Button asChild className="mt-6">
+          <Link to="/equipamentos">Ver equipamentos</Link>
+        </Button>
       </div>
     );
   }
@@ -118,18 +147,43 @@ function EquipmentDetail() {
 
   return (
     <div className="container-page py-8">
-      <Button variant="ghost" size="sm" asChild className="mb-4 gap-1 text-muted-foreground">
-        <Link to="/equipamentos"><ChevronLeft className="h-4 w-4" /> Voltar</Link>
-      </Button>
+      <nav
+        aria-label="Breadcrumb"
+        className="mb-5 flex flex-wrap items-center gap-1 text-sm text-muted-foreground"
+      >
+        <Link to="/" className="transition-colors hover:text-primary">
+          Início
+        </Link>
+        <ChevronRight className="h-3.5 w-3.5" aria-hidden />
+        <Link to="/equipamentos" className="transition-colors hover:text-primary">
+          Equipamentos
+        </Link>
+        {categoryName && (
+          <>
+            <ChevronRight className="h-3.5 w-3.5" aria-hidden />
+            <Link
+              to="/equipamentos"
+              search={{ categoria: item.category_slug! }}
+              className="transition-colors hover:text-primary"
+            >
+              {categoryName}
+            </Link>
+          </>
+        )}
+        <ChevronRight className="h-3.5 w-3.5" aria-hidden />
+        <span className="max-w-[220px] truncate font-medium text-foreground sm:max-w-none">
+          {item.title}
+        </span>
+      </nav>
 
       <div className="grid gap-10 lg:grid-cols-[1.3fr_1fr]">
         {/* Gallery */}
         <div>
-          <div className="overflow-hidden rounded-2xl border border-border bg-muted">
+          <div className="group overflow-hidden rounded-2xl border border-border bg-muted">
             <img
               src={activeImage}
               alt={item.title}
-              className="aspect-[4/3] w-full object-cover"
+              className="aspect-[4/3] w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
             />
           </div>
           {gallery.length > 1 && (
@@ -151,9 +205,15 @@ function EquipmentDetail() {
         </div>
 
         {/* Info */}
-        <div>
+        <div className="lg:sticky lg:top-24 lg:self-start">
           <div className="flex items-center gap-2">
-            <Badge className={item.mode === "locacao" ? "bg-accent text-accent-foreground" : "bg-secondary text-secondary-foreground"}>
+            <Badge
+              className={
+                item.mode === "locacao"
+                  ? "bg-accent text-accent-foreground"
+                  : "bg-secondary text-secondary-foreground"
+              }
+            >
               {item.mode === "locacao" ? "Locação" : "Venda"}
             </Badge>
             <Badge variant="outline">{item.condition}</Badge>
@@ -163,8 +223,12 @@ function EquipmentDetail() {
             </span>
           </div>
           <h1 className="mt-3 text-2xl font-bold sm:text-3xl">{item.title}</h1>
-          <p className="mt-1 text-muted-foreground">{item.brand} · {item.model}</p>
-          <p className="mt-4 text-3xl font-bold text-primary">{formatPrice(item.price, item.mode)}</p>
+          <p className="mt-1 text-muted-foreground">
+            {item.brand} · {item.model}
+          </p>
+          <p className="mt-4 text-3xl font-bold text-primary">
+            {formatPrice(item.price, item.mode)}
+          </p>
 
           <div className="mt-5 grid grid-cols-3 gap-3">
             {[
@@ -172,7 +236,10 @@ function EquipmentDetail() {
               { icon: Clock, label: "Horas", value: item.hours.toLocaleString("pt-BR") },
               { icon: MapPin, label: "Local", value: `${item.city}/${item.state}` },
             ].map((s) => (
-              <div key={s.label} className="rounded-xl border border-border bg-card p-3 text-center">
+              <div
+                key={s.label}
+                className="rounded-xl border border-border bg-card p-3 text-center"
+              >
                 <s.icon className="mx-auto mb-1 h-4 w-4 text-primary" />
                 <p className="text-xs text-muted-foreground">{s.label}</p>
                 <p className="text-sm font-semibold">{s.value}</p>
@@ -186,7 +253,11 @@ function EquipmentDetail() {
                 <p className="flex items-center gap-2 text-sm font-medium">
                   <Phone className="h-4 w-4 text-success" /> {contact.phone}
                 </p>
-                <Button variant="outline" asChild className="gap-2 border-success/40 text-success hover:bg-success/10">
+                <Button
+                  variant="outline"
+                  asChild
+                  className="gap-2 border-success/40 text-success hover:bg-success/10"
+                >
                   <a href={`https://wa.me/${contact.whatsapp}`} target="_blank" rel="noreferrer">
                     <MessageCircle className="h-4 w-4" /> Chamar no WhatsApp
                   </a>
@@ -194,11 +265,14 @@ function EquipmentDetail() {
               </div>
             ) : session ? (
               <Button className="gap-2" onClick={() => unlock.mutate()} disabled={unlock.isPending}>
-                <Phone className="h-4 w-4" /> {unlock.isPending ? "Desbloqueando..." : "Ver contato"}
+                <Phone className="h-4 w-4" />{" "}
+                {unlock.isPending ? "Desbloqueando..." : "Ver contato"}
               </Button>
             ) : (
               <Button asChild className="gap-2">
-                <Link to="/entrar"><Lock className="h-4 w-4" /> Entrar para ver o contato</Link>
+                <Link to="/entrar">
+                  <Lock className="h-4 w-4" /> Entrar para ver o contato
+                </Link>
               </Button>
             )}
             <div className="flex gap-2">
@@ -217,8 +291,17 @@ function EquipmentDetail() {
                 <Heart className={cn("h-4 w-4", isFavorite && "fill-accent text-accent")} />
                 {isFavorite ? "Favoritado" : "Favoritar"}
               </Button>
-              <Button variant="outline" onClick={handleShare} aria-label="Compartilhar" className="flex-1 gap-2">
-                {copied ? <Check className="h-4 w-4 text-success" /> : <Share2 className="h-4 w-4" />}
+              <Button
+                variant="outline"
+                onClick={handleShare}
+                aria-label="Compartilhar"
+                className="flex-1 gap-2"
+              >
+                {copied ? (
+                  <Check className="h-4 w-4 text-success" />
+                ) : (
+                  <Share2 className="h-4 w-4" />
+                )}
                 {copied ? "Link copiado" : "Compartilhar"}
               </Button>
             </div>
@@ -229,7 +312,9 @@ function EquipmentDetail() {
             <p className="mb-2 text-sm font-semibold">Enviar mensagem ao anunciante</p>
             {!session ? (
               <Button asChild variant="outline" className="w-full gap-2">
-                <Link to="/entrar"><Lock className="h-4 w-4" /> Entrar para enviar mensagem</Link>
+                <Link to="/entrar">
+                  <Lock className="h-4 w-4" /> Entrar para enviar mensagem
+                </Link>
               </Button>
             ) : messageSent ? (
               <p className="flex items-center gap-2 text-sm text-success">
@@ -248,7 +333,8 @@ function EquipmentDetail() {
                   disabled={!messageDraft.trim() || sendMessage.isPending}
                   onClick={() => sendMessage.mutate()}
                 >
-                  <Send className="h-4 w-4" /> {sendMessage.isPending ? "Enviando..." : "Enviar mensagem"}
+                  <Send className="h-4 w-4" />{" "}
+                  {sendMessage.isPending ? "Enviando..." : "Enviar mensagem"}
                 </Button>
               </div>
             )}
@@ -269,7 +355,7 @@ function EquipmentDetail() {
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-1.5">
                   <p className="truncate font-semibold">{company.name}</p>
-                  {company.verified && <BadgeCheck className="h-4 w-4 shrink-0 text-success" />}
+                  {company.verified && <VerifiedSeal className="h-4 w-4" />}
                 </div>
                 <p className="text-sm text-muted-foreground">
                   {company.city}/{company.state} · {company.years_on_market} anos no mercado
@@ -277,6 +363,18 @@ function EquipmentDetail() {
               </div>
             </Link>
           )}
+
+          {/* Safety notice */}
+          <div className="mt-4 flex gap-3 rounded-2xl border border-accent/30 bg-accent/5 p-4">
+            <ShieldAlert className="h-5 w-5 shrink-0 text-accent" />
+            <div className="text-sm">
+              <p className="font-semibold">Negocie com segurança</p>
+              <p className="mt-1 text-muted-foreground">
+                Nunca faça pagamentos antecipados fora da plataforma. Verifique o equipamento
+                pessoalmente e prefira empresas com selo de verificação.
+              </p>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -290,7 +388,10 @@ function EquipmentDetail() {
           <h2 className="text-xl font-bold">Especificações técnicas</h2>
           <div className="mt-3 overflow-hidden rounded-2xl border border-border">
             {item.specs.map((s, i) => (
-              <div key={i} className={`flex justify-between px-4 py-3 text-sm ${i % 2 ? "bg-card" : "bg-background"}`}>
+              <div
+                key={i}
+                className={`flex justify-between px-4 py-3 text-sm ${i % 2 ? "bg-card" : "bg-background"}`}
+              >
                 <span className="text-muted-foreground">{s.label}</span>
                 <span className="font-medium">{s.value}</span>
               </div>

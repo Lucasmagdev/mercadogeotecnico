@@ -1,8 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { BadgeCheck, MapPin, Check, X } from "lucide-react";
+import { MapPin, Check, X } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { VerifiedSeal } from "@/components/verified-seal";
 import { fetchAllCompaniesAdmin, setCompanyStatus } from "@/lib/queries";
 
 export const Route = createFileRoute("/admin/empresas")({
@@ -42,17 +43,25 @@ function AdminEmpresas() {
       <div className="mt-6 space-y-3">
         {isLoading && <p className="text-sm text-muted-foreground">Carregando...</p>}
         {companies?.map((c) => (
-          <div key={c.id} className="flex flex-wrap items-center gap-4 rounded-2xl border border-border bg-card p-4">
+          <div
+            key={c.id}
+            className="flex flex-wrap items-center gap-4 rounded-2xl border border-border bg-card p-4"
+          >
             <div className="min-w-0 flex-1">
               <div className="flex flex-wrap items-center gap-2">
                 <p className="font-semibold">{c.name}</p>
-                {c.verified && <BadgeCheck className="h-4 w-4 text-success" />}
-                <Badge className={`border-0 ${statusClass[c.status]}`}>{statusLabel[c.status]}</Badge>
+                {c.verified && <VerifiedSeal className="h-4 w-4" />}
+                <Badge className={`border-0 ${statusClass[c.status]}`}>
+                  {statusLabel[c.status]}
+                </Badge>
               </div>
               <p className="mt-1 flex items-center gap-1 text-sm text-muted-foreground">
-                <MapPin className="h-3.5 w-3.5" /> {c.city}/{c.state} · {c.cnpj || "CNPJ não informado"}
+                <MapPin className="h-3.5 w-3.5" /> {c.city}/{c.state} ·{" "}
+                {c.cnpj || "CNPJ não informado"}
               </p>
-              <p className="mt-1 text-sm text-muted-foreground">{c.phone} · {c.whatsapp}</p>
+              <p className="mt-1 text-sm text-muted-foreground">
+                {c.phone} · {c.whatsapp}
+              </p>
             </div>
             {c.status !== "approved" && (
               <Button

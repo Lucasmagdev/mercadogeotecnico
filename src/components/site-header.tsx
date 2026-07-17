@@ -1,16 +1,7 @@
 import { useState } from "react";
 import { Link, useRouterState, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import {
-  Search,
-  MessageSquare,
-  Bell,
-  Menu,
-  Plus,
-  Sun,
-  Moon,
-  ChevronDown,
-} from "lucide-react";
+import { Search, MessageSquare, Bell, Menu, Plus, Sun, Moon, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle } from "@/components/ui/sheet";
@@ -25,6 +16,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useTheme } from "@/components/theme-provider";
 import { useAuth } from "@/components/auth-provider";
+import { useRealtimeNotifications } from "@/hooks/use-realtime";
 import { fetchNotifications } from "@/lib/queries";
 import { Logo } from "@/components/logo";
 import { categories } from "@/lib/mock-data";
@@ -44,11 +36,14 @@ export function SiteHeader() {
   const initials = (profile?.full_name ?? session?.user.email ?? "?").slice(0, 2).toUpperCase();
   const [headerQuery, setHeaderQuery] = useState("");
 
+  useRealtimeNotifications(session?.user.id);
+
   const { data: notifications = [] } = useQuery({
     queryKey: ["notifications", session?.user.id],
     queryFn: () => fetchNotifications(session!.user.id),
     enabled: !!session,
-    refetchInterval: 8000,
+    // Realtime invalidates on insert; long interval only as safety net.
+    refetchInterval: 60000,
   });
   const unreadCount = notifications.filter((n) => !n.read).length;
   const unreadMessages = notifications.filter((n) => !n.read && n.type === "mensagem").length;
@@ -100,7 +95,9 @@ export function SiteHeader() {
               variant="ghost"
               size="sm"
               asChild
-              className={pathname.startsWith(item.to) ? "text-primary font-semibold" : "font-medium"}
+              className={
+                pathname.startsWith(item.to) ? "text-primary font-semibold" : "font-medium"
+              }
             >
               <Link to={item.to}>{item.label}</Link>
             </Button>
@@ -153,24 +150,38 @@ export function SiteHeader() {
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 {profile?.role === "admin" && (
-                  <DropdownMenuItem asChild><Link to="/admin">Painel admin</Link></DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link to="/admin">Painel admin</Link>
+                  </DropdownMenuItem>
                 )}
                 {profile?.role === "company" && (
                   <>
-                    <DropdownMenuItem asChild><Link to="/painel">Painel</Link></DropdownMenuItem>
-                    <DropdownMenuItem asChild><Link to="/painel/equipamentos">Meus Equipamentos</Link></DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link to="/painel">Painel</Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link to="/painel/equipamentos">Meus Equipamentos</Link>
+                    </DropdownMenuItem>
                   </>
                 )}
-                <DropdownMenuItem asChild><Link to="/favoritos">Favoritos</Link></DropdownMenuItem>
-                <DropdownMenuItem asChild><Link to="/configuracoes">Configurações</Link></DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/favoritos">Favoritos</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/configuracoes">Configurações</Link>
+                </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={() => signOut()}>Sair</DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           ) : (
             <div className="hidden items-center gap-1 sm:flex">
-              <Button variant="ghost" asChild><Link to="/entrar">Entrar</Link></Button>
-              <Button variant="outline" asChild><Link to="/cadastro">Cadastrar</Link></Button>
+              <Button variant="ghost" asChild>
+                <Link to="/entrar">Entrar</Link>
+              </Button>
+              <Button variant="outline" asChild>
+                <Link to="/cadastro">Cadastrar</Link>
+              </Button>
             </div>
           )}
 
@@ -182,7 +193,9 @@ export function SiteHeader() {
             </SheetTrigger>
             <SheetContent side="right" className="w-72">
               <SheetHeader>
-                <SheetTitle><Logo /></SheetTitle>
+                <SheetTitle>
+                  <Logo />
+                </SheetTitle>
               </SheetHeader>
               <div className="mt-6 flex flex-col gap-1">
                 {nav.map((item) => (
@@ -193,28 +206,63 @@ export function SiteHeader() {
                 {session ? (
                   <>
                     {profile?.role === "admin" && (
-                      <Button variant="ghost" asChild className="justify-start"><Link to="/admin">Painel admin</Link></Button>
+                      <Button variant="ghost" asChild className="justify-start">
+                        <Link to="/admin">Painel admin</Link>
+                      </Button>
                     )}
                     {profile?.role === "company" && (
-                      <Button variant="ghost" asChild className="justify-start"><Link to="/painel">Painel</Link></Button>
+                      <Button variant="ghost" asChild className="justify-start">
+                        <Link to="/painel">Painel</Link>
+                      </Button>
                     )}
-                    <Button variant="ghost" asChild className="justify-start"><Link to="/favoritos">Favoritos</Link></Button>
-                    <Button variant="ghost" asChild className="justify-start"><Link to="/mensagens">Mensagens</Link></Button>
-                    <Button variant="ghost" asChild className="justify-start"><Link to="/notificacoes">Notificações</Link></Button>
-                    <Button variant="ghost" asChild className="justify-start"><Link to="/configuracoes">Configurações</Link></Button>
-                    <Button variant="ghost" className="justify-start" onClick={() => signOut()}>Sair</Button>
+                    <Button variant="ghost" asChild className="justify-start">
+                      <Link to="/favoritos">Favoritos</Link>
+                    </Button>
+                    <Button variant="ghost" asChild className="justify-start">
+                      <Link to="/mensagens">Mensagens</Link>
+                    </Button>
+                    <Button variant="ghost" asChild className="justify-start">
+                      <Link to="/notificacoes">Notificações</Link>
+                    </Button>
+                    <Button variant="ghost" asChild className="justify-start">
+                      <Link to="/configuracoes">Configurações</Link>
+                    </Button>
+                    <Button variant="ghost" className="justify-start" onClick={() => signOut()}>
+                      Sair
+                    </Button>
                   </>
                 ) : (
                   <>
-                    <Button variant="ghost" asChild className="justify-start"><Link to="/entrar">Entrar</Link></Button>
-                    <Button variant="ghost" asChild className="justify-start"><Link to="/cadastro">Cadastrar</Link></Button>
+                    <Button variant="ghost" asChild className="justify-start">
+                      <Link to="/entrar">Entrar</Link>
+                    </Button>
+                    <Button variant="ghost" asChild className="justify-start">
+                      <Link to="/cadastro">Cadastrar</Link>
+                    </Button>
                   </>
                 )}
-                <Button asChild className="mt-4 gap-1.5"><Link to="/publicar"><Plus className="h-4 w-4" /> Anunciar</Link></Button>
+                <Button asChild className="mt-4 gap-1.5">
+                  <Link to="/publicar">
+                    <Plus className="h-4 w-4" /> Anunciar
+                  </Link>
+                </Button>
               </div>
             </SheetContent>
           </Sheet>
         </div>
+      </div>
+
+      {/* Mobile search */}
+      <div className="border-t border-border/60 pb-2.5 pt-2 lg:hidden">
+        <form onSubmit={submitSearch} className="container-page relative">
+          <Search className="pointer-events-none absolute left-8 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <Input
+            placeholder="Qual equipamento você procura?"
+            className="h-10 rounded-full bg-muted pl-10"
+            value={headerQuery}
+            onChange={(e) => setHeaderQuery(e.target.value)}
+          />
+        </form>
       </div>
     </header>
   );

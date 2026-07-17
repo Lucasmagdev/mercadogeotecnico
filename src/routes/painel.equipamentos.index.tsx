@@ -34,25 +34,40 @@ function PainelEquipamentos() {
     <div>
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h1 className="text-2xl font-bold">Meus equipamentos</h1>
-        <Button asChild className="gap-1.5"><Link to="/publicar"><Plus className="h-4 w-4" /> Novo anúncio</Link></Button>
+        <Button asChild className="gap-1.5">
+          <Link to="/publicar">
+            <Plus className="h-4 w-4" /> Novo anúncio
+          </Link>
+        </Button>
       </div>
 
       <div className="mt-6 space-y-3">
         {mine.map((e) => (
-          <div key={e.id} className="flex flex-wrap items-center gap-4 rounded-2xl border border-border bg-card p-4">
+          <div
+            key={e.id}
+            className="flex flex-wrap items-center gap-4 rounded-2xl border border-border bg-card p-4"
+          >
             <div className="min-w-0 flex-1">
               <div className="flex items-center gap-2">
                 <p className="truncate font-semibold">{e.title}</p>
-                <Badge variant="outline" className="shrink-0">{e.mode === "locacao" ? "Locação" : "Venda"}</Badge>
+                <Badge variant="outline" className="shrink-0">
+                  {e.mode === "locacao" ? "Locação" : "Venda"}
+                </Badge>
               </div>
-              <p className="text-sm text-muted-foreground">{formatPrice(e.price, e.mode)} · {e.city}/{e.state}</p>
+              <p className="text-sm text-muted-foreground">
+                {formatPrice(e.price, e.mode)} · {e.city}/{e.state}
+              </p>
             </div>
             <div className="flex gap-1.5">
               <Button variant="outline" size="icon" asChild aria-label="Ver">
-                <Link to="/equipamentos/$slug" params={{ slug: e.slug }}><Eye className="h-4 w-4" /></Link>
+                <Link to="/equipamentos/$slug" params={{ slug: e.slug }}>
+                  <Eye className="h-4 w-4" />
+                </Link>
               </Button>
               <Button variant="outline" size="icon" asChild aria-label="Editar">
-                <Link to="/painel/equipamentos/$id" params={{ id: e.id }}><Pencil className="h-4 w-4" /></Link>
+                <Link to="/painel/equipamentos/$id" params={{ id: e.id }}>
+                  <Pencil className="h-4 w-4" />
+                </Link>
               </Button>
               <Button
                 variant="outline"
@@ -72,7 +87,9 @@ function PainelEquipamentos() {
           </div>
         ))}
         {mine.length === 0 && (
-          <p className="text-sm text-muted-foreground">Você ainda não anunciou nenhum equipamento.</p>
+          <p className="text-sm text-muted-foreground">
+            Você ainda não anunciou nenhum equipamento.
+          </p>
         )}
       </div>
     </div>

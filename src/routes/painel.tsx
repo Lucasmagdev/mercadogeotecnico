@@ -47,15 +47,21 @@ function PainelLayout() {
   });
 
   if (loading || (session && companyLoading)) {
-    return <div className="container-page py-16 text-center text-muted-foreground">Carregando...</div>;
+    return (
+      <div className="container-page py-16 text-center text-muted-foreground">Carregando...</div>
+    );
   }
 
   if (!session) {
     return (
       <div className="container-page flex min-h-[60vh] flex-col items-center justify-center gap-3 text-center">
         <h1 className="text-xl font-bold">Área da empresa</h1>
-        <p className="text-muted-foreground">Entre com sua conta de empresa para acessar o painel.</p>
-        <Button asChild><Link to="/entrar">Entrar</Link></Button>
+        <p className="text-muted-foreground">
+          Entre com sua conta de empresa para acessar o painel.
+        </p>
+        <Button asChild>
+          <Link to="/entrar">Entrar</Link>
+        </Button>
       </div>
     );
   }
@@ -68,7 +74,9 @@ function PainelLayout() {
         <p className="max-w-md text-muted-foreground">
           Cadastre sua empresa para anunciar equipamentos e acessar o painel de gestão.
         </p>
-        <Button asChild><Link to="/cadastro/empresa">Cadastrar empresa</Link></Button>
+        <Button asChild>
+          <Link to="/cadastro/empresa">Cadastrar empresa</Link>
+        </Button>
       </div>
     );
   }
@@ -79,8 +87,8 @@ function PainelLayout() {
         <Clock className="h-10 w-10 text-accent" />
         <h1 className="text-xl font-bold">Cadastro em análise</h1>
         <p className="max-w-md text-muted-foreground">
-          Sua empresa <strong>{company.name}</strong> foi cadastrada e está aguardando aprovação do administrador.
-          Assim que aprovada, você poderá anunciar equipamentos.
+          Sua empresa <strong>{company.name}</strong> foi cadastrada e está aguardando aprovação do
+          administrador. Assim que aprovada, você poderá anunciar equipamentos.
         </p>
       </div>
     );
@@ -92,8 +100,8 @@ function PainelLayout() {
         <ShieldAlert className="h-10 w-10 text-destructive" />
         <h1 className="text-xl font-bold">Cadastro não aprovado</h1>
         <p className="max-w-md text-muted-foreground">
-          O cadastro da sua empresa não foi aprovado pelo administrador. Entre em contato com o suporte para mais
-          informações.
+          O cadastro da sua empresa não foi aprovado pelo administrador. Entre em contato com o
+          suporte para mais informações.
         </p>
       </div>
     );

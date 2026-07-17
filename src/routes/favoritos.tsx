@@ -15,7 +15,10 @@ export const Route = createFileRoute("/favoritos")({
 
 function Favoritos() {
   const { session, loading } = useAuth();
-  const { data: categories = [] } = useQuery({ queryKey: ["categories"], queryFn: fetchCategories });
+  const { data: categories = [] } = useQuery({
+    queryKey: ["categories"],
+    queryFn: fetchCategories,
+  });
   const { data: favs = [], isLoading } = useQuery({
     queryKey: ["favorite-equipment", session?.user.id],
     queryFn: () => fetchFavoriteEquipment(session!.user.id),
@@ -23,7 +26,9 @@ function Favoritos() {
   });
 
   if (loading) {
-    return <div className="container-page py-16 text-center text-muted-foreground">Carregando...</div>;
+    return (
+      <div className="container-page py-16 text-center text-muted-foreground">Carregando...</div>
+    );
   }
 
   if (!session) {
@@ -31,7 +36,9 @@ function Favoritos() {
       <div className="container-page flex min-h-[60vh] flex-col items-center justify-center gap-3 text-center">
         <Heart className="h-10 w-10 text-muted-foreground" />
         <h1 className="text-xl font-bold">Entre para ver seus favoritos</h1>
-        <Button asChild><Link to="/entrar">Entrar</Link></Button>
+        <Button asChild>
+          <Link to="/entrar">Entrar</Link>
+        </Button>
       </div>
     );
   }

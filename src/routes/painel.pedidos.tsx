@@ -27,7 +27,9 @@ function PainelPedidos() {
   return (
     <div>
       <h1 className="text-2xl font-bold">Pedidos</h1>
-      <p className="text-muted-foreground">Interessados que entraram em contato pelos seus anúncios.</p>
+      <p className="text-muted-foreground">
+        Interessados que entraram em contato pelos seus anúncios.
+      </p>
 
       <div className="mt-6 space-y-3">
         {leads.map((c) => (

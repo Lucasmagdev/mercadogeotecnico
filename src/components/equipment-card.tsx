@@ -1,7 +1,8 @@
 import { Link, useNavigate } from "@tanstack/react-router";
 import { motion } from "framer-motion";
-import { Heart, MapPin, BadgeCheck, Clock, Calendar } from "lucide-react";
+import { Heart, MapPin, Clock, Calendar, Star } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { VerifiedSeal } from "@/components/verified-seal";
 import { cn } from "@/lib/utils";
 import { formatPrice } from "@/lib/mock-data";
 import { getEquipmentCoverUrl } from "@/lib/equipment-images";
@@ -83,7 +84,10 @@ export function EquipmentCard({
         <div className="flex-1 p-4">
           <div className="mb-1 flex items-center justify-between gap-2 text-xs text-muted-foreground">
             <span className="line-clamp-1">{categoryName}</span>
-            <Badge variant="outline" className="shrink-0 rounded-full px-2 py-0 text-[11px] font-normal">
+            <Badge
+              variant="outline"
+              className="shrink-0 rounded-full px-2 py-0 text-[11px] font-normal"
+            >
               {item.condition}
             </Badge>
           </div>
@@ -105,11 +109,37 @@ export function EquipmentCard({
           </div>
 
           {company && (
-            <div className="mt-4 flex items-center gap-2 border-t border-border pt-3">
-              <span className="line-clamp-1 text-sm font-medium">{company.name}</span>
-              {company.verified && (
-                <BadgeCheck className="h-4 w-4 shrink-0 text-success" aria-label="Empresa verificada" />
-              )}
+            <div className="mt-4 flex items-center gap-2.5 border-t border-border pt-3">
+              <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-secondary text-[11px] font-bold text-secondary-foreground">
+                {company.name.slice(0, 2).toUpperCase()}
+              </span>
+              <span className="min-w-0 flex-1">
+                <span className="flex min-w-0 items-center gap-1.5">
+                  <span className="line-clamp-1 min-w-0 text-sm font-semibold">{company.name}</span>
+                  {company.verified && (
+                    <span
+                      className="inline-flex shrink-0 items-center gap-1 rounded-full bg-amber-400/15 px-1.5 py-0.5 text-[9px] font-bold leading-none text-[#14265C] dark:text-amber-300"
+                      title="Verificada pela GeoSelos"
+                    >
+                      <VerifiedSeal className="h-3.5 w-3.5" />
+                      GeoSelos
+                    </span>
+                  )}
+                </span>
+                <span className="flex items-center gap-1 text-xs text-muted-foreground">
+                  {company.rating > 0 && (
+                    <>
+                      <Star className="h-3 w-3 fill-amber-400 text-amber-400" />
+                      <span className="font-medium text-foreground">
+                        {company.rating.toFixed(1)}
+                      </span>
+                      {company.reviews > 0 && <span>({company.reviews})</span>}
+                      <span aria-hidden>·</span>
+                    </>
+                  )}
+                  <span className="truncate">{company.years_on_market} anos no mercado</span>
+                </span>
+              </span>
             </div>
           )}
         </div>

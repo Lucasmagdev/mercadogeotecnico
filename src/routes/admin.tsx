@@ -19,15 +19,21 @@ function AdminLayout() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
 
   if (loading) {
-    return <div className="container-page py-16 text-center text-muted-foreground">Carregando...</div>;
+    return (
+      <div className="container-page py-16 text-center text-muted-foreground">Carregando...</div>
+    );
   }
 
   if (!session) {
     return (
       <div className="container-page flex min-h-[60vh] flex-col items-center justify-center gap-3 text-center">
         <h1 className="text-xl font-bold">Área restrita</h1>
-        <p className="text-muted-foreground">Entre com uma conta de administrador para continuar.</p>
-        <Link to="/entrar" className="font-medium text-primary hover:underline">Entrar</Link>
+        <p className="text-muted-foreground">
+          Entre com uma conta de administrador para continuar.
+        </p>
+        <Link to="/entrar" className="font-medium text-primary hover:underline">
+          Entrar
+        </Link>
       </div>
     );
   }
@@ -37,7 +43,9 @@ function AdminLayout() {
       <div className="container-page flex min-h-[60vh] flex-col items-center justify-center gap-3 text-center">
         <ShieldCheck className="h-10 w-10 text-muted-foreground" />
         <h1 className="text-xl font-bold">Acesso restrito</h1>
-        <p className="text-muted-foreground">Esta área é exclusiva para administradores da plataforma.</p>
+        <p className="text-muted-foreground">
+          Esta área é exclusiva para administradores da plataforma.
+        </p>
       </div>
     );
   }
@@ -53,7 +61,9 @@ function AdminLayout() {
                 key={n.to}
                 to={n.to}
                 className={`flex shrink-0 items-center gap-2.5 rounded-xl px-4 py-2.5 text-sm font-medium transition-colors ${
-                  active ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:bg-muted"
+                  active
+                    ? "bg-primary text-primary-foreground"
+                    : "text-muted-foreground hover:bg-muted"
                 }`}
               >
                 <n.icon className="h-4 w-4" />

@@ -8,7 +8,10 @@ import { supabase } from "@/lib/supabase";
 
 export const Route = createFileRoute("/recuperar-senha")({
   head: () => ({
-    meta: [{ title: "Recuperar senha — Mercado Geotécnico" }, { name: "robots", content: "noindex" }],
+    meta: [
+      { title: "Recuperar senha — Mercado Geotécnico" },
+      { name: "robots", content: "noindex" },
+    ],
   }),
   component: RecuperarSenha,
 });
@@ -43,9 +46,12 @@ function RecuperarSenha() {
           </div>
           <h1 className="text-lg font-bold">Verifique seu e-mail</h1>
           <p className="mt-2 text-sm text-muted-foreground">
-            Se existir uma conta para <strong>{email}</strong>, enviamos um link para redefinir a senha.
+            Se existir uma conta para <strong>{email}</strong>, enviamos um link para redefinir a
+            senha.
           </p>
-          <Button asChild variant="outline" className="mt-5 w-full"><Link to="/entrar">Voltar ao login</Link></Button>
+          <Button asChild variant="outline" className="mt-5 w-full">
+            <Link to="/entrar">Voltar ao login</Link>
+          </Button>
         </div>
       </div>
     );

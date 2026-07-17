@@ -17,7 +17,10 @@ import { states } from "@/lib/mock-data";
 
 export const Route = createFileRoute("/cadastro/empresa")({
   head: () => ({
-    meta: [{ title: "Cadastro de empresa — Mercado Geotécnico" }, { name: "robots", content: "noindex" }],
+    meta: [
+      { title: "Cadastro de empresa — Mercado Geotécnico" },
+      { name: "robots", content: "noindex" },
+    ],
   }),
   component: CadastroEmpresa,
 });
@@ -81,10 +84,13 @@ function CadastroEmpresa() {
           </div>
           <h1 className="text-lg font-bold">Confirme seu e-mail</h1>
           <p className="mt-2 text-sm text-muted-foreground">
-            Enviamos um link de confirmação para <strong>{form.email}</strong>. Depois de confirmar, sua empresa
-            entra na fila de aprovação do administrador — você poderá anunciar assim que for aprovada.
+            Enviamos um link de confirmação para <strong>{form.email}</strong>. Depois de confirmar,
+            sua empresa entra na fila de aprovação do administrador — você poderá anunciar assim que
+            for aprovada.
           </p>
-          <Button asChild className="mt-5 w-full"><Link to="/entrar">Ir para o login</Link></Button>
+          <Button asChild className="mt-5 w-full">
+            <Link to="/entrar">Ir para o login</Link>
+          </Button>
         </div>
       </div>
     );
@@ -107,11 +113,20 @@ function CadastroEmpresa() {
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2 sm:col-span-2">
               <Label>Nome da empresa</Label>
-              <Input required value={form.companyName} onChange={(e) => set("companyName", e.target.value)} />
+              <Input
+                required
+                value={form.companyName}
+                onChange={(e) => set("companyName", e.target.value)}
+              />
             </div>
             <div className="space-y-2">
               <Label>CNPJ</Label>
-              <Input required value={form.cnpj} onChange={(e) => set("cnpj", e.target.value)} placeholder="00.000.000/0000-00" />
+              <Input
+                required
+                value={form.cnpj}
+                onChange={(e) => set("cnpj", e.target.value)}
+                placeholder="00.000.000/0000-00"
+              />
             </div>
             <div className="space-y-2">
               <Label>Telefone</Label>
@@ -124,19 +139,33 @@ function CadastroEmpresa() {
             <div className="space-y-2">
               <Label>Estado</Label>
               <Select value={form.state} onValueChange={(v) => set("state", v)}>
-                <SelectTrigger><SelectValue placeholder="UF" /></SelectTrigger>
+                <SelectTrigger>
+                  <SelectValue placeholder="UF" />
+                </SelectTrigger>
                 <SelectContent>
-                  {states.map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}
+                  {states.map((s) => (
+                    <SelectItem key={s} value={s}>
+                      {s}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
             <div className="space-y-2 sm:col-span-2">
               <Label>WhatsApp (com DDI, ex: 5511999990000)</Label>
-              <Input required value={form.whatsapp} onChange={(e) => set("whatsapp", e.target.value)} />
+              <Input
+                required
+                value={form.whatsapp}
+                onChange={(e) => set("whatsapp", e.target.value)}
+              />
             </div>
             <div className="space-y-2 sm:col-span-2">
               <Label>Descrição da empresa</Label>
-              <Textarea rows={3} value={form.description} onChange={(e) => set("description", e.target.value)} />
+              <Textarea
+                rows={3}
+                value={form.description}
+                onChange={(e) => set("description", e.target.value)}
+              />
             </div>
           </div>
 
@@ -145,11 +174,20 @@ function CadastroEmpresa() {
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-2 sm:col-span-2">
                 <Label>Seu nome</Label>
-                <Input required value={form.fullName} onChange={(e) => set("fullName", e.target.value)} />
+                <Input
+                  required
+                  value={form.fullName}
+                  onChange={(e) => set("fullName", e.target.value)}
+                />
               </div>
               <div className="space-y-2 sm:col-span-2">
                 <Label>E-mail</Label>
-                <Input type="email" required value={form.email} onChange={(e) => set("email", e.target.value)} />
+                <Input
+                  type="email"
+                  required
+                  value={form.email}
+                  onChange={(e) => set("email", e.target.value)}
+                />
               </div>
               <div className="space-y-2 sm:col-span-2">
                 <Label>Senha</Label>

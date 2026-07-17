@@ -8,7 +8,10 @@ import { supabase } from "@/lib/supabase";
 
 export const Route = createFileRoute("/cadastro/usuario")({
   head: () => ({
-    meta: [{ title: "Cadastro de usuário — Mercado Geotécnico" }, { name: "robots", content: "noindex" }],
+    meta: [
+      { title: "Cadastro de usuário — Mercado Geotécnico" },
+      { name: "robots", content: "noindex" },
+    ],
   }),
   component: CadastroUsuario,
 });
@@ -47,9 +50,12 @@ function CadastroUsuario() {
           </div>
           <h1 className="text-lg font-bold">Confirme seu e-mail</h1>
           <p className="mt-2 text-sm text-muted-foreground">
-            Enviamos um link de confirmação para <strong>{email}</strong>. Confirme para ativar sua conta e entrar.
+            Enviamos um link de confirmação para <strong>{email}</strong>. Confirme para ativar sua
+            conta e entrar.
           </p>
-          <Button asChild className="mt-5 w-full"><Link to="/entrar">Ir para o login</Link></Button>
+          <Button asChild className="mt-5 w-full">
+            <Link to="/entrar">Ir para o login</Link>
+          </Button>
         </div>
       </div>
     );

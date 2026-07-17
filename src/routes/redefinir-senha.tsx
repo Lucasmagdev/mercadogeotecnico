@@ -8,7 +8,10 @@ import { supabase } from "@/lib/supabase";
 
 export const Route = createFileRoute("/redefinir-senha")({
   head: () => ({
-    meta: [{ title: "Redefinir senha — Mercado Geotécnico" }, { name: "robots", content: "noindex" }],
+    meta: [
+      { title: "Redefinir senha — Mercado Geotécnico" },
+      { name: "robots", content: "noindex" },
+    ],
   }),
   component: RedefinirSenha,
 });
@@ -59,7 +62,9 @@ function RedefinirSenha() {
             <Check className="h-5 w-5" />
           </div>
           <h1 className="text-lg font-bold">Senha alterada!</h1>
-          <p className="mt-2 text-sm text-muted-foreground">Você já está conectado. Redirecionando...</p>
+          <p className="mt-2 text-sm text-muted-foreground">
+            Você já está conectado. Redirecionando...
+          </p>
         </div>
       </div>
     );
@@ -73,7 +78,9 @@ function RedefinirSenha() {
           <p className="mt-2 text-sm text-muted-foreground">
             Abra esta página pelo link enviado ao seu e-mail. Se o link expirou, solicite um novo.
           </p>
-          <Button asChild className="mt-5 w-full"><Link to="/recuperar-senha">Solicitar novo link</Link></Button>
+          <Button asChild className="mt-5 w-full">
+            <Link to="/recuperar-senha">Solicitar novo link</Link>
+          </Button>
         </div>
       </div>
     );
@@ -93,11 +100,23 @@ function RedefinirSenha() {
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
             <Label>Nova senha</Label>
-            <Input type="password" required minLength={6} value={password} onChange={(e) => setPassword(e.target.value)} />
+            <Input
+              type="password"
+              required
+              minLength={6}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
           </div>
           <div className="space-y-2">
             <Label>Confirmar senha</Label>
-            <Input type="password" required minLength={6} value={confirm} onChange={(e) => setConfirm(e.target.value)} />
+            <Input
+              type="password"
+              required
+              minLength={6}
+              value={confirm}
+              onChange={(e) => setConfirm(e.target.value)}
+            />
           </div>
           {error && <p className="text-sm text-destructive">{error}</p>}
           <Button type="submit" className="w-full" disabled={loading}>

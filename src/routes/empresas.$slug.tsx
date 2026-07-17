@@ -2,7 +2,6 @@ import { useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import {
-  BadgeCheck,
   MapPin,
   Star,
   Globe,
@@ -19,6 +18,8 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { EquipmentCard } from "@/components/equipment-card";
+import { CompanyReviews } from "@/components/company-reviews";
+import { VerifiedSeal } from "@/components/verified-seal";
 import { useAuth } from "@/components/auth-provider";
 import {
   fetchCategories,
@@ -36,7 +37,9 @@ export const Route = createFileRoute("/empresas/$slug")({
 function CompanyProfile() {
   const { slug } = Route.useParams();
   const { session } = useAuth();
-  const [contact, setContact] = useState<{ phone: string; whatsapp: string; site: string } | null>(null);
+  const [contact, setContact] = useState<{ phone: string; whatsapp: string; site: string } | null>(
+    null,
+  );
   const [messageDraft, setMessageDraft] = useState("");
   const [messageSent, setMessageSent] = useState(false);
 
@@ -44,7 +47,10 @@ function CompanyProfile() {
     queryKey: ["company", slug],
     queryFn: () => fetchCompanyBySlug(slug),
   });
-  const { data: categories = [] } = useQuery({ queryKey: ["categories"], queryFn: fetchCategories });
+  const { data: categories = [] } = useQuery({
+    queryKey: ["categories"],
+    queryFn: fetchCategories,
+  });
   const { data: items = [] } = useQuery({
     queryKey: ["company-equipment", company?.id],
     queryFn: () => fetchCompanyEquipment(company!.id),
@@ -65,14 +71,18 @@ function CompanyProfile() {
   });
 
   if (isLoading) {
-    return <div className="container-page py-24 text-center text-muted-foreground">Carregando...</div>;
+    return (
+      <div className="container-page py-24 text-center text-muted-foreground">Carregando...</div>
+    );
   }
 
   if (!company) {
     return (
       <div className="container-page py-24 text-center">
         <h1 className="text-2xl font-bold">Empresa não encontrada</h1>
-        <Button asChild className="mt-6"><Link to="/empresas">Ver empresas</Link></Button>
+        <Button asChild className="mt-6">
+          <Link to="/empresas">Ver empresas</Link>
+        </Button>
       </div>
     );
   }
@@ -83,7 +93,9 @@ function CompanyProfile() {
       <div className="h-40 w-full bg-gradient-to-r from-secondary to-primary sm:h-52" />
       <div className="container-page">
         <Button variant="ghost" size="sm" asChild className="mt-4 gap-1 text-muted-foreground">
-          <Link to="/empresas"><ChevronLeft className="h-4 w-4" /> Empresas</Link>
+          <Link to="/empresas">
+            <ChevronLeft className="h-4 w-4" /> Empresas
+          </Link>
         </Button>
 
         <div className="-mt-12 flex flex-col gap-4 sm:flex-row sm:items-end">
@@ -97,30 +109,44 @@ function CompanyProfile() {
               <h1 className="text-2xl font-bold">{company.name}</h1>
               {company.verified && (
                 <span className="inline-flex items-center gap-1 rounded-full bg-success/10 px-2 py-0.5 text-xs font-medium text-success">
-                  <BadgeCheck className="h-3.5 w-3.5" /> Verificada
+                  <VerifiedSeal className="h-3.5 w-3.5" /> Verificada pela GeoSelos
                 </span>
               )}
             </div>
             <div className="mt-1 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-muted-foreground">
-              <span className="flex items-center gap-1"><MapPin className="h-3.5 w-3.5" /> {company.city}/{company.state}</span>
-              <span className="flex items-center gap-1"><Star className="h-3.5 w-3.5 fill-accent text-accent" /> {company.rating} · {company.reviews} avaliações</span>
-              <span className="flex items-center gap-1"><Calendar className="h-3.5 w-3.5" /> {company.years_on_market} anos no mercado</span>
+              <span className="flex items-center gap-1">
+                <MapPin className="h-3.5 w-3.5" /> {company.city}/{company.state}
+              </span>
+              <span className="flex items-center gap-1">
+                <Star className="h-3.5 w-3.5 fill-accent text-accent" /> {company.rating} ·{" "}
+                {company.reviews} avaliações
+              </span>
+              <span className="flex items-center gap-1">
+                <Calendar className="h-3.5 w-3.5" /> {company.years_on_market} anos no mercado
+              </span>
             </div>
           </div>
           <div className="flex gap-2 pb-1">
             {contact ? (
-              <Button variant="outline" asChild className="gap-2 border-success/40 text-success hover:bg-success/10">
+              <Button
+                variant="outline"
+                asChild
+                className="gap-2 border-success/40 text-success hover:bg-success/10"
+              >
                 <a href={`https://wa.me/${contact.whatsapp}`} target="_blank" rel="noreferrer">
                   <MessageCircle className="h-4 w-4" /> {contact.phone}
                 </a>
               </Button>
             ) : session ? (
               <Button className="gap-2" onClick={() => unlock.mutate()} disabled={unlock.isPending}>
-                <Phone className="h-4 w-4" /> {unlock.isPending ? "Desbloqueando..." : "Ver contato"}
+                <Phone className="h-4 w-4" />{" "}
+                {unlock.isPending ? "Desbloqueando..." : "Ver contato"}
               </Button>
             ) : (
               <Button asChild className="gap-2">
-                <Link to="/entrar"><Lock className="h-4 w-4" /> Entrar para ver o contato</Link>
+                <Link to="/entrar">
+                  <Lock className="h-4 w-4" /> Entrar para ver o contato
+                </Link>
               </Button>
             )}
           </div>
@@ -145,19 +171,30 @@ function CompanyProfile() {
                     />
                   ))}
                 </div>
-                {items.length === 0 && <p className="text-sm text-muted-foreground">Nenhum equipamento anunciado ainda.</p>}
+                {items.length === 0 && (
+                  <p className="text-sm text-muted-foreground">
+                    Nenhum equipamento anunciado ainda.
+                  </p>
+                )}
               </TabsContent>
               <TabsContent value="servicos" className="mt-6">
                 <div className="grid gap-3 sm:grid-cols-2">
                   {company.services.map((s) => (
-                    <div key={s} className="rounded-xl border border-border bg-card p-4 font-medium">{s}</div>
+                    <div
+                      key={s}
+                      className="rounded-xl border border-border bg-card p-4 font-medium"
+                    >
+                      {s}
+                    </div>
                   ))}
                 </div>
               </TabsContent>
               <TabsContent value="avaliacoes" className="mt-6">
-                <p className="text-sm text-muted-foreground">
-                  Sistema de avaliações em breve. Nenhuma avaliação publicada ainda.
-                </p>
+                <CompanyReviews
+                  companyId={company.id}
+                  ownerId={company.owner_id}
+                  companySlug={company.slug}
+                />
               </TabsContent>
             </Tabs>
           </div>
@@ -171,15 +208,26 @@ function CompanyProfile() {
               <h3 className="mb-3 font-semibold">Contato</h3>
               {contact ? (
                 <div className="space-y-2 text-muted-foreground">
-                  <p className="flex items-center gap-2"><Globe className="h-4 w-4" /> {contact.site}</p>
-                  <p className="flex items-center gap-2"><Phone className="h-4 w-4" /> {contact.phone}</p>
-                  <p className="flex items-center gap-2"><MessageCircle className="h-4 w-4" /> WhatsApp disponível</p>
+                  <p className="flex items-center gap-2">
+                    <Globe className="h-4 w-4" /> {contact.site}
+                  </p>
+                  <p className="flex items-center gap-2">
+                    <Phone className="h-4 w-4" /> {contact.phone}
+                  </p>
+                  <p className="flex items-center gap-2">
+                    <MessageCircle className="h-4 w-4" /> WhatsApp disponível
+                  </p>
                 </div>
               ) : (
                 <p className="text-muted-foreground">
-                  {session ? "Clique em \"Ver contato\" para revelar." : (
-                    <Link to="/entrar" className="font-medium text-primary hover:underline">Entre</Link>
-                  )}{!session && " para ver os dados de contato."}
+                  {session ? (
+                    'Clique em "Ver contato" para revelar.'
+                  ) : (
+                    <Link to="/entrar" className="font-medium text-primary hover:underline">
+                      Entre
+                    </Link>
+                  )}
+                  {!session && " para ver os dados de contato."}
                 </p>
               )}
             </div>
@@ -187,7 +235,9 @@ function CompanyProfile() {
               <h3 className="mb-3 font-semibold">Enviar mensagem</h3>
               {!session ? (
                 <Button asChild variant="outline" className="w-full gap-2">
-                  <Link to="/entrar"><Lock className="h-4 w-4" /> Entrar para enviar mensagem</Link>
+                  <Link to="/entrar">
+                    <Lock className="h-4 w-4" /> Entrar para enviar mensagem
+                  </Link>
                 </Button>
               ) : messageSent ? (
                 <p className="flex items-center gap-2 text-sm text-success">

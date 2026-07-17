@@ -6,6 +6,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useAuth } from "@/components/auth-provider";
+import { useRealtimeMessages } from "@/hooks/use-realtime";
 import { fetchConversations, fetchMessages, sendMessage } from "@/lib/queries";
 
 type Search = { c?: string };
@@ -32,11 +33,14 @@ function Mensagens() {
   const [q, setQ] = useState("");
   const [draft, setDraft] = useState("");
 
+  useRealtimeMessages(session?.user.id);
+
   const { data: conversations = [] } = useQuery({
     queryKey: ["conversations", session?.user.id],
     queryFn: () => fetchConversations(session!.user.id),
     enabled: !!session,
-    refetchInterval: 5000,
+    // Realtime invalidates on new messages; this is just a safety net.
+    refetchInterval: 60000,
   });
 
   useEffect(() => {
@@ -49,7 +53,7 @@ function Mensagens() {
     queryKey: ["messages", activeId],
     queryFn: () => fetchMessages(activeId!),
     enabled: !!activeId,
-    refetchInterval: 4000,
+    refetchInterval: 60000,
   });
 
   const send = useMutation({
@@ -62,7 +66,9 @@ function Mensagens() {
   });
 
   if (loading) {
-    return <div className="container-page py-16 text-center text-muted-foreground">Carregando...</div>;
+    return (
+      <div className="container-page py-16 text-center text-muted-foreground">Carregando...</div>
+    );
   }
 
   if (!session) {
@@ -70,7 +76,9 @@ function Mensagens() {
       <div className="container-page flex min-h-[60vh] flex-col items-center justify-center gap-3 text-center">
         <MessageSquare className="h-10 w-10 text-muted-foreground" />
         <h1 className="text-xl font-bold">Entre para ver suas mensagens</h1>
-        <Button asChild><Link to="/entrar">Entrar</Link></Button>
+        <Button asChild>
+          <Link to="/entrar">Entrar</Link>
+        </Button>
       </div>
     );
   }
@@ -81,7 +89,7 @@ function Mensagens() {
   });
 
   function counterpartName(c: NonNullable<typeof active>) {
-    return c.buyer_id === session!.user.id ? c.companies?.name : c.buyer?.full_name ?? "Usuário";
+    return c.buyer_id === session!.user.id ? c.companies?.name : (c.buyer?.full_name ?? "Usuário");
   }
 
   return (
@@ -93,7 +101,12 @@ function Mensagens() {
           <div className="border-b border-border p-3">
             <div className="relative">
               <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-              <Input placeholder="Buscar conversa..." className="pl-10" value={q} onChange={(e) => setQ(e.target.value)} />
+              <Input
+                placeholder="Buscar conversa..."
+                className="pl-10"
+                value={q}
+                onChange={(e) => setQ(e.target.value)}
+              />
             </div>
           </div>
           <div className="flex-1 overflow-y-auto">
@@ -157,7 +170,10 @@ function Mensagens() {
 
               <div className="flex-1 space-y-3 overflow-y-auto bg-muted/30 p-4">
                 {messages.map((m) => (
-                  <div key={m.id} className={`flex ${m.sender_id === session.user.id ? "justify-end" : "justify-start"}`}>
+                  <div
+                    key={m.id}
+                    className={`flex ${m.sender_id === session.user.id ? "justify-end" : "justify-start"}`}
+                  >
                     <div
                       className={`max-w-[75%] rounded-2xl px-4 py-2 text-sm ${
                         m.sender_id === session.user.id
@@ -168,16 +184,23 @@ function Mensagens() {
                       <p>{m.body}</p>
                       <p
                         className={`mt-1 text-right text-[10px] ${
-                          m.sender_id === session.user.id ? "text-primary-foreground/70" : "text-muted-foreground"
+                          m.sender_id === session.user.id
+                            ? "text-primary-foreground/70"
+                            : "text-muted-foreground"
                         }`}
                       >
-                        {new Date(m.created_at).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}
+                        {new Date(m.created_at).toLocaleTimeString("pt-BR", {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })}
                       </p>
                     </div>
                   </div>
                 ))}
                 {messages.length === 0 && (
-                  <p className="text-center text-sm text-muted-foreground">Nenhuma mensagem ainda.</p>
+                  <p className="text-center text-sm text-muted-foreground">
+                    Nenhuma mensagem ainda.
+                  </p>
                 )}
               </div>
 
@@ -194,7 +217,12 @@ function Mensagens() {
                   value={draft}
                   onChange={(e) => setDraft(e.target.value)}
                 />
-                <Button type="submit" size="icon" aria-label="Enviar" disabled={send.isPending || !draft.trim()}>
+                <Button
+                  type="submit"
+                  size="icon"
+                  aria-label="Enviar"
+                  disabled={send.isPending || !draft.trim()}
+                >
                   <Send className="h-4 w-4" />
                 </Button>
               </form>

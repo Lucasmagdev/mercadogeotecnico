@@ -3,7 +3,12 @@ import { useQuery } from "@tanstack/react-query";
 import { Package, Eye, Heart, TrendingUp, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/components/auth-provider";
-import { countCompanyFavorites, fetchConversations, fetchMyCompany, fetchMyEquipment } from "@/lib/queries";
+import {
+  countCompanyFavorites,
+  fetchConversations,
+  fetchMyCompany,
+  fetchMyEquipment,
+} from "@/lib/queries";
 import { formatPrice } from "@/lib/mock-data";
 
 export const Route = createFileRoute("/painel/")({
@@ -37,7 +42,11 @@ function PainelIndex() {
   const leadCount = conversations.filter((c) => c.company_id === company?.id).length;
 
   const stats = [
-    { label: "Anúncios ativos", value: String(mine.filter((e) => e.status === "active").length), icon: Package },
+    {
+      label: "Anúncios ativos",
+      value: String(mine.filter((e) => e.status === "active").length),
+      icon: Package,
+    },
     { label: "Visualizações", value: String(totalViews), icon: Eye },
     { label: "Favoritos", value: String(favoritesCount), icon: Heart },
     { label: "Pedidos", value: String(leadCount), icon: TrendingUp },
@@ -50,7 +59,11 @@ function PainelIndex() {
           <h1 className="text-2xl font-bold">Visão geral</h1>
           <p className="text-muted-foreground">Bem-vindo de volta, {company?.name}.</p>
         </div>
-        <Button asChild className="gap-1.5"><Link to="/publicar"><Plus className="h-4 w-4" /> Anunciar</Link></Button>
+        <Button asChild className="gap-1.5">
+          <Link to="/publicar">
+            <Plus className="h-4 w-4" /> Anunciar
+          </Link>
+        </Button>
       </div>
 
       <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -74,13 +87,19 @@ function PainelIndex() {
           >
             <div className="min-w-0 flex-1">
               <p className="truncate font-medium">{e.title}</p>
-              <p className="text-sm text-muted-foreground">{e.city}/{e.state} · {e.condition}</p>
+              <p className="text-sm text-muted-foreground">
+                {e.city}/{e.state} · {e.condition}
+              </p>
             </div>
-            <span className="shrink-0 font-semibold text-primary">{formatPrice(e.price, e.mode)}</span>
+            <span className="shrink-0 font-semibold text-primary">
+              {formatPrice(e.price, e.mode)}
+            </span>
           </Link>
         ))}
         {mine.length === 0 && (
-          <p className="px-4 py-6 text-sm text-muted-foreground">Você ainda não anunciou nenhum equipamento.</p>
+          <p className="px-4 py-6 text-sm text-muted-foreground">
+            Você ainda não anunciou nenhum equipamento.
+          </p>
         )}
       </div>
     </div>

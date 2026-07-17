@@ -29,5 +29,10 @@ export function useFavoriteToggle(equipmentId: string) {
     },
   });
 
-  return { isFavorite, toggle: mutation.mutate, isPending: mutation.isPending, loggedIn: !!session };
+  return {
+    isFavorite,
+    toggle: mutation.mutate,
+    isPending: mutation.isPending,
+    loggedIn: !!session,
+  };
 }

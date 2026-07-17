@@ -97,3 +97,22 @@ export type MessageRow = {
   body: string;
   created_at: string;
 };
+
+export type Review = {
+  id: string;
+  company_id: string;
+  author_id: string;
+  rating: number;
+  comment: string | null;
+  created_at: string;
+  updated_at: string;
+  author_name: string;
+};
+
+export type CompanyAnalyticsDay = {
+  day: string;
+  views: number;
+  contact_unlocks: number;
+  messages: number;
+  favorites: number;
+};

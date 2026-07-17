@@ -2,10 +2,12 @@ import {
   supabase,
   type Category,
   type Company,
+  type CompanyAnalyticsDay,
   type ConversationRow,
   type EquipmentRow,
   type MessageRow,
   type NotificationRow,
+  type Review,
 } from "@/lib/supabase";
 
 export async function fetchCategories(): Promise<Category[]> {
@@ -26,10 +28,7 @@ export type EquipmentFilters = {
 };
 
 export async function fetchEquipmentList(filters: EquipmentFilters = {}): Promise<EquipmentRow[]> {
-  let query = supabase
-    .from("equipment")
-    .select("*, companies(*)")
-    .eq("status", "active");
+  let query = supabase.from("equipment").select("*, companies(*)").eq("status", "active");
 
   if (filters.q) query = query.ilike("title", `%${filters.q}%`);
   if (filters.categorias?.length) query = query.in("category_slug", filters.categorias);
@@ -45,6 +44,42 @@ export async function fetchEquipmentList(filters: EquipmentFilters = {}): Promis
   return data as EquipmentRow[];
 }
 
+export type EquipmentSort = "relevance" | "menor" | "maior" | "ano";
+
+export const EQUIPMENT_PAGE_SIZE = 12;
+
+export async function fetchEquipmentPage(
+  filters: EquipmentFilters & { sort?: EquipmentSort },
+  page: number,
+): Promise<{ items: EquipmentRow[]; total: number }> {
+  let query = supabase
+    .from("equipment")
+    .select("*, companies(*)", { count: "exact" })
+    .eq("status", "active");
+
+  if (filters.q)
+    query = query.textSearch("search_tsv", filters.q, { type: "websearch", config: "portuguese" });
+  if (filters.categorias?.length) query = query.in("category_slug", filters.categorias);
+  if (filters.modos?.length) query = query.in("mode", filters.modos);
+  if (filters.condicoes?.length) query = query.in("condition", filters.condicoes);
+  if (filters.marca && filters.marca !== "todas") query = query.eq("brand", filters.marca);
+  if (filters.estado && filters.estado !== "todos") query = query.eq("state", filters.estado);
+  if (filters.minPrice !== undefined && filters.minPrice > 0)
+    query = query.gte("price", filters.minPrice);
+  if (filters.maxPrice !== undefined) query = query.lte("price", filters.maxPrice);
+
+  if (filters.sort === "menor") query = query.order("price", { ascending: true });
+  else if (filters.sort === "maior") query = query.order("price", { ascending: false });
+  else if (filters.sort === "ano")
+    query = query.order("year", { ascending: false, nullsFirst: false });
+  else query = query.order("created_at", { ascending: false });
+
+  const from = page * EQUIPMENT_PAGE_SIZE;
+  const { data, error, count } = await query.range(from, from + EQUIPMENT_PAGE_SIZE - 1);
+  if (error) throw error;
+  return { items: data as EquipmentRow[], total: count ?? 0 };
+}
+
 export async function fetchEquipmentBySlug(slug: string): Promise<EquipmentRow | null> {
   const { data, error } = await supabase
     .from("equipment")
@@ -55,7 +90,10 @@ export async function fetchEquipmentBySlug(slug: string): Promise<EquipmentRow |
   return data as EquipmentRow | null;
 }
 
-export async function fetchRelatedEquipment(categorySlug: string, excludeId: string): Promise<EquipmentRow[]> {
+export async function fetchRelatedEquipment(
+  categorySlug: string,
+  excludeId: string,
+): Promise<EquipmentRow[]> {
   const { data, error } = await supabase
     .from("equipment")
     .select("*, companies(*)")
@@ -78,7 +116,11 @@ export async function fetchApprovedCompanies(): Promise<Company[]> {
 }
 
 export async function fetchCompanyBySlug(slug: string): Promise<Company | null> {
-  const { data, error } = await supabase.from("companies").select("*").eq("slug", slug).maybeSingle();
+  const { data, error } = await supabase
+    .from("companies")
+    .select("*")
+    .eq("slug", slug)
+    .maybeSingle();
   if (error) throw error;
   return data;
 }
@@ -94,7 +136,11 @@ export async function fetchCompanyEquipment(companyId: string): Promise<Equipmen
 }
 
 export async function fetchMyCompany(ownerId: string): Promise<Company | null> {
-  const { data, error } = await supabase.from("companies").select("*").eq("owner_id", ownerId).maybeSingle();
+  const { data, error } = await supabase
+    .from("companies")
+    .select("*")
+    .eq("owner_id", ownerId)
+    .maybeSingle();
   if (error) throw error;
   return data;
 }
@@ -165,7 +211,9 @@ export async function setCompanyStatus(id: string, status: "approved" | "rejecte
   if (error) throw error;
 }
 
-export async function unlockEquipmentContact(equipmentId: string): Promise<{ phone: string; whatsapp: string }> {
+export async function unlockEquipmentContact(
+  equipmentId: string,
+): Promise<{ phone: string; whatsapp: string }> {
   const { data, error } = await supabase.rpc("unlock_equipment_contact", { eq_id: equipmentId });
   if (error) throw error;
   return data[0];
@@ -179,7 +227,10 @@ export async function unlockCompanyContact(
   return data[0];
 }
 
-export async function updateProfile(id: string, patch: Partial<{ full_name: string; phone: string }>) {
+export async function updateProfile(
+  id: string,
+  patch: Partial<{ full_name: string; phone: string }>,
+) {
   const { error } = await supabase.from("profiles").update(patch).eq("id", id);
   if (error) throw error;
 }
@@ -224,7 +275,11 @@ export async function updateEquipment(
 }
 
 export async function fetchEquipmentById(id: string): Promise<EquipmentRow | null> {
-  const { data, error } = await supabase.from("equipment").select("*, companies(*)").eq("id", id).maybeSingle();
+  const { data, error } = await supabase
+    .from("equipment")
+    .select("*, companies(*)")
+    .eq("id", id)
+    .maybeSingle();
   if (error) throw error;
   return data as EquipmentRow | null;
 }
@@ -237,7 +292,10 @@ export async function incrementEquipmentViews(id: string) {
 // ---------- favorites ----------
 
 export async function fetchFavoriteIds(userId: string): Promise<Set<string>> {
-  const { data, error } = await supabase.from("favorites").select("equipment_id").eq("user_id", userId);
+  const { data, error } = await supabase
+    .from("favorites")
+    .select("equipment_id")
+    .eq("user_id", userId);
   if (error) throw error;
   return new Set(data.map((f) => f.equipment_id));
 }
@@ -253,7 +311,9 @@ export async function fetchFavoriteEquipment(userId: string): Promise<EquipmentR
 }
 
 export async function addFavorite(userId: string, equipmentId: string) {
-  const { error } = await supabase.from("favorites").insert({ user_id: userId, equipment_id: equipmentId });
+  const { error } = await supabase
+    .from("favorites")
+    .insert({ user_id: userId, equipment_id: equipmentId });
   if (error) throw error;
 }
 
@@ -286,7 +346,11 @@ export async function fetchNotifications(userId: string): Promise<NotificationRo
 }
 
 export async function markAllNotificationsRead(userId: string) {
-  const { error } = await supabase.from("notifications").update({ read: true }).eq("user_id", userId).eq("read", false);
+  const { error } = await supabase
+    .from("notifications")
+    .update({ read: true })
+    .eq("user_id", userId)
+    .eq("read", false);
   if (error) throw error;
 }
 
@@ -331,7 +395,11 @@ export async function sendMessage(conversationId: string, senderId: string, body
   if (error) throw error;
 }
 
-export async function startConversation(companyId: string, equipmentId: string | null, firstMessage: string) {
+export async function startConversation(
+  companyId: string,
+  equipmentId: string | null,
+  firstMessage: string,
+) {
   const { data, error } = await supabase.rpc("start_conversation", {
     comp_id: companyId,
     eq_id: equipmentId,
@@ -339,4 +407,47 @@ export async function startConversation(companyId: string, equipmentId: string |
   });
   if (error) throw error;
   return data as string;
+}
+
+// ---------- reviews ----------
+
+export async function fetchCompanyReviews(companyId: string): Promise<Review[]> {
+  const { data, error } = await supabase
+    .from("reviews_public")
+    .select("*")
+    .eq("company_id", companyId)
+    .order("created_at", { ascending: false });
+  if (error) throw error;
+  return data as Review[];
+}
+
+export async function upsertReview(companyId: string, rating: number, comment: string) {
+  const { data: auth } = await supabase.auth.getUser();
+  if (!auth.user) throw new Error("not_authenticated");
+  const { error } = await supabase
+    .from("reviews")
+    .upsert(
+      { company_id: companyId, author_id: auth.user.id, rating, comment: comment || null },
+      { onConflict: "company_id,author_id" },
+    );
+  if (error) throw error;
+}
+
+export async function deleteReview(id: string) {
+  const { error } = await supabase.from("reviews").delete().eq("id", id);
+  if (error) throw error;
+}
+
+// ---------- analytics ----------
+
+export async function fetchCompanyAnalytics(
+  companyId: string,
+  days = 30,
+): Promise<CompanyAnalyticsDay[]> {
+  const { data, error } = await supabase.rpc("company_analytics", {
+    comp_id: companyId,
+    days,
+  });
+  if (error) throw error;
+  return data as CompanyAnalyticsDay[];
 }

@@ -10,7 +10,10 @@ export const Route = createFileRoute("/notificacoes")({
   head: () => ({
     meta: [
       { title: "Notificações — Mercado Geotécnico" },
-      { name: "description", content: "Acompanhe propostas, mensagens e atualizações dos seus anúncios." },
+      {
+        name: "description",
+        content: "Acompanhe propostas, mensagens e atualizações dos seus anúncios.",
+      },
       { name: "robots", content: "noindex" },
     ],
   }),
@@ -36,11 +39,14 @@ function Notificacoes() {
 
   const markRead = useMutation({
     mutationFn: () => markAllNotificationsRead(session!.user.id),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["notifications", session?.user.id] }),
+    onSuccess: () =>
+      queryClient.invalidateQueries({ queryKey: ["notifications", session?.user.id] }),
   });
 
   if (loading) {
-    return <div className="container-page py-16 text-center text-muted-foreground">Carregando...</div>;
+    return (
+      <div className="container-page py-16 text-center text-muted-foreground">Carregando...</div>
+    );
   }
 
   if (!session) {
@@ -48,7 +54,9 @@ function Notificacoes() {
       <div className="container-page flex min-h-[60vh] flex-col items-center justify-center gap-3 text-center">
         <Bell className="h-10 w-10 text-muted-foreground" />
         <h1 className="text-xl font-bold">Entre para ver suas notificações</h1>
-        <Button asChild><Link to="/entrar">Entrar</Link></Button>
+        <Button asChild>
+          <Link to="/entrar">Entrar</Link>
+        </Button>
       </div>
     );
   }
@@ -59,7 +67,12 @@ function Notificacoes() {
     <div className="container-page max-w-2xl py-8">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">Notificações</h1>
-        <Button variant="ghost" size="sm" disabled={!hasUnread || markRead.isPending} onClick={() => markRead.mutate()}>
+        <Button
+          variant="ghost"
+          size="sm"
+          disabled={!hasUnread || markRead.isPending}
+          onClick={() => markRead.mutate()}
+        >
           Marcar todas como lidas
         </Button>
       </div>
@@ -89,7 +102,9 @@ function Notificacoes() {
             </div>
           );
           return n.link ? (
-            <Link key={n.id} to={n.link as "/painel" | "/mensagens"} className="block">{content}</Link>
+            <Link key={n.id} to={n.link as "/painel" | "/mensagens"} className="block">
+              {content}
+            </Link>
           ) : (
             <div key={n.id}>{content}</div>
           );

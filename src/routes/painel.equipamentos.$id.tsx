@@ -27,7 +27,10 @@ function EditarEquipamento() {
     queryKey: ["equipment-by-id", id],
     queryFn: () => fetchEquipmentById(id),
   });
-  const { data: categories = [] } = useQuery({ queryKey: ["categories"], queryFn: fetchCategories });
+  const { data: categories = [] } = useQuery({
+    queryKey: ["categories"],
+    queryFn: fetchCategories,
+  });
 
   const [form, setForm] = useState({
     title: "",
@@ -101,7 +104,9 @@ function EditarEquipamento() {
     return (
       <div className="py-16 text-center">
         <p className="text-muted-foreground">Anúncio não encontrado.</p>
-        <Button asChild className="mt-4"><Link to="/painel/equipamentos">Voltar</Link></Button>
+        <Button asChild className="mt-4">
+          <Link to="/painel/equipamentos">Voltar</Link>
+        </Button>
       </div>
     );
   }
@@ -109,7 +114,9 @@ function EditarEquipamento() {
   return (
     <div className="max-w-2xl">
       <Button variant="ghost" size="sm" asChild className="mb-4 gap-1 text-muted-foreground">
-        <Link to="/painel/equipamentos"><ChevronLeft className="h-4 w-4" /> Meus equipamentos</Link>
+        <Link to="/painel/equipamentos">
+          <ChevronLeft className="h-4 w-4" /> Meus equipamentos
+        </Link>
       </Button>
       <h1 className="text-2xl font-bold">Editar anúncio</h1>
 
@@ -122,18 +129,30 @@ function EditarEquipamento() {
           <div className="space-y-2">
             <Label>Categoria</Label>
             <Select value={form.category_slug} onValueChange={(v) => set("category_slug", v)}>
-              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
               <SelectContent>
-                {categories.map((c) => <SelectItem key={c.slug} value={c.slug}>{c.name}</SelectItem>)}
+                {categories.map((c) => (
+                  <SelectItem key={c.slug} value={c.slug}>
+                    {c.name}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>
           <div className="space-y-2">
             <Label>Marca</Label>
             <Select value={form.brand} onValueChange={(v) => set("brand", v)}>
-              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
               <SelectContent>
-                {brands.map((b) => <SelectItem key={b} value={b}>{b}</SelectItem>)}
+                {brands.map((b) => (
+                  <SelectItem key={b} value={b}>
+                    {b}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>
@@ -147,8 +166,13 @@ function EditarEquipamento() {
           </div>
           <div className="space-y-2">
             <Label>Condição</Label>
-            <Select value={form.condition} onValueChange={(v) => set("condition", v as typeof form.condition)}>
-              <SelectTrigger><SelectValue /></SelectTrigger>
+            <Select
+              value={form.condition}
+              onValueChange={(v) => set("condition", v as typeof form.condition)}
+            >
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
               <SelectContent>
                 <SelectItem value="Novo">Novo</SelectItem>
                 <SelectItem value="Seminovo">Seminovo</SelectItem>
@@ -158,8 +182,13 @@ function EditarEquipamento() {
           </div>
           <div className="space-y-2">
             <Label>Status</Label>
-            <Select value={form.status} onValueChange={(v) => set("status", v as typeof form.status)}>
-              <SelectTrigger><SelectValue /></SelectTrigger>
+            <Select
+              value={form.status}
+              onValueChange={(v) => set("status", v as typeof form.status)}
+            >
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
               <SelectContent>
                 <SelectItem value="active">Ativo</SelectItem>
                 <SelectItem value="paused">Pausado</SelectItem>
@@ -170,7 +199,11 @@ function EditarEquipamento() {
         </div>
         <div className="space-y-2">
           <Label>Descrição</Label>
-          <Textarea rows={4} value={form.description} onChange={(e) => set("description", e.target.value)} />
+          <Textarea
+            rows={4}
+            value={form.description}
+            onChange={(e) => set("description", e.target.value)}
+          />
         </div>
         <div className="space-y-2 border-t border-border pt-4">
           <div className="flex items-center justify-between">
@@ -190,12 +223,20 @@ function EditarEquipamento() {
               <Input
                 placeholder="Ex: Potência"
                 value={spec.label}
-                onChange={(e) => setSpecs((s) => s.map((sp, j) => (j === i ? { ...sp, label: e.target.value } : sp)))}
+                onChange={(e) =>
+                  setSpecs((s) =>
+                    s.map((sp, j) => (j === i ? { ...sp, label: e.target.value } : sp)),
+                  )
+                }
               />
               <Input
                 placeholder="Ex: 122 HP"
                 value={spec.value}
-                onChange={(e) => setSpecs((s) => s.map((sp, j) => (j === i ? { ...sp, value: e.target.value } : sp)))}
+                onChange={(e) =>
+                  setSpecs((s) =>
+                    s.map((sp, j) => (j === i ? { ...sp, value: e.target.value } : sp)),
+                  )
+                }
               />
               <Button
                 type="button"
@@ -212,15 +253,27 @@ function EditarEquipamento() {
         </div>
         <div className="space-y-2">
           <Label>Modalidade</Label>
-          <RadioGroup value={form.mode} onValueChange={(v) => set("mode", v as "venda" | "locacao")} className="flex gap-4">
-            <label className="flex items-center gap-2 text-sm"><RadioGroupItem value="venda" /> Venda</label>
-            <label className="flex items-center gap-2 text-sm"><RadioGroupItem value="locacao" /> Locação</label>
+          <RadioGroup
+            value={form.mode}
+            onValueChange={(v) => set("mode", v as "venda" | "locacao")}
+            className="flex gap-4"
+          >
+            <label className="flex items-center gap-2 text-sm">
+              <RadioGroupItem value="venda" /> Venda
+            </label>
+            <label className="flex items-center gap-2 text-sm">
+              <RadioGroupItem value="locacao" /> Locação
+            </label>
           </RadioGroup>
         </div>
         <div className="grid gap-4 sm:grid-cols-3">
           <div className="space-y-2">
             <Label>Valor (R$)</Label>
-            <Input type="number" value={form.price} onChange={(e) => set("price", e.target.value)} />
+            <Input
+              type="number"
+              value={form.price}
+              onChange={(e) => set("price", e.target.value)}
+            />
           </div>
           <div className="space-y-2">
             <Label>Cidade</Label>
@@ -229,15 +282,25 @@ function EditarEquipamento() {
           <div className="space-y-2">
             <Label>Estado</Label>
             <Select value={form.state} onValueChange={(v) => set("state", v)}>
-              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
               <SelectContent>
-                {states.map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}
+                {states.map((s) => (
+                  <SelectItem key={s} value={s}>
+                    {s}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>
         </div>
         <div className="flex items-center justify-end gap-3 pt-2">
-          {saved && <span className="flex items-center gap-1 text-sm text-success"><Check className="h-4 w-4" /> Salvo!</span>}
+          {saved && (
+            <span className="flex items-center gap-1 text-sm text-success">
+              <Check className="h-4 w-4" /> Salvo!
+            </span>
+          )}
           <Button onClick={() => mutation.mutate()} disabled={mutation.isPending}>
             {mutation.isPending ? "Salvando..." : "Salvar alterações"}
           </Button>
