@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useAuth } from "@/components/auth-provider";
 import { useRealtimeNotifications } from "@/hooks/use-realtime";
-import { fetchNotifications } from "@/lib/queries";
+import { fetchMyCompany, fetchNotifications } from "@/lib/queries";
 import { Logo } from "@/components/logo";
 import { categories } from "@/lib/mock-data";
 
@@ -45,6 +45,12 @@ export function SiteHeader() {
   });
   const unreadCount = notifications.filter((n) => !n.read).length;
   const unreadMessages = notifications.filter((n) => !n.read && n.type === "mensagem").length;
+
+  const { data: myCompany } = useQuery({
+    queryKey: ["my-company", session?.user.id],
+    queryFn: () => fetchMyCompany(session!.user.id),
+    enabled: !!session && profile?.role === "company",
+  });
 
   function submitSearch(e: React.FormEvent) {
     e.preventDefault();
@@ -147,6 +153,13 @@ export function SiteHeader() {
                     <DropdownMenuItem asChild>
                       <Link to="/painel/equipamentos">Meus Equipamentos</Link>
                     </DropdownMenuItem>
+                    {myCompany && (
+                      <DropdownMenuItem asChild>
+                        <Link to="/empresas/$slug" params={{ slug: myCompany.slug }}>
+                          Ver perfil
+                        </Link>
+                      </DropdownMenuItem>
+                    )}
                   </>
                 )}
                 <DropdownMenuItem asChild>
