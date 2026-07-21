@@ -157,7 +157,7 @@ function PainelAnalytics() {
           >
             <div className="min-w-0 flex-1">
               <p className="truncate font-medium">{e.title}</p>
-              <p className="text-sm text-muted-foreground">{formatPrice(e.price, e.mode)}</p>
+              <p className="text-sm text-muted-foreground">{formatPrice(e.price, e.mode, e.rental_period)}</p>
             </div>
             <span className="flex shrink-0 items-center gap-1.5 text-sm font-semibold text-primary">
               <Eye className="h-3.5 w-3.5" /> {e.views}

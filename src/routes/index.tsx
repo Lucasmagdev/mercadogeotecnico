@@ -288,7 +288,7 @@ function Home() {
                 className="rounded-full border-amber-400/40 bg-amber-400/10 text-xs font-semibold text-[#14265C] hover:bg-amber-400/20 dark:text-amber-300 sm:text-sm"
               >
                 <a
-                  href="https://solicitacao.geoselos.com.br/"
+                  href="https://geoselos.com/"
                   target="_blank"
                   rel="noreferrer"
                 >
@@ -434,7 +434,7 @@ function Home() {
                   className="rounded-full bg-amber-400 font-bold text-[#14265C] hover:bg-amber-300"
                 >
                   <a
-                    href="https://solicitacao.geoselos.com.br/"
+                    href="https://geoselos.com/"
                     target="_blank"
                     rel="noreferrer"
                   >
@@ -449,7 +449,7 @@ function Home() {
                   className="rounded-full border-white/20 bg-white/5 text-white hover:bg-white/10 hover:text-white"
                 >
                   <a
-                    href="https://solicitacao.geoselos.com.br/buscar"
+                    href="https://geoselos.com/"
                     target="_blank"
                     rel="noreferrer"
                   >

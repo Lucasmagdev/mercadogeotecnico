@@ -72,10 +72,13 @@ function Publicar() {
     condition: "" as "Novo" | "Seminovo" | "Usado" | "",
     description: "",
     mode: "venda" as "venda" | "locacao",
+    rentalPeriod: "dia" as "dia" | "semana" | "mes",
     price: "",
     city: "",
     state: "",
   });
+  const [customCategory, setCustomCategory] = useState("");
+  const [customBrand, setCustomBrand] = useState("");
   const [specs, setSpecs] = useState<Spec[]>([{ label: "", value: "" }]);
   const [photos, setPhotos] = useState<File[]>([]);
   const [done, setDone] = useState(false);
@@ -95,17 +98,22 @@ function Publicar() {
     mutationFn: async () => {
       const slug = `${slugify(form.title)}-${Math.random().toString(36).slice(2, 7)}`;
       const cleanSpecs = specs.filter((s) => s.label.trim() && s.value.trim());
+      if (form.category === "outros" && customCategory.trim()) {
+        cleanSpecs.unshift({ label: "Categoria", value: customCategory.trim() });
+      }
+      const finalBrand = form.brand === "outro" ? customBrand.trim() : form.brand;
       const imagePaths =
         photos.length > 0 ? await uploadEquipmentImages(session!.user.id, photos) : [];
       await createEquipment({
         company_id: company!.id,
         slug,
         title: form.title,
-        brand: form.brand,
+        brand: finalBrand,
         model: form.model,
         category_slug: form.category,
         price: Number(form.price),
         mode: form.mode,
+        rental_period: form.mode === "locacao" ? form.rentalPeriod : null,
         condition: form.condition as "Novo" | "Seminovo" | "Usado",
         year: Number(form.year),
         city: form.city,
@@ -197,9 +205,18 @@ function Publicar() {
   }
 
   const canAdvance =
-    (step === 0 && form.category) ||
-    (step === 1 && form.title && form.brand && form.model && form.year && form.condition) ||
-    (step === 2 && form.price && form.city && form.state) ||
+    (step === 0 &&
+      form.category &&
+      (form.category !== "outros" || customCategory.trim())) ||
+    (step === 1 &&
+      form.title &&
+      form.condition &&
+      (form.brand !== "outro" ? form.brand : customBrand.trim())) ||
+    (step === 2 &&
+      form.price &&
+      form.city &&
+      form.state &&
+      (form.mode !== "locacao" || form.rentalPeriod)) ||
     step === 3 ||
     step === 4;
 
@@ -245,20 +262,46 @@ function Publicar() {
       >
         {step === 0 && (
           <div className="space-y-4">
-            <h2 className="text-lg font-semibold">Qual a categoria?</h2>
+            <h2 className="text-lg font-semibold">
+              Qual a categoria? <span className="text-destructive">*</span>
+            </h2>
             <div className="grid gap-2.5 sm:grid-cols-3">
-              {categories.map((c) => (
-                <button
-                  key={c.slug}
-                  onClick={() => set("category", c.slug)}
-                  className={`rounded-xl border p-3 text-left text-sm font-medium transition-colors hover:border-primary hover:bg-primary/5 ${
-                    form.category === c.slug ? "border-primary bg-primary/5" : "border-border"
-                  }`}
-                >
-                  {c.name}
-                </button>
-              ))}
+              {categories
+                .filter((c) => c.slug !== "outros")
+                .map((c) => (
+                  <button
+                    key={c.slug}
+                    onClick={() => set("category", c.slug)}
+                    className={`rounded-xl border p-3 text-left text-sm font-medium transition-colors hover:border-primary hover:bg-primary/5 ${
+                      form.category === c.slug ? "border-primary bg-primary/5" : "border-border"
+                    }`}
+                  >
+                    {c.name}
+                  </button>
+                ))}
+              <button
+                onClick={() => set("category", "outros")}
+                className={`rounded-xl border p-3 text-left text-sm font-medium transition-colors hover:border-primary hover:bg-primary/5 ${
+                  form.category === "outros" ? "border-primary bg-primary/5" : "border-border"
+                }`}
+              >
+                Outro
+              </button>
             </div>
+            {form.category === "outros" && (
+              <div className="space-y-2">
+                <Label>Descreva a categoria</Label>
+                <Input
+                  placeholder="Ex: Compactador de solo"
+                  value={customCategory}
+                  onChange={(e) => setCustomCategory(e.target.value)}
+                />
+                <p className="text-xs text-muted-foreground">
+                  Seu anúncio fica na categoria "Outros"; essa descrição aparece nos detalhes do
+                  anúncio.
+                </p>
+              </div>
+            )}
           </div>
         )}
 
@@ -266,16 +309,29 @@ function Publicar() {
           <div className="space-y-4">
             <h2 className="text-lg font-semibold">Detalhes do equipamento</h2>
             <div className="space-y-2">
-              <Label>Título do anúncio</Label>
+              <Label>
+                Título do anúncio <span className="text-destructive">*</span>
+              </Label>
               <Input
                 placeholder="Ex: Escavadeira Hidráulica CAT 320"
                 value={form.title}
                 onChange={(e) => set("title", e.target.value)}
               />
             </div>
+            <div className="space-y-2">
+              <Label>Descrição</Label>
+              <Textarea
+                rows={4}
+                placeholder="Descreva o estado, histórico de manutenção e diferenciais."
+                value={form.description}
+                onChange={(e) => set("description", e.target.value)}
+              />
+            </div>
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-2">
-                <Label>Marca</Label>
+                <Label>
+                  Marca <span className="text-destructive">*</span>
+                </Label>
                 <Select value={form.brand} onValueChange={(v) => set("brand", v)}>
                   <SelectTrigger>
                     <SelectValue placeholder="Selecione" />
@@ -286,8 +342,17 @@ function Publicar() {
                         {b}
                       </SelectItem>
                     ))}
+                    <SelectItem value="outro">Outro</SelectItem>
                   </SelectContent>
                 </Select>
+                {form.brand === "outro" && (
+                  <Input
+                    className="mt-2"
+                    placeholder="Digite a marca"
+                    value={customBrand}
+                    onChange={(e) => setCustomBrand(e.target.value)}
+                  />
+                )}
               </div>
               <div className="space-y-2">
                 <Label>Modelo</Label>
@@ -307,7 +372,9 @@ function Publicar() {
                 />
               </div>
               <div className="space-y-2">
-                <Label>Condição</Label>
+                <Label>
+                  Condição <span className="text-destructive">*</span>
+                </Label>
                 <Select
                   value={form.condition}
                   onValueChange={(v) => set("condition", v as typeof form.condition)}
@@ -322,15 +389,6 @@ function Publicar() {
                   </SelectContent>
                 </Select>
               </div>
-            </div>
-            <div className="space-y-2">
-              <Label>Descrição</Label>
-              <Textarea
-                rows={4}
-                placeholder="Descreva o estado, histórico de manutenção e diferenciais."
-                value={form.description}
-                onChange={(e) => set("description", e.target.value)}
-              />
             </div>
 
             <div className="space-y-2 border-t border-border pt-4">
@@ -404,7 +462,9 @@ function Publicar() {
             </div>
             <div className="grid gap-4 sm:grid-cols-3">
               <div className="space-y-2 sm:col-span-1">
-                <Label>Valor (R$)</Label>
+                <Label>
+                  Valor (R$) <span className="text-destructive">*</span>
+                </Label>
                 <Input
                   type="number"
                   placeholder="685000"
@@ -412,8 +472,30 @@ function Publicar() {
                   onChange={(e) => set("price", e.target.value)}
                 />
               </div>
+              {form.mode === "locacao" && (
+                <div className="space-y-2">
+                  <Label>
+                    Por <span className="text-destructive">*</span>
+                  </Label>
+                  <Select
+                    value={form.rentalPeriod}
+                    onValueChange={(v) => set("rentalPeriod", v as typeof form.rentalPeriod)}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="dia">Dia</SelectItem>
+                      <SelectItem value="semana">Semana</SelectItem>
+                      <SelectItem value="mes">Mês</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
               <div className="space-y-2">
-                <Label>Cidade</Label>
+                <Label>
+                  Cidade <span className="text-destructive">*</span>
+                </Label>
                 <Input
                   placeholder="São Paulo"
                   value={form.city}
@@ -421,7 +503,9 @@ function Publicar() {
                 />
               </div>
               <div className="space-y-2">
-                <Label>Estado</Label>
+                <Label>
+                  Estado <span className="text-destructive">*</span>
+                </Label>
                 <Select value={form.state} onValueChange={(v) => set("state", v)}>
                   <SelectTrigger>
                     <SelectValue placeholder="UF" />

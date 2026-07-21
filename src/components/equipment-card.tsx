@@ -94,7 +94,7 @@ export function EquipmentCard({
           </div>
           <h3 className="line-clamp-1 font-semibold">{item.title}</h3>
           <p className="mt-2 text-xl font-bold text-primary">
-            {formatPrice(item.price, item.mode)}
+            {formatPrice(item.price, item.mode, item.rental_period)}
           </p>
 
           <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1.5 text-xs text-muted-foreground">

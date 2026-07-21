@@ -168,6 +168,7 @@ export async function createEquipment(payload: {
   category_slug: string;
   price: number;
   mode: "venda" | "locacao";
+  rental_period: "dia" | "semana" | "mes" | null;
   condition: "Novo" | "Seminovo" | "Usado";
   year: number;
   city: string;
@@ -275,6 +276,7 @@ export async function updateEquipment(
     category_slug: string;
     price: number;
     mode: "venda" | "locacao";
+    rental_period: "dia" | "semana" | "mes" | null;
     condition: "Novo" | "Seminovo" | "Usado";
     year: number;
     city: string;

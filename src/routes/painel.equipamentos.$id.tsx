@@ -42,6 +42,7 @@ function EditarEquipamento() {
     condition: "" as "Novo" | "Seminovo" | "Usado" | "",
     description: "",
     mode: "venda" as "venda" | "locacao",
+    rentalPeriod: "dia" as "dia" | "semana" | "mes",
     price: "",
     city: "",
     state: "",
@@ -61,6 +62,7 @@ function EditarEquipamento() {
         condition: item.condition,
         description: item.description ?? "",
         mode: item.mode,
+        rentalPeriod: item.rental_period ?? "dia",
         price: String(item.price),
         city: item.city ?? "",
         state: item.state ?? "",
@@ -83,6 +85,7 @@ function EditarEquipamento() {
         category_slug: form.category_slug,
         price: Number(form.price),
         mode: form.mode,
+        rental_period: form.mode === "locacao" ? form.rentalPeriod : null,
         condition: form.condition as "Novo" | "Seminovo" | "Usado",
         year: Number(form.year),
         city: form.city,
@@ -145,18 +148,16 @@ function EditarEquipamento() {
           </div>
           <div className="space-y-2">
             <Label>Marca</Label>
-            <Select value={form.brand} onValueChange={(v) => set("brand", v)}>
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {brands.map((b) => (
-                  <SelectItem key={b} value={b}>
-                    {b}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <Input
+              list="brand-options"
+              value={form.brand}
+              onChange={(e) => set("brand", e.target.value)}
+            />
+            <datalist id="brand-options">
+              {brands.map((b) => (
+                <option key={b} value={b} />
+              ))}
+            </datalist>
           </div>
           <div className="space-y-2">
             <Label>Modelo</Label>
@@ -277,6 +278,24 @@ function EditarEquipamento() {
               onChange={(e) => set("price", e.target.value)}
             />
           </div>
+          {form.mode === "locacao" && (
+            <div className="space-y-2">
+              <Label>Por</Label>
+              <Select
+                value={form.rentalPeriod}
+                onValueChange={(v) => set("rentalPeriod", v as typeof form.rentalPeriod)}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="dia">Dia</SelectItem>
+                  <SelectItem value="semana">Semana</SelectItem>
+                  <SelectItem value="mes">Mês</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          )}
           <div className="space-y-2">
             <Label>Cidade</Label>
             <Input value={form.city} onChange={(e) => set("city", e.target.value)} />

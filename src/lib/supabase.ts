@@ -54,6 +54,7 @@ export type EquipmentRow = {
   category_slug: string | null;
   price: number;
   mode: "venda" | "locacao";
+  rental_period: "dia" | "semana" | "mes" | null;
   condition: "Novo" | "Seminovo" | "Usado";
   year: number | null;
   hours: number;

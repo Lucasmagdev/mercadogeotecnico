@@ -41,11 +41,22 @@ export const brands = [
 ];
 export const states = ["SP", "RJ", "MG", "PR", "RS", "SC", "BA", "GO"];
 
-export function formatPrice(value: number, mode: "venda" | "locacao") {
+const rentalPeriodSuffix: Record<"dia" | "semana" | "mes", string> = {
+  dia: "/dia",
+  semana: "/semana",
+  mes: "/mês",
+};
+
+export function formatPrice(
+  value: number,
+  mode: "venda" | "locacao",
+  rentalPeriod?: "dia" | "semana" | "mes" | null,
+) {
   const formatted = new Intl.NumberFormat("pt-BR", {
     style: "currency",
     currency: "BRL",
     maximumFractionDigits: 0,
   }).format(value);
-  return mode === "locacao" ? `${formatted}/dia` : formatted;
+  if (mode !== "locacao") return formatted;
+  return `${formatted}${rentalPeriodSuffix[rentalPeriod ?? "dia"]}`;
 }

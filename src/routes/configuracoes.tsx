@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { CircleCheck, Clock, ShieldAlert, ImagePlus, Lock } from "lucide-react";
+import { CircleCheck, Clock, ShieldAlert, ImagePlus, ImageOff, Lock, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { GeoSelosVerification } from "@/components/geoselos-verification";
 import { Input } from "@/components/ui/input";
@@ -208,6 +208,13 @@ function CompanySettings({ ownerId }: { ownerId: string }) {
 
   return (
     <div className="mt-6 space-y-6 rounded-2xl border border-border bg-card p-6">
+      <div className="flex justify-end">
+        <Button variant="outline" size="sm" className="gap-1.5" asChild>
+          <Link to="/empresas/$slug" params={{ slug: company.slug }} target="_blank">
+            <ExternalLink className="h-4 w-4" /> Ver meu perfil
+          </Link>
+        </Button>
+      </div>
       {company.status === "approved" && (
         <div className="flex items-center gap-2 text-sm font-medium text-success">
           {company.verified ? (
@@ -348,38 +355,57 @@ function ImageUploadCard({
   onSaved: () => void;
 }) {
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [pendingFile, setPendingFile] = useState<File | null>(null);
+  const [pendingPreview, setPendingPreview] = useState<string | null>(null);
   const currentPath = kind === "logo" ? company.logo_path : company.banner_path;
-  const previewUrl = getCompanyImageUrl(currentPath);
+  const previewUrl = pendingPreview ?? getCompanyImageUrl(currentPath);
 
   const mutation = useMutation({
     mutationFn: async (file: File) => {
       const path = await uploadCompanyImage(ownerId, file, kind);
       await updateCompany(company.id, kind === "logo" ? { logo_path: path } : { banner_path: path });
     },
-    onSuccess: onSaved,
+    onSuccess: () => {
+      setPendingFile(null);
+      setPendingPreview(null);
+      toast.success("Imagem salva!");
+      onSaved();
+    },
     onError: (err) =>
       toast.error(err instanceof Error ? err.message : "Não foi possível enviar a imagem."),
   });
 
   return (
     <div className="rounded-2xl border border-border bg-card p-6">
-      <div className="flex items-center justify-between gap-3">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <p className="font-semibold">{title}</p>
           <p className="text-sm text-muted-foreground">{description}</p>
         </div>
         {!locked && (
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            className="gap-1.5"
-            disabled={mutation.isPending}
-            onClick={() => fileInputRef.current?.click()}
-          >
-            <ImagePlus className="h-4 w-4" />
-            {mutation.isPending ? "Enviando..." : previewUrl ? "Trocar" : "Adicionar"}
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              className="gap-1.5"
+              disabled={mutation.isPending}
+              onClick={() => fileInputRef.current?.click()}
+            >
+              <ImagePlus className="h-4 w-4" />
+              {currentPath || pendingPreview ? "Trocar" : "Adicionar"}
+            </Button>
+            {pendingFile && (
+              <Button
+                type="button"
+                size="sm"
+                disabled={mutation.isPending}
+                onClick={() => mutation.mutate(pendingFile)}
+              >
+                {mutation.isPending ? "Salvando..." : "Salvar"}
+              </Button>
+            )}
+          </div>
         )}
       </div>
 
@@ -390,7 +416,10 @@ function ImageUploadCard({
         className="hidden"
         onChange={(e) => {
           const file = e.target.files?.[0];
-          if (file) mutation.mutate(file);
+          if (!file) return;
+          if (pendingPreview) URL.revokeObjectURL(pendingPreview);
+          setPendingFile(file);
+          setPendingPreview(URL.createObjectURL(file));
           e.target.value = "";
         }}
       />
@@ -411,7 +440,7 @@ function ImageUploadCard({
           {previewUrl ? (
             <img src={previewUrl} alt={title} className="h-full w-full object-cover" />
           ) : (
-            <span className="text-xs text-muted-foreground">Nenhuma imagem</span>
+            <ImageOff className="h-6 w-6 shrink-0 text-muted-foreground" aria-label="Nenhuma imagem" />
           )}
         </div>
       )}

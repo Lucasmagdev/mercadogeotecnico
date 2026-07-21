@@ -230,7 +230,7 @@ function EquipmentDetail() {
             {item.brand} · {item.model}
           </p>
           <p className="mt-4 text-3xl font-bold text-primary">
-            {formatPrice(item.price, item.mode)}
+            {formatPrice(item.price, item.mode, item.rental_period)}
           </p>
 
           <div className="mt-5 grid grid-cols-3 gap-3">

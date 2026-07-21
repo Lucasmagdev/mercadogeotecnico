@@ -57,7 +57,7 @@ function PainelEquipamentos() {
                 </Badge>
               </div>
               <p className="text-sm text-muted-foreground">
-                {formatPrice(e.price, e.mode)} · {e.city}/{e.state}
+                {formatPrice(e.price, e.mode, e.rental_period)} · {e.city}/{e.state}
               </p>
             </div>
             <div className="flex gap-1.5">

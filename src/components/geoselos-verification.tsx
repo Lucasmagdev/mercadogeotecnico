@@ -121,7 +121,7 @@ export function GeoSelosVerification({
               className="w-full rounded-full bg-[#14265C] text-white hover:bg-[#1b3475]"
             >
               <a
-                href="https://solicitacao.geoselos.com.br/"
+                href="https://geoselos.com/"
                 target="_blank"
                 rel="noreferrer"
               >

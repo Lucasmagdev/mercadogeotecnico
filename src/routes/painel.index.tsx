@@ -92,7 +92,7 @@ function PainelIndex() {
               </p>
             </div>
             <span className="shrink-0 font-semibold text-primary">
-              {formatPrice(e.price, e.mode)}
+              {formatPrice(e.price, e.mode, e.rental_period)}
             </span>
           </Link>
         ))}
