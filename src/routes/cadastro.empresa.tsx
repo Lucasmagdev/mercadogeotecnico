@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { Building2, MailCheck } from "lucide-react";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { Building2, MapPin, Phone, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -12,8 +12,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { supabase } from "@/lib/supabase";
+import { useAuth } from "@/components/auth-provider";
+import { registerCompany } from "@/lib/queries";
 import { states } from "@/lib/mock-data";
+import { formatPhoneBR } from "@/lib/utils";
 
 export const Route = createFileRoute("/cadastro/empresa")({
   head: () => ({
@@ -26,6 +28,43 @@ export const Route = createFileRoute("/cadastro/empresa")({
 });
 
 function CadastroEmpresa() {
+  const { session, loading } = useAuth();
+
+  if (loading) {
+    return (
+      <div className="container-page py-16 text-center text-muted-foreground">Carregando...</div>
+    );
+  }
+
+  if (!session) {
+    return (
+      <div className="container-page flex min-h-[70vh] flex-col items-center justify-center gap-4 py-12 text-center">
+        <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-secondary/10 text-secondary">
+          <Building2 className="h-5 w-5" />
+        </div>
+        <h1 className="text-xl font-bold">Crie sua conta antes de cadastrar a empresa</h1>
+        <p className="max-w-md text-muted-foreground">
+          O cadastro da empresa fica vinculado à sua conta pessoal. Crie sua conta (ou entre, se já
+          tiver uma) e volte aqui em seguida.
+        </p>
+        <div className="flex flex-wrap justify-center gap-2">
+          <Button asChild>
+            <Link to="/cadastro/usuario">Criar conta</Link>
+          </Button>
+          <Button variant="outline" asChild>
+            <Link to="/entrar">Já tenho conta</Link>
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  return <EmpresaForm email={session.user.email ?? ""} />;
+}
+
+function EmpresaForm({ email }: { email: string }) {
+  const navigate = useNavigate();
+  const { refreshProfile } = useAuth();
   const [form, setForm] = useState({
     companyName: "",
     cnpj: "",
@@ -34,13 +73,9 @@ function CadastroEmpresa() {
     phone: "",
     whatsapp: "",
     description: "",
-    fullName: "",
-    email: "",
-    password: "",
   });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const [sent, setSent] = useState(false);
 
   function set<K extends keyof typeof form>(key: K, value: (typeof form)[K]) {
     setForm((f) => ({ ...f, [key]: value }));
@@ -50,66 +85,45 @@ function CadastroEmpresa() {
     e.preventDefault();
     setLoading(true);
     setError("");
-    const { error } = await supabase.auth.signUp({
-      email: form.email,
-      password: form.password,
-      options: {
-        data: {
-          account_type: "company",
-          full_name: form.fullName,
-          company_name: form.companyName,
-          cnpj: form.cnpj,
-          city: form.city,
-          state: form.state,
-          phone: form.phone,
-          whatsapp: form.whatsapp,
-          description: form.description,
-        },
-      },
-    });
-    setLoading(false);
-    if (error) {
-      setError(error.message);
-      return;
+    try {
+      await registerCompany({
+        name: form.companyName,
+        cnpj: form.cnpj,
+        city: form.city,
+        state: form.state,
+        phone: form.phone,
+        whatsapp: form.whatsapp,
+        description: form.description,
+      });
+      await refreshProfile();
+      navigate({ to: "/painel" });
+    } catch (err) {
+      setError(
+        err instanceof Error && err.message === "company_already_exists"
+          ? "Sua conta já tem uma empresa cadastrada."
+          : "Não foi possível cadastrar a empresa. Tente novamente.",
+      );
+      setLoading(false);
     }
-    setSent(true);
-  }
-
-  if (sent) {
-    return (
-      <div className="container-page flex min-h-[70vh] items-center justify-center py-12">
-        <div className="w-full max-w-md rounded-2xl border border-border bg-card p-6 text-center shadow-soft">
-          <div className="mx-auto mb-3 flex h-11 w-11 items-center justify-center rounded-xl bg-success/10 text-success">
-            <MailCheck className="h-5 w-5" />
-          </div>
-          <h1 className="text-lg font-bold">Confirme seu e-mail</h1>
-          <p className="mt-2 text-sm text-muted-foreground">
-            Enviamos um link de confirmação para <strong>{form.email}</strong>. Depois de confirmar,
-            sua empresa entra na fila de aprovação do administrador — você poderá anunciar assim que
-            for aprovada.
-          </p>
-          <Button asChild className="mt-5 w-full">
-            <Link to="/entrar">Ir para o login</Link>
-          </Button>
-        </div>
-      </div>
-    );
   }
 
   return (
-    <div className="container-page flex min-h-[70vh] items-center justify-center py-12">
-      <div className="w-full max-w-lg rounded-2xl border border-border bg-card p-6 shadow-soft">
-        <div className="mb-6 text-center">
-          <div className="mx-auto mb-3 flex h-11 w-11 items-center justify-center rounded-xl bg-secondary/10 text-secondary">
-            <Building2 className="h-5 w-5" />
-          </div>
-          <h1 className="text-xl font-bold">Cadastrar empresa</h1>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Seu cadastro passa por aprovação do administrador antes de anunciar.
-          </p>
+    <div className="container-page py-12">
+      <div className="mx-auto mb-8 max-w-lg text-center">
+        <div className="mx-auto mb-3 flex h-11 w-11 items-center justify-center rounded-xl bg-secondary/10 text-secondary">
+          <Building2 className="h-5 w-5" />
         </div>
+        <h1 className="text-xl font-bold">Cadastrar empresa</h1>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Seu cadastro passa por aprovação do administrador antes de anunciar.
+        </p>
+      </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+      <div className="mx-auto grid max-w-4xl gap-8 lg:grid-cols-[1fr_320px]">
+        <form
+          onSubmit={handleSubmit}
+          className="space-y-4 rounded-2xl border border-border bg-card p-6 shadow-soft"
+        >
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2 sm:col-span-2">
               <Label>Nome da empresa</Label>
@@ -130,7 +144,12 @@ function CadastroEmpresa() {
             </div>
             <div className="space-y-2">
               <Label>Telefone</Label>
-              <Input required value={form.phone} onChange={(e) => set("phone", e.target.value)} />
+              <Input
+                required
+                value={form.phone}
+                onChange={(e) => set("phone", formatPhoneBR(e.target.value))}
+                placeholder="(11) 91234-5678"
+              />
             </div>
             <div className="space-y-2">
               <Label>Cidade</Label>
@@ -156,7 +175,7 @@ function CadastroEmpresa() {
               <Input
                 required
                 value={form.whatsapp}
-                onChange={(e) => set("whatsapp", e.target.value)}
+                onChange={(e) => set("whatsapp", e.target.value.replace(/\D/g, ""))}
               />
             </div>
             <div className="space-y-2 sm:col-span-2">
@@ -170,50 +189,47 @@ function CadastroEmpresa() {
           </div>
 
           <div className="border-t border-border pt-4">
-            <p className="mb-3 text-sm font-medium">Dados de acesso</p>
-            <div className="grid gap-4 sm:grid-cols-2">
-              <div className="space-y-2 sm:col-span-2">
-                <Label>Seu nome</Label>
-                <Input
-                  required
-                  value={form.fullName}
-                  onChange={(e) => set("fullName", e.target.value)}
-                />
-              </div>
-              <div className="space-y-2 sm:col-span-2">
-                <Label>E-mail</Label>
-                <Input
-                  type="email"
-                  required
-                  value={form.email}
-                  onChange={(e) => set("email", e.target.value)}
-                />
-              </div>
-              <div className="space-y-2 sm:col-span-2">
-                <Label>Senha</Label>
-                <Input
-                  type="password"
-                  required
-                  minLength={6}
-                  value={form.password}
-                  onChange={(e) => set("password", e.target.value)}
-                />
-              </div>
-            </div>
+            <p className="mb-1 text-sm font-medium">Conta vinculada</p>
+            <p className="text-sm text-muted-foreground">{email}</p>
           </div>
 
           {error && <p className="text-sm text-destructive">{error}</p>}
           <Button type="submit" className="w-full" disabled={loading}>
-            {loading ? "Enviando..." : "Cadastrar empresa"}
+            {loading ? "Cadastrando..." : "Cadastrar empresa"}
           </Button>
         </form>
 
-        <p className="mt-5 text-center text-sm text-muted-foreground">
-          Já tem conta?{" "}
-          <Link to="/entrar" className="font-medium text-primary hover:underline">
-            Entrar
-          </Link>
-        </p>
+        <div className="lg:sticky lg:top-24 lg:self-start">
+          <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+            Assim vai aparecer
+          </p>
+          <div className="overflow-hidden rounded-2xl border border-border bg-card shadow-soft">
+            <div className="h-16 bg-gradient-to-r from-secondary to-primary" />
+            <div className="-mt-8 flex flex-col items-start gap-2 p-4">
+              <span className="flex h-14 w-14 items-center justify-center rounded-full border-4 border-card bg-secondary text-sm font-bold text-secondary-foreground">
+                {(form.companyName || "?").slice(0, 2).toUpperCase()}
+              </span>
+              <h3 className="font-semibold leading-tight">
+                {form.companyName || "Nome da sua empresa"}
+              </h3>
+              <p className="flex items-center gap-1 text-xs text-muted-foreground">
+                <MapPin className="h-3.5 w-3.5 shrink-0" />
+                {form.city || form.state ? `${form.city || "Cidade"}/${form.state || "UF"}` : "—"}
+              </p>
+              {form.phone && (
+                <p className="flex items-center gap-1 text-xs text-muted-foreground">
+                  <Phone className="h-3.5 w-3.5 shrink-0" /> {form.phone}
+                </p>
+              )}
+              <p className="line-clamp-3 text-xs text-muted-foreground">
+                {form.description || "A descrição da sua empresa aparece aqui."}
+              </p>
+              <span className="mt-1 flex items-center gap-1 rounded-full bg-accent/15 px-2 py-0.5 text-[11px] font-medium text-accent-foreground">
+                <Sparkles className="h-3 w-3" /> Aguardando aprovação
+              </span>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );

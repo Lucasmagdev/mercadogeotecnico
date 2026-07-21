@@ -1,14 +1,15 @@
-import { getCompanyPhotoUrl } from "@/lib/company-images";
+import { getCompanyImageUrl, getCompanyPhotoUrl } from "@/lib/company-images";
 import { cn } from "@/lib/utils";
 
 type CompanyAvatarProps = {
   name: string;
   slug: string;
+  logoPath?: string | null;
   className?: string;
 };
 
-export function CompanyAvatar({ name, slug, className }: CompanyAvatarProps) {
-  const photo = getCompanyPhotoUrl(slug);
+export function CompanyAvatar({ name, slug, logoPath, className }: CompanyAvatarProps) {
+  const photo = getCompanyImageUrl(logoPath) ?? getCompanyPhotoUrl(slug);
 
   if (photo) {
     return (

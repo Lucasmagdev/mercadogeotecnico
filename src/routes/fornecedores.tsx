@@ -63,7 +63,12 @@ function Suppliers() {
             params={{ slug: c.slug }}
             className="rounded-2xl border border-border bg-card p-5 text-center shadow-soft transition-all hover:-translate-y-0.5 hover:shadow-lift"
           >
-            <CompanyAvatar name={c.name} slug={c.slug} className="mx-auto h-16 w-16 text-lg" />
+            <CompanyAvatar
+              name={c.name}
+              slug={c.slug}
+              logoPath={c.logo_path}
+              className="mx-auto h-16 w-16 text-lg"
+            />
             <div className="mt-3 flex items-center justify-center gap-1.5">
               <h3 className="font-semibold">{c.name}</h3>
               {c.verified && <GeoSelosVerification />}

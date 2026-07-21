@@ -14,6 +14,7 @@ import {
   Check,
 } from "lucide-react";
 import { CompanyAvatar } from "@/components/company-avatar";
+import { getCompanyImageUrl } from "@/lib/company-images";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -93,7 +94,14 @@ function CompanyProfile() {
   return (
     <div>
       {/* Cover */}
-      <div className="h-40 w-full bg-gradient-to-r from-secondary to-primary sm:h-52" />
+      {company.verified && company.banner_path ? (
+        <div
+          className="h-40 w-full bg-cover bg-center sm:h-52"
+          style={{ backgroundImage: `url(${getCompanyImageUrl(company.banner_path)})` }}
+        />
+      ) : (
+        <div className="h-40 w-full bg-gradient-to-r from-secondary to-primary sm:h-52" />
+      )}
       <div className="container-page">
         <Button variant="ghost" size="sm" asChild className="mt-4 gap-1 text-muted-foreground">
           <Link to="/empresas">
@@ -105,6 +113,7 @@ function CompanyProfile() {
           <CompanyAvatar
             name={company.name}
             slug={company.slug}
+            logoPath={company.logo_path}
             className="h-24 w-24 border-4 border-background text-2xl shadow-card"
           />
           <div className="flex-1 pb-1">

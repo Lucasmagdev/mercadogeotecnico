@@ -51,7 +51,12 @@ function Companies() {
               params={{ slug: c.slug }}
               className="flex gap-4 rounded-2xl border border-border bg-card p-5 shadow-soft transition-all hover:-translate-y-0.5 hover:shadow-lift"
             >
-              <CompanyAvatar name={c.name} slug={c.slug} className="h-16 w-16 text-lg" />
+              <CompanyAvatar
+                name={c.name}
+                slug={c.slug}
+                logoPath={c.logo_path}
+                className="h-16 w-16 text-lg"
+              />
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-1.5">
                   <h3 className="truncate font-semibold">{c.name}</h3>

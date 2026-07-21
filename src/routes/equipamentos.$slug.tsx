@@ -350,7 +350,12 @@ function EquipmentDetail() {
               params={{ slug: company.slug }}
               className="mt-4 flex items-center gap-3 rounded-2xl border border-border bg-card p-4 transition-colors hover:border-primary/40"
             >
-              <CompanyAvatar name={company.name} slug={company.slug} className="text-sm" />
+              <CompanyAvatar
+                name={company.name}
+                slug={company.slug}
+                logoPath={company.logo_path}
+                className="text-sm"
+              />
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-1.5">
                   <p className="truncate font-semibold">{company.name}</p>

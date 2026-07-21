@@ -1,13 +1,14 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { CircleCheck, Clock, ShieldAlert } from "lucide-react";
+import { CircleCheck, Clock, ShieldAlert, ImagePlus, Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { GeoSelosVerification } from "@/components/geoselos-verification";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Separator } from "@/components/ui/separator";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Select,
   SelectContent,
@@ -18,7 +19,10 @@ import {
 import { toast } from "sonner";
 import { useAuth } from "@/components/auth-provider";
 import { fetchMyCompany, updateCompany, updateProfile } from "@/lib/queries";
+import { getCompanyImageUrl, uploadCompanyImage } from "@/lib/company-images";
 import { states } from "@/lib/mock-data";
+import { formatPhoneBR } from "@/lib/utils";
+import type { Company } from "@/lib/supabase";
 
 export const Route = createFileRoute("/configuracoes")({
   head: () => ({
@@ -53,9 +57,38 @@ function Configuracoes() {
       <p className="mt-1 text-muted-foreground">Gerencie os dados da sua conta.</p>
 
       {profile?.role === "company" ? (
-        <CompanySettings ownerId={session.user.id} />
+        <Tabs defaultValue="empresa" className="mt-6">
+          <TabsList>
+            <TabsTrigger value="empresa">Empresa</TabsTrigger>
+            <TabsTrigger value="aparencia">Aparência</TabsTrigger>
+            <TabsTrigger value="conta">Minha conta</TabsTrigger>
+          </TabsList>
+          <TabsContent value="empresa">
+            <CompanySettings ownerId={session.user.id} />
+          </TabsContent>
+          <TabsContent value="aparencia">
+            <CompanyAppearance ownerId={session.user.id} />
+          </TabsContent>
+          <TabsContent value="conta">
+            <ProfileSettings userId={session.user.id} refreshProfile={refreshProfile} />
+          </TabsContent>
+        </Tabs>
       ) : (
-        <ProfileSettings userId={session.user.id} refreshProfile={refreshProfile} />
+        <>
+          <ProfileSettings userId={session.user.id} refreshProfile={refreshProfile} />
+          <div className="mt-4 rounded-2xl border border-dashed border-border p-4 text-sm">
+            <p className="font-medium">Tem uma empresa?</p>
+            <p className="mt-0.5 text-muted-foreground">
+              Cadastre sua empresa e comece a anunciar equipamentos.
+            </p>
+            <Link
+              to="/cadastro/empresa"
+              className="mt-1.5 inline-block font-semibold text-primary hover:underline"
+            >
+              Cadastrar minha empresa →
+            </Link>
+          </div>
+        </>
       )}
     </div>
   );
@@ -97,7 +130,7 @@ function ProfileSettings({
         </div>
         <div className="space-y-2 sm:col-span-2">
           <Label>Telefone</Label>
-          <Input value={phone} onChange={(e) => setPhone(e.target.value)} />
+          <Input value={phone} onChange={(e) => setPhone(formatPhoneBR(e.target.value))} />
         </div>
       </div>
       <div className="flex items-center justify-end gap-3">
@@ -207,11 +240,17 @@ function CompanySettings({ ownerId }: { ownerId: string }) {
         </div>
         <div className="space-y-2">
           <Label>Telefone</Label>
-          <Input value={form.phone} onChange={(e) => set("phone", e.target.value)} />
+          <Input
+            value={form.phone}
+            onChange={(e) => set("phone", formatPhoneBR(e.target.value))}
+          />
         </div>
         <div className="space-y-2">
           <Label>WhatsApp</Label>
-          <Input value={form.whatsapp} onChange={(e) => set("whatsapp", e.target.value)} />
+          <Input
+            value={form.whatsapp}
+            onChange={(e) => set("whatsapp", e.target.value.replace(/\D/g, ""))}
+          />
         </div>
         <div className="space-y-2">
           <Label>Site</Label>
@@ -251,6 +290,131 @@ function CompanySettings({ ownerId }: { ownerId: string }) {
           {mutation.isPending ? "Salvando..." : "Salvar alterações"}
         </Button>
       </div>
+    </div>
+  );
+}
+
+function CompanyAppearance({ ownerId }: { ownerId: string }) {
+  const queryClient = useQueryClient();
+  const { data: company, isLoading } = useQuery({
+    queryKey: ["my-company", ownerId],
+    queryFn: () => fetchMyCompany(ownerId),
+  });
+
+  if (isLoading) {
+    return <p className="mt-6 text-sm text-muted-foreground">Carregando...</p>;
+  }
+
+  if (!company) return null;
+
+  return (
+    <div className="mt-6 space-y-6">
+      <ImageUploadCard
+        title="Logo da empresa"
+        description="Aparece nos seus anúncios e no seu perfil público."
+        kind="logo"
+        company={company}
+        ownerId={ownerId}
+        onSaved={() => queryClient.invalidateQueries({ queryKey: ["my-company", ownerId] })}
+      />
+      <ImageUploadCard
+        title="Capa do perfil"
+        description="Imagem de fundo do seu perfil público."
+        kind="banner"
+        company={company}
+        ownerId={ownerId}
+        locked={!company.verified}
+        onSaved={() => queryClient.invalidateQueries({ queryKey: ["my-company", ownerId] })}
+      />
+    </div>
+  );
+}
+
+function ImageUploadCard({
+  title,
+  description,
+  kind,
+  company,
+  ownerId,
+  locked,
+  onSaved,
+}: {
+  title: string;
+  description: string;
+  kind: "logo" | "banner";
+  company: Company;
+  ownerId: string;
+  locked?: boolean;
+  onSaved: () => void;
+}) {
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const currentPath = kind === "logo" ? company.logo_path : company.banner_path;
+  const previewUrl = getCompanyImageUrl(currentPath);
+
+  const mutation = useMutation({
+    mutationFn: async (file: File) => {
+      const path = await uploadCompanyImage(ownerId, file, kind);
+      await updateCompany(company.id, kind === "logo" ? { logo_path: path } : { banner_path: path });
+    },
+    onSuccess: onSaved,
+    onError: (err) =>
+      toast.error(err instanceof Error ? err.message : "Não foi possível enviar a imagem."),
+  });
+
+  return (
+    <div className="rounded-2xl border border-border bg-card p-6">
+      <div className="flex items-center justify-between gap-3">
+        <div>
+          <p className="font-semibold">{title}</p>
+          <p className="text-sm text-muted-foreground">{description}</p>
+        </div>
+        {!locked && (
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            className="gap-1.5"
+            disabled={mutation.isPending}
+            onClick={() => fileInputRef.current?.click()}
+          >
+            <ImagePlus className="h-4 w-4" />
+            {mutation.isPending ? "Enviando..." : previewUrl ? "Trocar" : "Adicionar"}
+          </Button>
+        )}
+      </div>
+
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/jpeg,image/png,image/webp"
+        className="hidden"
+        onChange={(e) => {
+          const file = e.target.files?.[0];
+          if (file) mutation.mutate(file);
+          e.target.value = "";
+        }}
+      />
+
+      {locked ? (
+        <div className="mt-4 flex items-center gap-2 rounded-xl bg-muted/50 p-4 text-sm text-muted-foreground">
+          <Lock className="h-4 w-4 shrink-0" />
+          Disponível para empresas verificadas pela GeoSelos.
+        </div>
+      ) : (
+        <div
+          className={
+            kind === "logo"
+              ? "mt-4 flex h-20 w-20 items-center justify-center overflow-hidden rounded-full bg-muted"
+              : "mt-4 flex h-32 w-full items-center justify-center overflow-hidden rounded-xl bg-muted"
+          }
+        >
+          {previewUrl ? (
+            <img src={previewUrl} alt={title} className="h-full w-full object-cover" />
+          ) : (
+            <span className="text-xs text-muted-foreground">Nenhuma imagem</span>
+          )}
+        </div>
+      )}
     </div>
   );
 }

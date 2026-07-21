@@ -317,7 +317,11 @@ function Home() {
                   className="group flex h-full flex-col rounded-2xl border border-border bg-card p-5 shadow-soft transition-all duration-300 hover:-translate-y-1 hover:border-primary/40 hover:shadow-lift"
                 >
                   <div className="flex items-center gap-3">
-                    <CompanyAvatar name={company.name} slug={company.slug} />
+                    <CompanyAvatar
+                      name={company.name}
+                      slug={company.slug}
+                      logoPath={company.logo_path}
+                    />
                     <span className="min-w-0">
                       <span className="flex items-center gap-1.5">
                         <span className="truncate font-semibold">{company.name}</span>

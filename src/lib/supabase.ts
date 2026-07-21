@@ -33,6 +33,8 @@ export type Company = {
   years_on_market: number;
   rating: number;
   reviews: number;
+  logo_path: string | null;
+  banner_path: string | null;
   created_at: string;
 };
 

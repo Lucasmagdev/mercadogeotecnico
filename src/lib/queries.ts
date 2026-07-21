@@ -186,19 +186,26 @@ export async function deleteEquipment(id: string) {
   if (error) throw error;
 }
 
-export async function createCompany(payload: {
-  owner_id: string;
+export async function registerCompany(payload: {
   name: string;
-  slug: string;
   cnpj: string;
   city: string;
   state: string;
   phone: string;
   whatsapp: string;
   description: string;
-}) {
-  const { error } = await supabase.from("companies").insert(payload);
+}): Promise<string> {
+  const { data, error } = await supabase.rpc("register_company", {
+    p_name: payload.name,
+    p_cnpj: payload.cnpj,
+    p_city: payload.city,
+    p_state: payload.state,
+    p_phone: payload.phone,
+    p_whatsapp: payload.whatsapp,
+    p_description: payload.description,
+  });
   if (error) throw error;
+  return data as string;
 }
 
 export async function fetchAllCompaniesAdmin(): Promise<Company[]> {
@@ -251,6 +258,8 @@ export async function updateCompany(
     whatsapp: string;
     site: string;
     description: string;
+    logo_path: string | null;
+    banner_path: string | null;
   }>,
 ) {
   const { error } = await supabase.from("companies").update(patch).eq("id", id);
