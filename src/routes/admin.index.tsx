@@ -8,7 +8,11 @@ export const Route = createFileRoute("/admin/")({
 });
 
 function AdminHome() {
-  const { data: companies } = useQuery({
+  const {
+    data: companies,
+    isLoading,
+    isError,
+  } = useQuery({
     queryKey: ["admin-companies"],
     queryFn: fetchAllCompaniesAdmin,
   });
@@ -19,6 +23,12 @@ function AdminHome() {
   return (
     <div>
       <h1 className="text-2xl font-bold">Visão geral</h1>
+      {isLoading && <p className="mt-4 text-sm text-muted-foreground">Carregando...</p>}
+      {isError && (
+        <p className="mt-4 text-sm text-destructive">
+          Não foi possível carregar os dados. Recarregue a página.
+        </p>
+      )}
       <div className="mt-6 grid gap-4 sm:grid-cols-3">
         <div className="rounded-2xl border border-border bg-card p-5">
           <Building2 className="h-5 w-5 text-primary" />

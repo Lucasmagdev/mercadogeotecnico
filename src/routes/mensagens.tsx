@@ -5,6 +5,7 @@ import { Send, Search, MessageSquare } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { toast } from "sonner";
 import { useAuth } from "@/components/auth-provider";
 import { useRealtimeMessages } from "@/hooks/use-realtime";
 import { fetchConversations, fetchMessages, sendMessage } from "@/lib/queries";
@@ -63,6 +64,7 @@ function Mensagens() {
       queryClient.invalidateQueries({ queryKey: ["messages", activeId] });
       queryClient.invalidateQueries({ queryKey: ["conversations", session?.user.id] });
     },
+    onError: () => toast.error("Não foi possível enviar a mensagem. Tente novamente."),
   });
 
   if (loading) {

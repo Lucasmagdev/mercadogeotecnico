@@ -38,7 +38,6 @@ import { GeoSelosVerification } from "@/components/geoselos-verification";
 import { VerifiedSeal } from "@/components/verified-seal";
 import { CompanyAvatar } from "@/components/company-avatar";
 import { fetchApprovedCompanies, fetchCategories, fetchEquipmentList } from "@/lib/queries";
-import { brands } from "@/lib/mock-data";
 import fundaffLogo from "@/assets/verified-companies/fundaff.jpg";
 import fastengeLogo from "@/assets/verified-companies/fastenge.png";
 import gontijoLogo from "@/assets/verified-companies/gontijo.png";
@@ -468,13 +467,16 @@ function Home() {
                 {geoselosCompanies.map((company) => (
                   <div
                     key={company.name}
-                    className="flex min-h-16 items-center gap-4 rounded-xl border border-white/10 bg-white p-3"
+                    className="flex min-h-16 items-center gap-3 rounded-xl border border-white/10 bg-white p-3"
                   >
                     <img
                       src={company.logo}
                       alt={`Logo da ${company.name}`}
-                      className="h-9 min-w-0 flex-1 object-contain object-left"
+                      className="h-9 w-9 shrink-0 rounded object-contain"
                     />
+                    <span className="flex-1 text-sm font-semibold text-slate-800">
+                      {company.name}
+                    </span>
                     <VerifiedSeal className="h-5 w-5 shrink-0" />
                   </div>
                 ))}
@@ -487,33 +489,6 @@ function Home() {
             </div>
           </div>
         </motion.div>
-      </section>
-
-      {/* Brands marquee */}
-      <section
-        className="border-y border-border bg-card py-5"
-        aria-label="Marcas presentes no marketplace"
-      >
-        <div className="relative overflow-hidden">
-          <div
-            className="pointer-events-none absolute inset-y-0 left-0 z-10 w-24 bg-gradient-to-r from-card to-transparent"
-            aria-hidden
-          />
-          <div
-            className="pointer-events-none absolute inset-y-0 right-0 z-10 w-24 bg-gradient-to-l from-card to-transparent"
-            aria-hidden
-          />
-          <div className="animate-marquee flex w-max items-center gap-16 pr-16">
-            {[...brands, ...brands, ...brands, ...brands].map((b, i) => (
-              <span
-                key={i}
-                className="text-lg font-semibold tracking-wide text-muted-foreground/60"
-              >
-                {b}
-              </span>
-            ))}
-          </div>
-        </div>
       </section>
 
       {/* How it works */}

@@ -1,4 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 import { useAuth } from "@/components/auth-provider";
 import { addFavorite, fetchFavoriteIds, removeFavorite } from "@/lib/queries";
 
@@ -26,6 +27,13 @@ export function useFavoriteToggle(equipmentId: string) {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["favorite-ids", session?.user.id] });
       queryClient.invalidateQueries({ queryKey: ["favorite-equipment", session?.user.id] });
+    },
+    onError: (err) => {
+      if (err instanceof Error && err.message === "not_authenticated") {
+        toast.error("Entre na sua conta para favoritar.");
+      } else {
+        toast.error("Não foi possível atualizar favoritos. Tente novamente.");
+      }
     },
   });
 

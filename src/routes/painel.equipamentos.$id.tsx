@@ -14,6 +14,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { toast } from "sonner";
 import { fetchCategories, fetchEquipmentById, updateEquipment } from "@/lib/queries";
 import { brands, states } from "@/lib/mock-data";
 
@@ -94,6 +95,7 @@ function EditarEquipamento() {
       setSaved(true);
       setTimeout(() => setSaved(false), 2000);
     },
+    onError: () => toast.error("Não foi possível salvar. Tente novamente."),
   });
 
   if (isLoading) {

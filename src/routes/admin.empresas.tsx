@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { MapPin, Check, X } from "lucide-react";
+import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { GeoSelosVerification } from "@/components/geoselos-verification";
@@ -24,7 +25,11 @@ const statusClass: Record<string, string> = {
 
 function AdminEmpresas() {
   const queryClient = useQueryClient();
-  const { data: companies, isLoading } = useQuery({
+  const {
+    data: companies,
+    isLoading,
+    isError,
+  } = useQuery({
     queryKey: ["admin-companies"],
     queryFn: fetchAllCompaniesAdmin,
   });
@@ -33,6 +38,7 @@ function AdminEmpresas() {
     mutationFn: ({ id, status }: { id: string; status: "approved" | "rejected" }) =>
       setCompanyStatus(id, status),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["admin-companies"] }),
+    onError: () => toast.error("Não foi possível atualizar o status. Tente novamente."),
   });
 
   return (
@@ -42,6 +48,11 @@ function AdminEmpresas() {
 
       <div className="mt-6 space-y-3">
         {isLoading && <p className="text-sm text-muted-foreground">Carregando...</p>}
+        {isError && (
+          <p className="text-sm text-destructive">
+            Não foi possível carregar as empresas. Recarregue a página.
+          </p>
+        )}
         {companies?.map((c) => (
           <div
             key={c.id}

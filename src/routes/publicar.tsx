@@ -518,7 +518,11 @@ function Publicar() {
               Revise as informações e publique seu anúncio para milhares de empresas.
             </p>
             {submit.isError && (
-              <p className="text-sm text-destructive">Erro ao publicar. Tente novamente.</p>
+              <p className="text-sm text-destructive">
+                {submit.error instanceof Error
+                  ? submit.error.message
+                  : "Erro ao publicar. Tente novamente."}
+              </p>
             )}
             <Button
               size="lg"

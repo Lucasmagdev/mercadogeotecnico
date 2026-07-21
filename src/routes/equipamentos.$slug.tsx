@@ -35,6 +35,7 @@ import {
 import { formatPrice } from "@/lib/mock-data";
 import { getEquipmentImageUrls } from "@/lib/equipment-images";
 import { cn } from "@/lib/utils";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/equipamentos/$slug")({
   head: () => ({
@@ -81,6 +82,7 @@ function EquipmentDetail() {
   const unlock = useMutation({
     mutationFn: () => unlockEquipmentContact(item!.id),
     onSuccess: (data) => setContact(data),
+    onError: () => toast.error("Não foi possível liberar o contato. Tente novamente."),
   });
 
   const sendMessage = useMutation({
@@ -89,6 +91,7 @@ function EquipmentDetail() {
       setMessageSent(true);
       setMessageDraft("");
     },
+    onError: () => toast.error("Não foi possível enviar a mensagem. Tente novamente."),
   });
 
   async function handleShare() {

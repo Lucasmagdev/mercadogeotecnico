@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Plus, Trash2, Eye, Pencil } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 import { useAuth } from "@/components/auth-provider";
 import { deleteEquipment, fetchMyCompany, fetchMyEquipment } from "@/lib/queries";
 import { formatPrice } from "@/lib/mock-data";
@@ -28,6 +29,7 @@ function PainelEquipamentos() {
   const remove = useMutation({
     mutationFn: (id: string) => deleteEquipment(id),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["my-equipment", company?.id] }),
+    onError: () => toast.error("Não foi possível excluir o anúncio. Tente novamente."),
   });
 
   return (

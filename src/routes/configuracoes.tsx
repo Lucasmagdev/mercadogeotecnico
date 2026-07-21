@@ -15,6 +15,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { toast } from "sonner";
 import { useAuth } from "@/components/auth-provider";
 import { fetchMyCompany, updateCompany, updateProfile } from "@/lib/queries";
 import { states } from "@/lib/mock-data";
@@ -84,6 +85,7 @@ function ProfileSettings({
       setSaved(true);
       setTimeout(() => setSaved(false), 2000);
     },
+    onError: () => toast.error("Não foi possível salvar. Tente novamente."),
   });
 
   return (
@@ -153,6 +155,7 @@ function CompanySettings({ ownerId }: { ownerId: string }) {
       setSaved(true);
       setTimeout(() => setSaved(false), 2000);
     },
+    onError: () => toast.error("Não foi possível salvar. Tente novamente."),
   });
 
   if (isLoading) {

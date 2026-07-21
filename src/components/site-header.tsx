@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link, useRouterState, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { Search, MessageSquare, Bell, Menu, Plus, Sun, Moon, ChevronDown } from "lucide-react";
+import { Search, MessageSquare, Bell, Menu, Plus, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle } from "@/components/ui/sheet";
@@ -14,7 +14,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useTheme } from "@/components/theme-provider";
 import { useAuth } from "@/components/auth-provider";
 import { useRealtimeNotifications } from "@/hooks/use-realtime";
 import { fetchNotifications } from "@/lib/queries";
@@ -29,7 +28,6 @@ const nav = [
 ];
 
 export function SiteHeader() {
-  const { theme, toggle } = useTheme();
   const { session, profile, signOut } = useAuth();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const navigate = useNavigate();
@@ -59,16 +57,6 @@ export function SiteHeader() {
         <Link to="/" className="flex items-center gap-2 shrink-0">
           <Logo />
         </Link>
-
-        <form onSubmit={submitSearch} className="relative hidden flex-1 max-w-md lg:block">
-          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-          <Input
-            placeholder="Qual equipamento você procura?"
-            className="h-10 rounded-full bg-muted pl-10"
-            value={headerQuery}
-            onChange={(e) => setHeaderQuery(e.target.value)}
-          />
-        </form>
 
         <nav className="hidden items-center gap-1 xl:flex">
           <DropdownMenu>
@@ -105,9 +93,6 @@ export function SiteHeader() {
         </nav>
 
         <div className="ml-auto flex items-center gap-1">
-          <Button variant="ghost" size="icon" onClick={toggle} aria-label="Alternar tema">
-            {theme === "dark" ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
-          </Button>
           <Button variant="ghost" size="icon" asChild className="relative hidden sm:inline-flex">
             <Link to="/mensagens" aria-label="Mensagens">
               <MessageSquare className="h-5 w-5" />

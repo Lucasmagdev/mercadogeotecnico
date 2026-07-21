@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { MessageSquare, CheckCircle2, XCircle, Users, Bell } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 import { useAuth } from "@/components/auth-provider";
 import { fetchNotifications, markAllNotificationsRead } from "@/lib/queries";
 import type { NotificationRow } from "@/lib/supabase";
@@ -41,6 +42,7 @@ function Notificacoes() {
     mutationFn: () => markAllNotificationsRead(session!.user.id),
     onSuccess: () =>
       queryClient.invalidateQueries({ queryKey: ["notifications", session?.user.id] }),
+    onError: () => toast.error("Não foi possível marcar como lidas. Tente novamente."),
   });
 
   if (loading) {

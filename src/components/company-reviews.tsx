@@ -4,6 +4,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Star, Trash2, Lock, Pencil } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import { toast } from "sonner";
 import { useAuth } from "@/components/auth-provider";
 import { deleteReview, fetchCompanyReviews, upsertReview } from "@/lib/queries";
 import { cn } from "@/lib/utils";
@@ -75,6 +76,7 @@ export function CompanyReviews({
   const remove = useMutation({
     mutationFn: (id: string) => deleteReview(id),
     onSuccess: refresh,
+    onError: () => toast.error("Não foi possível excluir a avaliação. Tente novamente."),
   });
 
   const showForm = editing || (!myReview && session && !isOwner);

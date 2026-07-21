@@ -20,6 +20,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { EquipmentCard } from "@/components/equipment-card";
 import { CompanyReviews } from "@/components/company-reviews";
 import { GeoSelosVerification } from "@/components/geoselos-verification";
+import { toast } from "sonner";
 import { useAuth } from "@/components/auth-provider";
 import {
   fetchCategories,
@@ -60,6 +61,7 @@ function CompanyProfile() {
   const unlock = useMutation({
     mutationFn: () => unlockCompanyContact(company!.id),
     onSuccess: (data) => setContact(data),
+    onError: () => toast.error("Não foi possível liberar o contato. Tente novamente."),
   });
 
   const sendMessage = useMutation({
@@ -68,6 +70,7 @@ function CompanyProfile() {
       setMessageSent(true);
       setMessageDraft("");
     },
+    onError: () => toast.error("Não foi possível enviar a mensagem. Tente novamente."),
   });
 
   if (isLoading) {

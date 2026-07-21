@@ -110,7 +110,8 @@ export async function fetchApprovedCompanies(): Promise<Company[]> {
     .from("companies")
     .select("*")
     .eq("status", "approved")
-    .order("name");
+    .order("name")
+    .limit(200);
   if (error) throw error;
   return data;
 }
@@ -130,7 +131,9 @@ export async function fetchCompanyEquipment(companyId: string): Promise<Equipmen
     .from("equipment")
     .select("*, companies(*)")
     .eq("company_id", companyId)
-    .eq("status", "active");
+    .eq("status", "active")
+    .order("created_at", { ascending: false })
+    .limit(200);
   if (error) throw error;
   return data as EquipmentRow[];
 }
@@ -150,7 +153,8 @@ export async function fetchMyEquipment(companyId: string): Promise<EquipmentRow[
     .from("equipment")
     .select("*, companies(*)")
     .eq("company_id", companyId)
-    .order("created_at", { ascending: false });
+    .order("created_at", { ascending: false })
+    .limit(500);
   if (error) throw error;
   return data as EquipmentRow[];
 }
@@ -201,7 +205,8 @@ export async function fetchAllCompaniesAdmin(): Promise<Company[]> {
   const { data, error } = await supabase
     .from("companies")
     .select("*")
-    .order("created_at", { ascending: false });
+    .order("created_at", { ascending: false })
+    .limit(500);
   if (error) throw error;
   return data;
 }

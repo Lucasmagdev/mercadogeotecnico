@@ -394,7 +394,7 @@ function EquipmentList() {
         </aside>
 
         <div>
-          <div className="mb-5 flex items-center justify-between gap-3">
+          <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
             <Sheet>
               <SheetTrigger asChild>
                 <Button variant="outline" className="gap-2 lg:hidden">
@@ -411,7 +411,7 @@ function EquipmentList() {
 
             <div className="ml-auto flex items-center gap-2">
               <Select value={sort} onValueChange={(v) => setSort(v as EquipmentSort)}>
-                <SelectTrigger className="w-44">
+                <SelectTrigger className="w-32 sm:w-44">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
