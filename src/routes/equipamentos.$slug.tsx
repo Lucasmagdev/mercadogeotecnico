@@ -159,7 +159,7 @@ function EquipmentDetail() {
         </Link>
         <ChevronRight className="h-3.5 w-3.5" aria-hidden />
         <Link to="/equipamentos" className="transition-colors hover:text-primary">
-          Equipamentos
+          Almoxarifado
         </Link>
         {categoryName && (
           <>

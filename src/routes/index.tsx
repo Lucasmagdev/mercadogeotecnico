@@ -7,7 +7,6 @@ import {
   ArrowRight,
   Zap,
   TrendingUp,
-  Construction,
   Tractor,
   Drill,
   Cable,
@@ -17,7 +16,6 @@ import {
   Wrench,
   Layers,
   Ruler,
-  FlaskConical,
   Forklift,
   Truck,
   Briefcase,
@@ -50,7 +48,6 @@ export const Route = createFileRoute("/")({
 const categoryIcons: Record<string, LucideIcon> = {
   "maquinas-pesadas": Truck,
   bobcat: Forklift,
-  escavadeiras: Construction,
   retroescavadeiras: Tractor,
   perfuratrizes: Drill,
   guindastes: Cable,
@@ -62,7 +59,6 @@ const categoryIcons: Record<string, LucideIcon> = {
   ferramentas: Wrench,
   "equipamentos-fundacao": Layers,
   "equipamentos-sondagem": Ruler,
-  "equipamentos-laboratorio": FlaskConical,
   servicos: Briefcase,
 };
 
@@ -168,9 +164,11 @@ function Home() {
             className="mx-auto max-w-3xl text-center"
           >
             <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">
-              Equipamentos de engenharia para{" "}
-              <span className="text-gradient-primary">comprar e alugar</span>
+              O <span className="text-gradient-primary">almoxarife geotécnico</span> da sua obra
             </h1>
+            <p className="mt-2 text-muted-foreground">
+              Compre e alugue equipamentos de engenharia em minutos.
+            </p>
             <form
               onSubmit={submitHeroSearch}
               className="mt-5 hidden items-center gap-2 rounded-2xl border border-border bg-background p-2 shadow-soft transition-shadow focus-within:shadow-lift lg:flex"

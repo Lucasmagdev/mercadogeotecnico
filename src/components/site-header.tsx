@@ -21,7 +21,7 @@ import { Logo } from "@/components/logo";
 import { categories } from "@/lib/mock-data";
 
 const nav = [
-  { to: "/equipamentos", label: "Equipamentos" },
+  { to: "/equipamentos", label: "Almoxarifado" },
   { to: "/servicos", label: "Serviços" },
   { to: "/empresas", label: "Empresas" },
   { to: "/fornecedores", label: "Fornecedores" },

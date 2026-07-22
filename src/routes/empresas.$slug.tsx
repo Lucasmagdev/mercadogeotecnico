@@ -166,7 +166,7 @@ function CompanyProfile() {
           <div>
             <Tabs defaultValue="equipamentos">
               <TabsList>
-                <TabsTrigger value="equipamentos">Equipamentos</TabsTrigger>
+                <TabsTrigger value="equipamentos">Almoxarifado</TabsTrigger>
                 <TabsTrigger value="servicos">Serviços</TabsTrigger>
                 <TabsTrigger value="avaliacoes">Avaliações</TabsTrigger>
               </TabsList>

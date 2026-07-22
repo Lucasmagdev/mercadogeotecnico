@@ -5,7 +5,7 @@ const columns = [
   {
     title: "Plataforma",
     links: [
-      { to: "/equipamentos", label: "Equipamentos" },
+      { to: "/equipamentos", label: "Almoxarifado" },
       { to: "/servicos", label: "Serviços" },
       { to: "/empresas", label: "Empresas" },
       { to: "/fornecedores", label: "Fornecedores" },
@@ -45,7 +45,7 @@ export function SiteFooter() {
         <div className="col-span-2 md:col-span-1">
           <Logo />
           <p className="mt-4 max-w-xs text-sm text-muted-foreground">
-            O maior ecossistema digital para empresas de engenharia. Compre, venda, alugue
+            O almoxarife geotécnico digital do setor de engenharia. Compre, venda, alugue
             equipamentos e conecte-se com fornecedores confiáveis.
           </p>
         </div>

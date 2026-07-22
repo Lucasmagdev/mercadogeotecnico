@@ -88,21 +88,21 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Mercado Geotécnico — A plataforma que conecta empresas de engenharia" },
+      { title: "Mercado Geotécnico — O almoxarife geotécnico da sua obra" },
       {
         name: "description",
         content:
-          "Compre, venda, alugue equipamentos e encontre fornecedores de engenharia em um único lugar. A plataforma SaaS premium para o setor.",
+          "Seu almoxarife geotécnico digital: compre, alugue e encontre equipamentos e fornecedores de engenharia em um só lugar.",
       },
       { name: "author", content: "Mercado Geotécnico" },
       {
         property: "og:title",
-        content: "Mercado Geotécnico — Plataforma de equipamentos de engenharia",
+        content: "Mercado Geotécnico — O almoxarife geotécnico da sua obra",
       },
       {
         property: "og:description",
         content:
-          "Compre, venda, alugue equipamentos e encontre fornecedores de engenharia em um único lugar.",
+          "Seu almoxarife geotécnico digital: compre, alugue e encontre equipamentos e fornecedores de engenharia em um só lugar.",
       },
       { property: "og:type", content: "website" },
       { property: "og:locale", content: "pt_BR" },

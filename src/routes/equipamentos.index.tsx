@@ -370,7 +370,7 @@ function EquipmentList() {
   return (
     <div className="container-page py-8">
       <div className="mb-6">
-        <h1 className="text-2xl font-bold sm:text-3xl">Equipamentos</h1>
+        <h1 className="text-2xl font-bold sm:text-3xl">Almoxarifado</h1>
         <p className="mt-1 text-primary">{total} anúncios encontrados</p>
       </div>
 
