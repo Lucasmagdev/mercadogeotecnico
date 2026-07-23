@@ -70,7 +70,6 @@ export function SiteFooter() {
       <div className="border-t border-border">
         <div className="container-page flex flex-col items-center justify-between gap-3 py-6 text-sm text-muted-foreground sm:flex-row">
           <p>© 2025 Mercado Geotécnico. Todos os direitos reservados.</p>
-          <p>Feito para o setor de engenharia.</p>
         </div>
       </div>
     </footer>
