@@ -187,26 +187,21 @@ function Home() {
           </motion.div>
 
           {/* Category chips */}
-          <div className="relative -mx-5 mt-6">
-            <div className="scrollbar-none overflow-x-auto px-5">
-              <div className="flex w-max gap-2">
-                {categories.map((c) => {
-                  const Icon = categoryIcons[c.slug] ?? Package;
-                  return (
-                    <Link
-                      key={c.slug}
-                      to="/equipamentos"
-                      search={{ categoria: c.slug }}
-                      className="flex shrink-0 items-center gap-2 rounded-full border border-border bg-background px-4 py-2 text-sm font-medium transition-all hover:-translate-y-0.5 hover:border-primary/40 hover:text-primary"
-                    >
-                      <Icon className="h-4 w-4 text-primary" />
-                      {c.name}
-                    </Link>
-                  );
-                })}
-              </div>
-            </div>
-            <div className="pointer-events-none absolute inset-y-0 right-0 w-12 bg-gradient-to-l from-card to-transparent" />
+          <div className="mt-6 flex flex-wrap justify-center gap-2">
+            {categories.map((c) => {
+              const Icon = categoryIcons[c.slug] ?? Package;
+              return (
+                <Link
+                  key={c.slug}
+                  to="/equipamentos"
+                  search={{ categoria: c.slug }}
+                  className="flex items-center gap-2 rounded-full border border-border bg-background px-4 py-2 text-sm font-medium transition-all hover:-translate-y-0.5 hover:border-primary/40 hover:text-primary"
+                >
+                  <Icon className="h-4 w-4 text-primary" />
+                  {c.name}
+                </Link>
+              );
+            })}
           </div>
         </div>
       </section>
