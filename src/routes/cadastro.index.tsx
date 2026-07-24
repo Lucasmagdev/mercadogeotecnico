@@ -25,7 +25,7 @@ function Cadastro() {
             </div>
             <h2 className="mt-4 text-lg font-semibold">Sou usuário</h2>
             <p className="mt-1 text-sm text-muted-foreground">
-              Quero buscar equipamentos e entrar em contato com empresas.
+              Quero buscar peças e entrar em contato com empresas.
             </p>
           </Link>
 
@@ -38,7 +38,7 @@ function Cadastro() {
             </div>
             <h2 className="mt-4 text-lg font-semibold">Sou empresa</h2>
             <p className="mt-1 text-sm text-muted-foreground">
-              Quero anunciar equipamentos. Cadastro sujeito à aprovação.
+              Quero anunciar peças. Cadastro sujeito à aprovação.
             </p>
           </Link>
         </div>

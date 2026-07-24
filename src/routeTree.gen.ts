@@ -16,33 +16,33 @@ import { Route as RedefinirSenhaRouteImport } from './routes/redefinir-senha'
 import { Route as RecuperarSenhaRouteImport } from './routes/recuperar-senha'
 import { Route as PublicarRouteImport } from './routes/publicar'
 import { Route as PrivacidadeRouteImport } from './routes/privacidade'
+import { Route as PecasRouteImport } from './routes/pecas'
 import { Route as PainelRouteImport } from './routes/painel'
 import { Route as NotificacoesRouteImport } from './routes/notificacoes'
 import { Route as MensagensRouteImport } from './routes/mensagens'
 import { Route as FornecedoresRouteImport } from './routes/fornecedores'
 import { Route as FavoritosRouteImport } from './routes/favoritos'
-import { Route as EquipamentosRouteImport } from './routes/equipamentos'
 import { Route as EntrarRouteImport } from './routes/entrar'
 import { Route as EmpresasRouteImport } from './routes/empresas'
 import { Route as ConfiguracoesRouteImport } from './routes/configuracoes'
 import { Route as CadastroRouteImport } from './routes/cadastro'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as PecasIndexRouteImport } from './routes/pecas.index'
 import { Route as PainelIndexRouteImport } from './routes/painel.index'
-import { Route as EquipamentosIndexRouteImport } from './routes/equipamentos.index'
 import { Route as EmpresasIndexRouteImport } from './routes/empresas.index'
 import { Route as CadastroIndexRouteImport } from './routes/cadastro.index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
+import { Route as PecasSlugRouteImport } from './routes/pecas.$slug'
 import { Route as PainelPedidosRouteImport } from './routes/painel.pedidos'
-import { Route as PainelEquipamentosRouteImport } from './routes/painel.equipamentos'
+import { Route as PainelPecasRouteImport } from './routes/painel.pecas'
 import { Route as PainelAnalyticsRouteImport } from './routes/painel.analytics'
-import { Route as EquipamentosSlugRouteImport } from './routes/equipamentos.$slug'
 import { Route as EmpresasSlugRouteImport } from './routes/empresas.$slug'
 import { Route as CadastroUsuarioRouteImport } from './routes/cadastro.usuario'
 import { Route as CadastroEmpresaRouteImport } from './routes/cadastro.empresa'
 import { Route as AdminEmpresasRouteImport } from './routes/admin.empresas'
-import { Route as PainelEquipamentosIndexRouteImport } from './routes/painel.equipamentos.index'
-import { Route as PainelEquipamentosIdRouteImport } from './routes/painel.equipamentos.$id'
+import { Route as PainelPecasIndexRouteImport } from './routes/painel.pecas.index'
+import { Route as PainelPecasIdRouteImport } from './routes/painel.pecas.$id'
 
 const TermosRoute = TermosRouteImport.update({
   id: '/termos',
@@ -79,6 +79,11 @@ const PrivacidadeRoute = PrivacidadeRouteImport.update({
   path: '/privacidade',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PecasRoute = PecasRouteImport.update({
+  id: '/pecas',
+  path: '/pecas',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PainelRoute = PainelRouteImport.update({
   id: '/painel',
   path: '/painel',
@@ -102,11 +107,6 @@ const FornecedoresRoute = FornecedoresRouteImport.update({
 const FavoritosRoute = FavoritosRouteImport.update({
   id: '/favoritos',
   path: '/favoritos',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const EquipamentosRoute = EquipamentosRouteImport.update({
-  id: '/equipamentos',
-  path: '/equipamentos',
   getParentRoute: () => rootRouteImport,
 } as any)
 const EntrarRoute = EntrarRouteImport.update({
@@ -139,15 +139,15 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PecasIndexRoute = PecasIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => PecasRoute,
+} as any)
 const PainelIndexRoute = PainelIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => PainelRoute,
-} as any)
-const EquipamentosIndexRoute = EquipamentosIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => EquipamentosRoute,
 } as any)
 const EmpresasIndexRoute = EmpresasIndexRouteImport.update({
   id: '/',
@@ -164,25 +164,25 @@ const AdminIndexRoute = AdminIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AdminRoute,
 } as any)
+const PecasSlugRoute = PecasSlugRouteImport.update({
+  id: '/$slug',
+  path: '/$slug',
+  getParentRoute: () => PecasRoute,
+} as any)
 const PainelPedidosRoute = PainelPedidosRouteImport.update({
   id: '/pedidos',
   path: '/pedidos',
   getParentRoute: () => PainelRoute,
 } as any)
-const PainelEquipamentosRoute = PainelEquipamentosRouteImport.update({
-  id: '/equipamentos',
-  path: '/equipamentos',
+const PainelPecasRoute = PainelPecasRouteImport.update({
+  id: '/pecas',
+  path: '/pecas',
   getParentRoute: () => PainelRoute,
 } as any)
 const PainelAnalyticsRoute = PainelAnalyticsRouteImport.update({
   id: '/analytics',
   path: '/analytics',
   getParentRoute: () => PainelRoute,
-} as any)
-const EquipamentosSlugRoute = EquipamentosSlugRouteImport.update({
-  id: '/$slug',
-  path: '/$slug',
-  getParentRoute: () => EquipamentosRoute,
 } as any)
 const EmpresasSlugRoute = EmpresasSlugRouteImport.update({
   id: '/$slug',
@@ -204,15 +204,15 @@ const AdminEmpresasRoute = AdminEmpresasRouteImport.update({
   path: '/empresas',
   getParentRoute: () => AdminRoute,
 } as any)
-const PainelEquipamentosIndexRoute = PainelEquipamentosIndexRouteImport.update({
+const PainelPecasIndexRoute = PainelPecasIndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => PainelEquipamentosRoute,
+  getParentRoute: () => PainelPecasRoute,
 } as any)
-const PainelEquipamentosIdRoute = PainelEquipamentosIdRouteImport.update({
+const PainelPecasIdRoute = PainelPecasIdRouteImport.update({
   id: '/$id',
   path: '/$id',
-  getParentRoute: () => PainelEquipamentosRoute,
+  getParentRoute: () => PainelPecasRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
@@ -222,12 +222,12 @@ export interface FileRoutesByFullPath {
   '/configuracoes': typeof ConfiguracoesRoute
   '/empresas': typeof EmpresasRouteWithChildren
   '/entrar': typeof EntrarRoute
-  '/equipamentos': typeof EquipamentosRouteWithChildren
   '/favoritos': typeof FavoritosRoute
   '/fornecedores': typeof FornecedoresRoute
   '/mensagens': typeof MensagensRoute
   '/notificacoes': typeof NotificacoesRoute
   '/painel': typeof PainelRouteWithChildren
+  '/pecas': typeof PecasRouteWithChildren
   '/privacidade': typeof PrivacidadeRoute
   '/publicar': typeof PublicarRoute
   '/recuperar-senha': typeof RecuperarSenhaRoute
@@ -239,17 +239,17 @@ export interface FileRoutesByFullPath {
   '/cadastro/empresa': typeof CadastroEmpresaRoute
   '/cadastro/usuario': typeof CadastroUsuarioRoute
   '/empresas/$slug': typeof EmpresasSlugRoute
-  '/equipamentos/$slug': typeof EquipamentosSlugRoute
   '/painel/analytics': typeof PainelAnalyticsRoute
-  '/painel/equipamentos': typeof PainelEquipamentosRouteWithChildren
+  '/painel/pecas': typeof PainelPecasRouteWithChildren
   '/painel/pedidos': typeof PainelPedidosRoute
+  '/pecas/$slug': typeof PecasSlugRoute
   '/admin/': typeof AdminIndexRoute
   '/cadastro/': typeof CadastroIndexRoute
   '/empresas/': typeof EmpresasIndexRoute
-  '/equipamentos/': typeof EquipamentosIndexRoute
   '/painel/': typeof PainelIndexRoute
-  '/painel/equipamentos/$id': typeof PainelEquipamentosIdRoute
-  '/painel/equipamentos/': typeof PainelEquipamentosIndexRoute
+  '/pecas/': typeof PecasIndexRoute
+  '/painel/pecas/$id': typeof PainelPecasIdRoute
+  '/painel/pecas/': typeof PainelPecasIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -270,16 +270,16 @@ export interface FileRoutesByTo {
   '/cadastro/empresa': typeof CadastroEmpresaRoute
   '/cadastro/usuario': typeof CadastroUsuarioRoute
   '/empresas/$slug': typeof EmpresasSlugRoute
-  '/equipamentos/$slug': typeof EquipamentosSlugRoute
   '/painel/analytics': typeof PainelAnalyticsRoute
   '/painel/pedidos': typeof PainelPedidosRoute
+  '/pecas/$slug': typeof PecasSlugRoute
   '/admin': typeof AdminIndexRoute
   '/cadastro': typeof CadastroIndexRoute
   '/empresas': typeof EmpresasIndexRoute
-  '/equipamentos': typeof EquipamentosIndexRoute
   '/painel': typeof PainelIndexRoute
-  '/painel/equipamentos/$id': typeof PainelEquipamentosIdRoute
-  '/painel/equipamentos': typeof PainelEquipamentosIndexRoute
+  '/pecas': typeof PecasIndexRoute
+  '/painel/pecas/$id': typeof PainelPecasIdRoute
+  '/painel/pecas': typeof PainelPecasIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -289,12 +289,12 @@ export interface FileRoutesById {
   '/configuracoes': typeof ConfiguracoesRoute
   '/empresas': typeof EmpresasRouteWithChildren
   '/entrar': typeof EntrarRoute
-  '/equipamentos': typeof EquipamentosRouteWithChildren
   '/favoritos': typeof FavoritosRoute
   '/fornecedores': typeof FornecedoresRoute
   '/mensagens': typeof MensagensRoute
   '/notificacoes': typeof NotificacoesRoute
   '/painel': typeof PainelRouteWithChildren
+  '/pecas': typeof PecasRouteWithChildren
   '/privacidade': typeof PrivacidadeRoute
   '/publicar': typeof PublicarRoute
   '/recuperar-senha': typeof RecuperarSenhaRoute
@@ -306,17 +306,17 @@ export interface FileRoutesById {
   '/cadastro/empresa': typeof CadastroEmpresaRoute
   '/cadastro/usuario': typeof CadastroUsuarioRoute
   '/empresas/$slug': typeof EmpresasSlugRoute
-  '/equipamentos/$slug': typeof EquipamentosSlugRoute
   '/painel/analytics': typeof PainelAnalyticsRoute
-  '/painel/equipamentos': typeof PainelEquipamentosRouteWithChildren
+  '/painel/pecas': typeof PainelPecasRouteWithChildren
   '/painel/pedidos': typeof PainelPedidosRoute
+  '/pecas/$slug': typeof PecasSlugRoute
   '/admin/': typeof AdminIndexRoute
   '/cadastro/': typeof CadastroIndexRoute
   '/empresas/': typeof EmpresasIndexRoute
-  '/equipamentos/': typeof EquipamentosIndexRoute
   '/painel/': typeof PainelIndexRoute
-  '/painel/equipamentos/$id': typeof PainelEquipamentosIdRoute
-  '/painel/equipamentos/': typeof PainelEquipamentosIndexRoute
+  '/pecas/': typeof PecasIndexRoute
+  '/painel/pecas/$id': typeof PainelPecasIdRoute
+  '/painel/pecas/': typeof PainelPecasIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -327,12 +327,12 @@ export interface FileRouteTypes {
     | '/configuracoes'
     | '/empresas'
     | '/entrar'
-    | '/equipamentos'
     | '/favoritos'
     | '/fornecedores'
     | '/mensagens'
     | '/notificacoes'
     | '/painel'
+    | '/pecas'
     | '/privacidade'
     | '/publicar'
     | '/recuperar-senha'
@@ -344,17 +344,17 @@ export interface FileRouteTypes {
     | '/cadastro/empresa'
     | '/cadastro/usuario'
     | '/empresas/$slug'
-    | '/equipamentos/$slug'
     | '/painel/analytics'
-    | '/painel/equipamentos'
+    | '/painel/pecas'
     | '/painel/pedidos'
+    | '/pecas/$slug'
     | '/admin/'
     | '/cadastro/'
     | '/empresas/'
-    | '/equipamentos/'
     | '/painel/'
-    | '/painel/equipamentos/$id'
-    | '/painel/equipamentos/'
+    | '/pecas/'
+    | '/painel/pecas/$id'
+    | '/painel/pecas/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -375,16 +375,16 @@ export interface FileRouteTypes {
     | '/cadastro/empresa'
     | '/cadastro/usuario'
     | '/empresas/$slug'
-    | '/equipamentos/$slug'
     | '/painel/analytics'
     | '/painel/pedidos'
+    | '/pecas/$slug'
     | '/admin'
     | '/cadastro'
     | '/empresas'
-    | '/equipamentos'
     | '/painel'
-    | '/painel/equipamentos/$id'
-    | '/painel/equipamentos'
+    | '/pecas'
+    | '/painel/pecas/$id'
+    | '/painel/pecas'
   id:
     | '__root__'
     | '/'
@@ -393,12 +393,12 @@ export interface FileRouteTypes {
     | '/configuracoes'
     | '/empresas'
     | '/entrar'
-    | '/equipamentos'
     | '/favoritos'
     | '/fornecedores'
     | '/mensagens'
     | '/notificacoes'
     | '/painel'
+    | '/pecas'
     | '/privacidade'
     | '/publicar'
     | '/recuperar-senha'
@@ -410,17 +410,17 @@ export interface FileRouteTypes {
     | '/cadastro/empresa'
     | '/cadastro/usuario'
     | '/empresas/$slug'
-    | '/equipamentos/$slug'
     | '/painel/analytics'
-    | '/painel/equipamentos'
+    | '/painel/pecas'
     | '/painel/pedidos'
+    | '/pecas/$slug'
     | '/admin/'
     | '/cadastro/'
     | '/empresas/'
-    | '/equipamentos/'
     | '/painel/'
-    | '/painel/equipamentos/$id'
-    | '/painel/equipamentos/'
+    | '/pecas/'
+    | '/painel/pecas/$id'
+    | '/painel/pecas/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -430,12 +430,12 @@ export interface RootRouteChildren {
   ConfiguracoesRoute: typeof ConfiguracoesRoute
   EmpresasRoute: typeof EmpresasRouteWithChildren
   EntrarRoute: typeof EntrarRoute
-  EquipamentosRoute: typeof EquipamentosRouteWithChildren
   FavoritosRoute: typeof FavoritosRoute
   FornecedoresRoute: typeof FornecedoresRoute
   MensagensRoute: typeof MensagensRoute
   NotificacoesRoute: typeof NotificacoesRoute
   PainelRoute: typeof PainelRouteWithChildren
+  PecasRoute: typeof PecasRouteWithChildren
   PrivacidadeRoute: typeof PrivacidadeRoute
   PublicarRoute: typeof PublicarRoute
   RecuperarSenhaRoute: typeof RecuperarSenhaRoute
@@ -496,6 +496,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PrivacidadeRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/pecas': {
+      id: '/pecas'
+      path: '/pecas'
+      fullPath: '/pecas'
+      preLoaderRoute: typeof PecasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/painel': {
       id: '/painel'
       path: '/painel'
@@ -529,13 +536,6 @@ declare module '@tanstack/react-router' {
       path: '/favoritos'
       fullPath: '/favoritos'
       preLoaderRoute: typeof FavoritosRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/equipamentos': {
-      id: '/equipamentos'
-      path: '/equipamentos'
-      fullPath: '/equipamentos'
-      preLoaderRoute: typeof EquipamentosRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/entrar': {
@@ -580,19 +580,19 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/pecas/': {
+      id: '/pecas/'
+      path: '/'
+      fullPath: '/pecas/'
+      preLoaderRoute: typeof PecasIndexRouteImport
+      parentRoute: typeof PecasRoute
+    }
     '/painel/': {
       id: '/painel/'
       path: '/'
       fullPath: '/painel/'
       preLoaderRoute: typeof PainelIndexRouteImport
       parentRoute: typeof PainelRoute
-    }
-    '/equipamentos/': {
-      id: '/equipamentos/'
-      path: '/'
-      fullPath: '/equipamentos/'
-      preLoaderRoute: typeof EquipamentosIndexRouteImport
-      parentRoute: typeof EquipamentosRoute
     }
     '/empresas/': {
       id: '/empresas/'
@@ -615,6 +615,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminIndexRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/pecas/$slug': {
+      id: '/pecas/$slug'
+      path: '/$slug'
+      fullPath: '/pecas/$slug'
+      preLoaderRoute: typeof PecasSlugRouteImport
+      parentRoute: typeof PecasRoute
+    }
     '/painel/pedidos': {
       id: '/painel/pedidos'
       path: '/pedidos'
@@ -622,11 +629,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PainelPedidosRouteImport
       parentRoute: typeof PainelRoute
     }
-    '/painel/equipamentos': {
-      id: '/painel/equipamentos'
-      path: '/equipamentos'
-      fullPath: '/painel/equipamentos'
-      preLoaderRoute: typeof PainelEquipamentosRouteImport
+    '/painel/pecas': {
+      id: '/painel/pecas'
+      path: '/pecas'
+      fullPath: '/painel/pecas'
+      preLoaderRoute: typeof PainelPecasRouteImport
       parentRoute: typeof PainelRoute
     }
     '/painel/analytics': {
@@ -635,13 +642,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/painel/analytics'
       preLoaderRoute: typeof PainelAnalyticsRouteImport
       parentRoute: typeof PainelRoute
-    }
-    '/equipamentos/$slug': {
-      id: '/equipamentos/$slug'
-      path: '/$slug'
-      fullPath: '/equipamentos/$slug'
-      preLoaderRoute: typeof EquipamentosSlugRouteImport
-      parentRoute: typeof EquipamentosRoute
     }
     '/empresas/$slug': {
       id: '/empresas/$slug'
@@ -671,19 +671,19 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminEmpresasRouteImport
       parentRoute: typeof AdminRoute
     }
-    '/painel/equipamentos/': {
-      id: '/painel/equipamentos/'
+    '/painel/pecas/': {
+      id: '/painel/pecas/'
       path: '/'
-      fullPath: '/painel/equipamentos/'
-      preLoaderRoute: typeof PainelEquipamentosIndexRouteImport
-      parentRoute: typeof PainelEquipamentosRoute
+      fullPath: '/painel/pecas/'
+      preLoaderRoute: typeof PainelPecasIndexRouteImport
+      parentRoute: typeof PainelPecasRoute
     }
-    '/painel/equipamentos/$id': {
-      id: '/painel/equipamentos/$id'
+    '/painel/pecas/$id': {
+      id: '/painel/pecas/$id'
       path: '/$id'
-      fullPath: '/painel/equipamentos/$id'
-      preLoaderRoute: typeof PainelEquipamentosIdRouteImport
-      parentRoute: typeof PainelEquipamentosRoute
+      fullPath: '/painel/pecas/$id'
+      preLoaderRoute: typeof PainelPecasIdRouteImport
+      parentRoute: typeof PainelPecasRoute
     }
   }
 }
@@ -730,49 +730,48 @@ const EmpresasRouteWithChildren = EmpresasRoute._addFileChildren(
   EmpresasRouteChildren,
 )
 
-interface EquipamentosRouteChildren {
-  EquipamentosSlugRoute: typeof EquipamentosSlugRoute
-  EquipamentosIndexRoute: typeof EquipamentosIndexRoute
+interface PainelPecasRouteChildren {
+  PainelPecasIdRoute: typeof PainelPecasIdRoute
+  PainelPecasIndexRoute: typeof PainelPecasIndexRoute
 }
 
-const EquipamentosRouteChildren: EquipamentosRouteChildren = {
-  EquipamentosSlugRoute: EquipamentosSlugRoute,
-  EquipamentosIndexRoute: EquipamentosIndexRoute,
+const PainelPecasRouteChildren: PainelPecasRouteChildren = {
+  PainelPecasIdRoute: PainelPecasIdRoute,
+  PainelPecasIndexRoute: PainelPecasIndexRoute,
 }
 
-const EquipamentosRouteWithChildren = EquipamentosRoute._addFileChildren(
-  EquipamentosRouteChildren,
+const PainelPecasRouteWithChildren = PainelPecasRoute._addFileChildren(
+  PainelPecasRouteChildren,
 )
-
-interface PainelEquipamentosRouteChildren {
-  PainelEquipamentosIdRoute: typeof PainelEquipamentosIdRoute
-  PainelEquipamentosIndexRoute: typeof PainelEquipamentosIndexRoute
-}
-
-const PainelEquipamentosRouteChildren: PainelEquipamentosRouteChildren = {
-  PainelEquipamentosIdRoute: PainelEquipamentosIdRoute,
-  PainelEquipamentosIndexRoute: PainelEquipamentosIndexRoute,
-}
-
-const PainelEquipamentosRouteWithChildren =
-  PainelEquipamentosRoute._addFileChildren(PainelEquipamentosRouteChildren)
 
 interface PainelRouteChildren {
   PainelAnalyticsRoute: typeof PainelAnalyticsRoute
-  PainelEquipamentosRoute: typeof PainelEquipamentosRouteWithChildren
+  PainelPecasRoute: typeof PainelPecasRouteWithChildren
   PainelPedidosRoute: typeof PainelPedidosRoute
   PainelIndexRoute: typeof PainelIndexRoute
 }
 
 const PainelRouteChildren: PainelRouteChildren = {
   PainelAnalyticsRoute: PainelAnalyticsRoute,
-  PainelEquipamentosRoute: PainelEquipamentosRouteWithChildren,
+  PainelPecasRoute: PainelPecasRouteWithChildren,
   PainelPedidosRoute: PainelPedidosRoute,
   PainelIndexRoute: PainelIndexRoute,
 }
 
 const PainelRouteWithChildren =
   PainelRoute._addFileChildren(PainelRouteChildren)
+
+interface PecasRouteChildren {
+  PecasSlugRoute: typeof PecasSlugRoute
+  PecasIndexRoute: typeof PecasIndexRoute
+}
+
+const PecasRouteChildren: PecasRouteChildren = {
+  PecasSlugRoute: PecasSlugRoute,
+  PecasIndexRoute: PecasIndexRoute,
+}
+
+const PecasRouteWithChildren = PecasRoute._addFileChildren(PecasRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
@@ -781,12 +780,12 @@ const rootRouteChildren: RootRouteChildren = {
   ConfiguracoesRoute: ConfiguracoesRoute,
   EmpresasRoute: EmpresasRouteWithChildren,
   EntrarRoute: EntrarRoute,
-  EquipamentosRoute: EquipamentosRouteWithChildren,
   FavoritosRoute: FavoritosRoute,
   FornecedoresRoute: FornecedoresRoute,
   MensagensRoute: MensagensRoute,
   NotificacoesRoute: NotificacoesRoute,
   PainelRoute: PainelRouteWithChildren,
+  PecasRoute: PecasRouteWithChildren,
   PrivacidadeRoute: PrivacidadeRoute,
   PublicarRoute: PublicarRoute,
   RecuperarSenhaRoute: RecuperarSenhaRoute,

@@ -14,8 +14,7 @@ export const Route = createFileRoute("/fornecedores")({
       { title: "Fornecedores — Mercado Geotécnico" },
       {
         name: "description",
-        content:
-          "Encontre fornecedores confiáveis de equipamentos, peças e serviços de engenharia.",
+        content: "Encontre fornecedores confiáveis de peças, ferramentas e serviços de engenharia.",
       },
     ],
   }),
@@ -38,7 +37,7 @@ function Suppliers() {
       <div className="mb-6">
         <h1 className="text-2xl font-bold sm:text-3xl">Fornecedores</h1>
         <p className="mt-1 text-muted-foreground">
-          Fornecedores verificados de equipamentos, peças e serviços.
+          Fornecedores verificados de peças, ferramentas e serviços.
         </p>
       </div>
       <div className="relative mb-8 max-w-md">

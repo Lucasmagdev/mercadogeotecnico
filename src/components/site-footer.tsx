@@ -5,7 +5,7 @@ const columns = [
   {
     title: "Plataforma",
     links: [
-      { to: "/equipamentos", label: "Almoxarifado" },
+      { to: "/pecas", label: "Almoxarifado" },
       { to: "/servicos", label: "Serviços" },
       { to: "/empresas", label: "Empresas" },
       { to: "/fornecedores", label: "Fornecedores" },
@@ -14,7 +14,7 @@ const columns = [
   {
     title: "Para Empresas",
     links: [
-      { to: "/publicar", label: "Anunciar Equipamento" },
+      { to: "/publicar", label: "Anunciar Peça" },
       { to: "/painel", label: "Painel da Empresa" },
       { to: "/painel/analytics", label: "Analytics" },
       { to: "/painel/pedidos", label: "Pedidos" },
@@ -23,8 +23,8 @@ const columns = [
   {
     title: "Recursos",
     links: [
-      { to: "/equipamentos", label: "Comprar" },
-      { to: "/equipamentos", label: "Alugar" },
+      { to: "/pecas", label: "Comprar" },
+      { to: "/pecas", label: "Alugar" },
       { to: "/empresas", label: "Reputação" },
       { to: "/mensagens", label: "Mensagens" },
     ],
@@ -45,8 +45,8 @@ export function SiteFooter() {
         <div className="col-span-2 md:col-span-1">
           <Logo />
           <p className="mt-4 max-w-xs text-sm text-muted-foreground">
-            O almoxarife geotécnico digital do setor de engenharia. Compre, venda, alugue
-            equipamentos e conecte-se com fornecedores confiáveis.
+            O almoxarife geotécnico digital do setor de engenharia. Compre, venda, alugue peças e
+            conecte-se com fornecedores confiáveis.
           </p>
         </div>
         {columns.map((col) => (

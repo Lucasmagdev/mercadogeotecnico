@@ -16,7 +16,7 @@ export const Route = createFileRoute("/entrar")({
 
 const highlights = [
   { icon: ShieldCheck, text: "Empresas verificadas com selo de confiança" },
-  { icon: Zap, text: "Busca técnica por milhares de equipamentos" },
+  { icon: Zap, text: "Busca técnica por milhares de peças" },
   { icon: MessagesSquare, text: "Negociação direta, sem intermediários" },
 ];
 

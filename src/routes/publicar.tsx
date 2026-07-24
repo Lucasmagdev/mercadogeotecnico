@@ -35,10 +35,10 @@ import { slugify } from "@/lib/utils";
 export const Route = createFileRoute("/publicar")({
   head: () => ({
     meta: [
-      { title: "Anunciar equipamento — Mercado Geotécnico" },
+      { title: "Anunciar peça — Mercado Geotécnico" },
       {
         name: "description",
-        content: "Publique seu equipamento, peça ou serviço de engenharia em poucos passos.",
+        content: "Publique sua peça, ferramenta ou acessório de engenharia em poucos passos.",
       },
     ],
   }),
@@ -156,7 +156,7 @@ function Publicar() {
         <Building2 className="h-10 w-10 text-muted-foreground" />
         <h1 className="text-xl font-bold">Cadastre sua empresa</h1>
         <p className="max-w-md text-muted-foreground">
-          Somente empresas cadastradas e aprovadas podem anunciar equipamentos.
+          Somente empresas cadastradas e aprovadas podem anunciar peças.
         </p>
         <Button asChild>
           <Link to="/cadastro/empresa">Cadastrar empresa</Link>
@@ -194,20 +194,16 @@ function Publicar() {
       <div className="container-page flex min-h-[60vh] flex-col items-center justify-center gap-3 text-center">
         <Sparkles className="h-10 w-10 text-success" />
         <h1 className="text-xl font-bold">Anúncio publicado!</h1>
-        <p className="text-muted-foreground">
-          Seu equipamento já está visível para milhares de empresas.
-        </p>
+        <p className="text-muted-foreground">Sua peça já está visível para outras empresas.</p>
         <Button asChild>
-          <Link to="/painel/equipamentos">Ver meus equipamentos</Link>
+          <Link to="/painel/pecas">Ver minhas peças</Link>
         </Button>
       </div>
     );
   }
 
   const canAdvance =
-    (step === 0 &&
-      form.category &&
-      (form.category !== "outros" || customCategory.trim())) ||
+    (step === 0 && form.category && (form.category !== "outros" || customCategory.trim())) ||
     (step === 1 &&
       form.title &&
       form.condition &&
@@ -222,7 +218,7 @@ function Publicar() {
 
   return (
     <div className="container-page max-w-3xl py-8">
-      <h1 className="text-2xl font-bold sm:text-3xl">Anunciar equipamento</h1>
+      <h1 className="text-2xl font-bold sm:text-3xl">Anunciar peça</h1>
       <p className="mt-1 text-muted-foreground">
         Preencha as informações para publicar seu anúncio.
       </p>
@@ -307,7 +303,7 @@ function Publicar() {
 
         {step === 1 && (
           <div className="space-y-4">
-            <h2 className="text-lg font-semibold">Detalhes do equipamento</h2>
+            <h2 className="text-lg font-semibold">Detalhes da peça</h2>
             <div className="space-y-2">
               <Label>
                 Título do anúncio <span className="text-destructive">*</span>
@@ -525,7 +521,7 @@ function Publicar() {
 
         {step === 3 && (
           <div className="space-y-4">
-            <h2 className="text-lg font-semibold">Fotos do equipamento</h2>
+            <h2 className="text-lg font-semibold">Fotos da peça</h2>
             <input
               ref={fileInputRef}
               type="file"

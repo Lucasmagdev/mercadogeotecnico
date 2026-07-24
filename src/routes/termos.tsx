@@ -16,7 +16,7 @@ export const Route = createFileRoute("/termos")({
 const sections = [
   {
     title: "1. Sobre a plataforma",
-    body: "O Mercado Geotécnico é um marketplace que conecta empresas do setor de engenharia para compra, venda e locação de equipamentos, além da contratação de serviços. A plataforma atua como intermediadora de contato: as negociações, pagamentos e entregas são de responsabilidade das partes envolvidas.",
+    body: "O Mercado Geotécnico é um marketplace que conecta empresas do setor de engenharia para compra, venda e locação de peças, ferramentas e acessórios, além da contratação de serviços. A plataforma atua como intermediadora de contato: as negociações, pagamentos e entregas são de responsabilidade das partes envolvidas.",
   },
   {
     title: "2. Cadastro e conta",
@@ -24,11 +24,11 @@ const sections = [
   },
   {
     title: "3. Anúncios",
-    body: "O anunciante é integralmente responsável pela veracidade das informações publicadas, incluindo fotos, especificações técnicas, preço e condição do equipamento. Anúncios com conteúdo falso, ilegal ou enganoso serão removidos e podem resultar em suspensão da conta.",
+    body: "O anunciante é integralmente responsável pela veracidade das informações publicadas, incluindo fotos, especificações técnicas, preço e condição da peça. Anúncios com conteúdo falso, ilegal ou enganoso serão removidos e podem resultar em suspensão da conta.",
   },
   {
     title: "4. Negociações",
-    body: "A plataforma não participa das negociações nem garante a conclusão de transações. Recomendamos verificar o equipamento pessoalmente, conferir a documentação e nunca realizar pagamentos antecipados fora de canais seguros.",
+    body: "A plataforma não participa das negociações nem garante a conclusão de transações. Recomendamos verificar a peça pessoalmente, conferir a documentação e nunca realizar pagamentos antecipados fora de canais seguros.",
   },
   {
     title: "5. Responsabilidades",

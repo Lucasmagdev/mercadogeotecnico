@@ -119,9 +119,7 @@ function CompanyProfile() {
           <div className="flex-1 pb-1">
             <div className="flex items-center gap-2">
               <h1 className="text-2xl font-bold">{company.name}</h1>
-              {company.verified && (
-                <GeoSelosVerification variant="full" />
-              )}
+              {company.verified && <GeoSelosVerification variant="full" />}
             </div>
             <div className="mt-1 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-muted-foreground">
               <span className="flex items-center gap-1">
@@ -164,13 +162,13 @@ function CompanyProfile() {
 
         <div className="mt-6 grid gap-8 py-6 lg:grid-cols-[1fr_300px]">
           <div>
-            <Tabs defaultValue="equipamentos">
+            <Tabs defaultValue="pecas">
               <TabsList>
-                <TabsTrigger value="equipamentos">Almoxarifado</TabsTrigger>
+                <TabsTrigger value="pecas">Almoxarifado</TabsTrigger>
                 <TabsTrigger value="servicos">Serviços</TabsTrigger>
                 <TabsTrigger value="avaliacoes">Avaliações</TabsTrigger>
               </TabsList>
-              <TabsContent value="equipamentos" className="mt-6">
+              <TabsContent value="pecas" className="mt-6">
                 <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
                   {items.map((it, i) => (
                     <EquipmentCard
@@ -182,9 +180,7 @@ function CompanyProfile() {
                   ))}
                 </div>
                 {items.length === 0 && (
-                  <p className="text-sm text-muted-foreground">
-                    Nenhum equipamento anunciado ainda.
-                  </p>
+                  <p className="text-sm text-muted-foreground">Nenhuma peça anunciada ainda.</p>
                 )}
               </TabsContent>
               <TabsContent value="servicos" className="mt-6">

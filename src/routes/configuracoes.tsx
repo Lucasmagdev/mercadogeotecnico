@@ -1,7 +1,15 @@
 import { useEffect, useRef, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { CircleCheck, Clock, ShieldAlert, ImagePlus, ImageOff, Lock, ExternalLink } from "lucide-react";
+import {
+  CircleCheck,
+  Clock,
+  ShieldAlert,
+  ImagePlus,
+  ImageOff,
+  Lock,
+  ExternalLink,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { GeoSelosVerification } from "@/components/geoselos-verification";
 import { Input } from "@/components/ui/input";
@@ -79,7 +87,7 @@ function Configuracoes() {
           <div className="mt-4 rounded-2xl border border-dashed border-border p-4 text-sm">
             <p className="font-medium">Tem uma empresa?</p>
             <p className="mt-0.5 text-muted-foreground">
-              Cadastre sua empresa e comece a anunciar equipamentos.
+              Cadastre sua empresa e comece a anunciar peças.
             </p>
             <Link
               to="/cadastro/empresa"
@@ -247,10 +255,7 @@ function CompanySettings({ ownerId }: { ownerId: string }) {
         </div>
         <div className="space-y-2">
           <Label>Telefone</Label>
-          <Input
-            value={form.phone}
-            onChange={(e) => set("phone", formatPhoneBR(e.target.value))}
-          />
+          <Input value={form.phone} onChange={(e) => set("phone", formatPhoneBR(e.target.value))} />
         </div>
         <div className="space-y-2">
           <Label>WhatsApp</Label>
@@ -363,7 +368,10 @@ function ImageUploadCard({
   const mutation = useMutation({
     mutationFn: async (file: File) => {
       const path = await uploadCompanyImage(ownerId, file, kind);
-      await updateCompany(company.id, kind === "logo" ? { logo_path: path } : { banner_path: path });
+      await updateCompany(
+        company.id,
+        kind === "logo" ? { logo_path: path } : { banner_path: path },
+      );
     },
     onSuccess: () => {
       setPendingFile(null);
@@ -440,7 +448,10 @@ function ImageUploadCard({
           {previewUrl ? (
             <img src={previewUrl} alt={title} className="h-full w-full object-cover" />
           ) : (
-            <ImageOff className="h-6 w-6 shrink-0 text-muted-foreground" aria-label="Nenhuma imagem" />
+            <ImageOff
+              className="h-6 w-6 shrink-0 text-muted-foreground"
+              aria-label="Nenhuma imagem"
+            />
           )}
         </div>
       )}

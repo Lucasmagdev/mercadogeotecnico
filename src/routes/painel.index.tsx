@@ -81,7 +81,7 @@ function PainelIndex() {
         {mine.map((e, i) => (
           <Link
             key={e.id}
-            to="/equipamentos/$slug"
+            to="/pecas/$slug"
             params={{ slug: e.slug }}
             className={`flex items-center gap-4 px-4 py-3 transition-colors hover:bg-muted/50 ${i % 2 ? "bg-card" : "bg-background"}`}
           >
@@ -98,7 +98,7 @@ function PainelIndex() {
         ))}
         {mine.length === 0 && (
           <p className="px-4 py-6 text-sm text-muted-foreground">
-            Você ainda não anunciou nenhum equipamento.
+            Você ainda não anunciou nenhuma peça.
           </p>
         )}
       </div>

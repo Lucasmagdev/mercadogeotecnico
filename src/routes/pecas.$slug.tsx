@@ -37,9 +37,9 @@ import { getEquipmentImageUrls } from "@/lib/equipment-images";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
-export const Route = createFileRoute("/equipamentos/$slug")({
+export const Route = createFileRoute("/pecas/$slug")({
   head: () => ({
-    meta: [{ title: "Equipamento — Mercado Geotécnico" }],
+    meta: [{ title: "Peça — Mercado Geotécnico" }],
   }),
   component: EquipmentDetail,
 });
@@ -135,9 +135,9 @@ function EquipmentDetail() {
   if (!item) {
     return (
       <div className="container-page py-24 text-center">
-        <h1 className="text-2xl font-bold">Equipamento não encontrado</h1>
+        <h1 className="text-2xl font-bold">Peça não encontrada</h1>
         <Button asChild className="mt-6">
-          <Link to="/equipamentos">Ver equipamentos</Link>
+          <Link to="/pecas">Ver peças</Link>
         </Button>
       </div>
     );
@@ -158,14 +158,14 @@ function EquipmentDetail() {
           Início
         </Link>
         <ChevronRight className="h-3.5 w-3.5" aria-hidden />
-        <Link to="/equipamentos" className="transition-colors hover:text-primary">
+        <Link to="/pecas" className="transition-colors hover:text-primary">
           Almoxarifado
         </Link>
         {categoryName && (
           <>
             <ChevronRight className="h-3.5 w-3.5" aria-hidden />
             <Link
-              to="/equipamentos"
+              to="/pecas"
               search={{ categoria: item.category_slug! }}
               className="transition-colors hover:text-primary"
             >
@@ -374,8 +374,8 @@ function EquipmentDetail() {
             <div className="text-sm">
               <p className="font-semibold">Negocie com segurança</p>
               <p className="mt-1 text-muted-foreground">
-                Nunca faça pagamentos antecipados fora da plataforma. Verifique o equipamento
-                pessoalmente e prefira empresas com selo de verificação.
+                Nunca faça pagamentos antecipados fora da plataforma. Verifique a peça pessoalmente
+                e prefira empresas com selo de verificação.
               </p>
             </div>
           </div>
@@ -406,7 +406,7 @@ function EquipmentDetail() {
 
       {related.length > 0 && (
         <div className="mt-16">
-          <h2 className="mb-6 text-xl font-bold">Equipamentos relacionados</h2>
+          <h2 className="mb-6 text-xl font-bold">Peças relacionadas</h2>
           <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
             {related.map((r, i) => (
               <EquipmentCard

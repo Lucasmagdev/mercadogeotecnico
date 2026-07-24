@@ -53,12 +53,12 @@ const categoryIcons: Record<string, LucideIcon> = {
   guindastes: Cable,
   geradores: Zap,
   motores: Cog,
-  "equipamentos-hidraulicos": Droplets,
+  "pecas-hidraulicas": Droplets,
   trados: Drill,
   pecas: Package,
   ferramentas: Wrench,
-  "equipamentos-fundacao": Layers,
-  "equipamentos-sondagem": Ruler,
+  "pecas-fundacao": Layers,
+  "pecas-sondagem": Ruler,
   servicos: Briefcase,
 };
 
@@ -84,7 +84,7 @@ const steps = [
   {
     icon: Search,
     title: "Anuncie ou encontre",
-    desc: "Publique equipamentos com fotos e especificações, ou busque com filtros técnicos.",
+    desc: "Publique peças com fotos e especificações, ou busque com filtros técnicos.",
   },
   {
     icon: Handshake,
@@ -112,7 +112,7 @@ function SectionHeader({
       </div>
       {linkLabel && (
         <Button variant="ghost" asChild className="shrink-0 gap-1">
-          <Link to="/equipamentos" search={(search ?? {}) as never}>
+          <Link to="/pecas" search={(search ?? {}) as never}>
             {linkLabel} <ArrowRight className="h-4 w-4" />
           </Link>
         </Button>
@@ -144,7 +144,7 @@ function Home() {
 
   function submitHeroSearch(e: React.FormEvent) {
     e.preventDefault();
-    navigate({ to: "/equipamentos", search: heroQuery ? { q: heroQuery } : {} });
+    navigate({ to: "/pecas", search: heroQuery ? { q: heroQuery } : {} });
   }
 
   return (
@@ -164,10 +164,10 @@ function Home() {
             className="mx-auto max-w-3xl text-center"
           >
             <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">
-              O <span className="text-gradient-primary">almoxarife geotécnico</span> da sua obra
+              O <span className="text-gradient-primary">Almoxarifado da Geotecnia</span> Brasileira
             </h1>
             <p className="mt-2 text-muted-foreground">
-              Compre e alugue equipamentos de engenharia em minutos.
+              Negocie peças e ferramentas com outras empresas do setor geotécnico.
             </p>
             <form
               onSubmit={submitHeroSearch}
@@ -193,7 +193,7 @@ function Home() {
               return (
                 <Link
                   key={c.slug}
-                  to="/equipamentos"
+                  to="/pecas"
                   search={{ categoria: c.slug }}
                   className="flex items-center gap-2 rounded-full border border-border bg-background px-4 py-2 text-sm font-medium transition-all hover:-translate-y-0.5 hover:border-primary/40 hover:text-primary"
                 >
@@ -210,7 +210,7 @@ function Home() {
       <section className="container-page py-10">
         <SectionHeader
           title="Anunciados recentemente"
-          subtitle="Equipamentos publicados por empresas do setor."
+          subtitle="Peças publicadas por empresas do setor."
           linkLabel="Ver todos"
         />
         {isLoading ? (
@@ -283,11 +283,7 @@ function Home() {
                 asChild
                 className="rounded-full border-amber-400/40 bg-amber-400/10 text-xs font-semibold text-[#14265C] hover:bg-amber-400/20 dark:text-amber-300 sm:text-sm"
               >
-                <a
-                  href="https://geoselos.com/"
-                  target="_blank"
-                  rel="noreferrer"
-                >
+                <a href="https://geoselos.com/" target="_blank" rel="noreferrer">
                   Solicite sua verificação GeoSelos
                 </a>
               </Button>
@@ -321,9 +317,7 @@ function Home() {
                     <span className="min-w-0">
                       <span className="flex items-center gap-1.5">
                         <span className="truncate font-semibold">{company.name}</span>
-                        {company.verified && (
-                          <GeoSelosVerification />
-                        )}
+                        {company.verified && <GeoSelosVerification />}
                       </span>
                       <span className="flex items-center gap-1 text-xs text-muted-foreground">
                         <MapPin className="h-3 w-3" />
@@ -395,9 +389,7 @@ function Home() {
                   <p className="text-xs font-bold uppercase tracking-[0.18em] text-amber-300">
                     Reconhecimento técnico GeoSelos
                   </p>
-                  <p className="mt-1 text-sm text-blue-100">
-                    Fundações especiais e geotecnia
-                  </p>
+                  <p className="mt-1 text-sm text-blue-100">Fundações especiais e geotecnia</p>
                 </div>
               </div>
 
@@ -429,11 +421,7 @@ function Home() {
                   size="lg"
                   className="rounded-full bg-amber-400 font-bold text-[#14265C] hover:bg-amber-300"
                 >
-                  <a
-                    href="https://geoselos.com/"
-                    target="_blank"
-                    rel="noreferrer"
-                  >
+                  <a href="https://geoselos.com/" target="_blank" rel="noreferrer">
                     Solicite sua verificação GeoSelos
                     <ExternalLink className="h-4 w-4" />
                   </a>
@@ -444,11 +432,7 @@ function Home() {
                   variant="outline"
                   className="rounded-full border-white/20 bg-white/5 text-white hover:bg-white/10 hover:text-white"
                 >
-                  <a
-                    href="https://geoselos.com/"
-                    target="_blank"
-                    rel="noreferrer"
-                  >
+                  <a href="https://geoselos.com/" target="_blank" rel="noreferrer">
                     Consultar empresas reconhecidas
                   </a>
                 </Button>
@@ -495,9 +479,7 @@ function Home() {
       <section className="container-page py-14">
         <div className="mx-auto max-w-2xl text-center">
           <h2 className="text-xl font-bold sm:text-2xl">Como funciona</h2>
-          <p className="mt-2 text-sm text-muted-foreground">
-            Três passos entre o cadastro e o negócio fechado.
-          </p>
+          <p className="mt-2 text-sm text-muted-foreground">Transforme itens sem uso em dinheiro.</p>
         </div>
         <div className="relative mt-10 grid gap-6 md:grid-cols-3">
           <div
@@ -540,11 +522,10 @@ function Home() {
           <div className="relative">
             <TrendingUp className="mx-auto mb-4 h-8 w-8 text-accent" />
             <h2 className="mx-auto max-w-2xl text-3xl font-bold sm:text-4xl">
-              Anuncie seus equipamentos e alcance milhares de empresas
+              Anuncie e alcance outras empresas do setor geotécnico
             </h2>
             <p className="mx-auto mt-4 max-w-xl text-secondary-foreground/80">
-              Publique em minutos, receba propostas e construa sua reputação no maior ecossistema de
-              engenharia.
+              Encontre peças novas ou usadas no almoxarifado de outras empresas.
             </p>
             <dl className="mx-auto mt-8 flex max-w-xl flex-wrap justify-center gap-x-12 gap-y-4">
               {stats.map((s) => (
@@ -563,7 +544,7 @@ function Home() {
                 size="lg"
                 className="rounded-full transition-transform hover:-translate-y-0.5"
               >
-                <Link to="/publicar">Anunciar Equipamento</Link>
+                <Link to="/publicar">Anunciar Peça</Link>
               </Button>
               <Button
                 asChild

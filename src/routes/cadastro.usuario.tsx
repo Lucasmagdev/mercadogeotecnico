@@ -59,7 +59,7 @@ function CadastroUsuario() {
           <div className="mt-4 rounded-xl bg-secondary/10 p-3 text-left">
             <p className="text-sm font-medium text-secondary">É dono de uma empresa?</p>
             <p className="mt-0.5 text-xs text-muted-foreground">
-              Depois de entrar, cadastre sua empresa e comece a anunciar equipamentos.
+              Depois de entrar, cadastre sua empresa e comece a anunciar peças.
             </p>
             <Link
               to="/cadastro/empresa"

@@ -8,7 +8,7 @@ import { useAuth } from "@/components/auth-provider";
 import { deleteEquipment, fetchMyCompany, fetchMyEquipment } from "@/lib/queries";
 import { formatPrice } from "@/lib/mock-data";
 
-export const Route = createFileRoute("/painel/equipamentos/")({
+export const Route = createFileRoute("/painel/pecas/")({
   component: PainelEquipamentos,
 });
 
@@ -35,7 +35,7 @@ function PainelEquipamentos() {
   return (
     <div>
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <h1 className="text-2xl font-bold">Meus equipamentos</h1>
+        <h1 className="text-2xl font-bold">Minhas peças</h1>
         <Button asChild className="gap-1.5">
           <Link to="/publicar">
             <Plus className="h-4 w-4" /> Novo anúncio
@@ -62,12 +62,12 @@ function PainelEquipamentos() {
             </div>
             <div className="flex gap-1.5">
               <Button variant="outline" size="icon" asChild aria-label="Ver">
-                <Link to="/equipamentos/$slug" params={{ slug: e.slug }}>
+                <Link to="/pecas/$slug" params={{ slug: e.slug }}>
                   <Eye className="h-4 w-4" />
                 </Link>
               </Button>
               <Button variant="outline" size="icon" asChild aria-label="Editar">
-                <Link to="/painel/equipamentos/$id" params={{ id: e.id }}>
+                <Link to="/painel/pecas/$id" params={{ id: e.id }}>
                   <Pencil className="h-4 w-4" />
                 </Link>
               </Button>
@@ -89,9 +89,7 @@ function PainelEquipamentos() {
           </div>
         ))}
         {mine.length === 0 && (
-          <p className="text-sm text-muted-foreground">
-            Você ainda não anunciou nenhum equipamento.
-          </p>
+          <p className="text-sm text-muted-foreground">Você ainda não anunciou nenhuma peça.</p>
         )}
       </div>
     </div>

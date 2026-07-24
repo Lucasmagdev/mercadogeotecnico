@@ -37,10 +37,10 @@ function NotFoundComponent() {
             Voltar ao início
           </Link>
           <Link
-            to="/equipamentos"
+            to="/pecas"
             className="inline-flex items-center justify-center rounded-full border border-input bg-background px-5 py-2 text-sm font-medium text-foreground transition-colors hover:bg-muted"
           >
-            Ver equipamentos
+            Ver peças
           </Link>
         </div>
       </div>
@@ -92,7 +92,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       {
         name: "description",
         content:
-          "Seu almoxarife geotécnico digital: compre, alugue e encontre equipamentos e fornecedores de engenharia em um só lugar.",
+          "Seu almoxarife geotécnico digital: compre, alugue e encontre peças e fornecedores de engenharia em um só lugar.",
       },
       { name: "author", content: "Mercado Geotécnico" },
       {
@@ -102,7 +102,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       {
         property: "og:description",
         content:
-          "Seu almoxarife geotécnico digital: compre, alugue e encontre equipamentos e fornecedores de engenharia em um só lugar.",
+          "Seu almoxarife geotécnico digital: compre, alugue e encontre peças e fornecedores de engenharia em um só lugar.",
       },
       { property: "og:type", content: "website" },
       { property: "og:locale", content: "pt_BR" },

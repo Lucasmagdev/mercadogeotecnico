@@ -159,7 +159,7 @@ function Mensagens() {
                     <p className="text-sm font-semibold">{counterpartName(active)}</p>
                     {active.equipment && (
                       <Link
-                        to="/equipamentos/$slug"
+                        to="/pecas/$slug"
                         params={{ slug: active.equipment.slug }}
                         className="text-xs text-muted-foreground hover:text-primary hover:underline"
                       >

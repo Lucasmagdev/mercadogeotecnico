@@ -20,13 +20,13 @@ export const categories: Category[] = [
   { slug: "guindastes", name: "Guindastes", count: 208 },
   { slug: "geradores", name: "Geradores", count: 561 },
   { slug: "motores", name: "Motores", count: 389 },
-  { slug: "equipamentos-hidraulicos", name: "Equipamentos Hidráulicos", count: 267 },
+  { slug: "pecas-hidraulicas", name: "Peças Hidráulicas", count: 267 },
   { slug: "trados", name: "Trados", count: 98 },
   { slug: "pecas", name: "Peças", count: 2140 },
   { slug: "ferramentas", name: "Ferramentas", count: 1732 },
-  { slug: "equipamentos-fundacao", name: "Equipamentos de Fundação", count: 176 },
-  { slug: "equipamentos-sondagem", name: "Equipamentos de Sondagem", count: 121 },
-  { slug: "equipamentos-laboratorio", name: "Equipamentos de Laboratório", count: 89 },
+  { slug: "pecas-fundacao", name: "Peças de Fundação", count: 176 },
+  { slug: "pecas-sondagem", name: "Peças de Sondagem", count: 121 },
+  { slug: "pecas-laboratorio", name: "Peças de Laboratório", count: 89 },
   { slug: "servicos", name: "Serviços", count: 640 },
 ];
 

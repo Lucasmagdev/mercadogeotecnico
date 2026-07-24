@@ -151,13 +151,15 @@ function PainelAnalytics() {
         {ranked.map((e, i) => (
           <Link
             key={e.id}
-            to="/equipamentos/$slug"
+            to="/pecas/$slug"
             params={{ slug: e.slug }}
             className={`flex items-center gap-4 px-4 py-3 transition-colors hover:bg-muted/50 ${i % 2 ? "bg-card" : "bg-background"}`}
           >
             <div className="min-w-0 flex-1">
               <p className="truncate font-medium">{e.title}</p>
-              <p className="text-sm text-muted-foreground">{formatPrice(e.price, e.mode, e.rental_period)}</p>
+              <p className="text-sm text-muted-foreground">
+                {formatPrice(e.price, e.mode, e.rental_period)}
+              </p>
             </div>
             <span className="flex shrink-0 items-center gap-1.5 text-sm font-semibold text-primary">
               <Eye className="h-3.5 w-3.5" /> {e.views}

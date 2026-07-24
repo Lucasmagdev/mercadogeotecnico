@@ -29,7 +29,7 @@ export const Route = createFileRoute("/painel")({
 
 const nav = [
   { to: "/painel", label: "Visão geral", icon: LayoutDashboard, exact: true },
-  { to: "/painel/equipamentos", label: "Meus equipamentos", icon: Package },
+  { to: "/painel/pecas", label: "Minhas peças", icon: Package },
   { to: "/painel/analytics", label: "Analytics", icon: BarChart3 },
   { to: "/painel/pedidos", label: "Pedidos", icon: ClipboardList },
   { to: "/mensagens", label: "Mensagens", icon: MessageSquare },
@@ -72,7 +72,7 @@ function PainelLayout() {
         <Building2 className="h-10 w-10 text-muted-foreground" />
         <h1 className="text-xl font-bold">Área exclusiva para empresas</h1>
         <p className="max-w-md text-muted-foreground">
-          Cadastre sua empresa para anunciar equipamentos e acessar o painel de gestão.
+          Cadastre sua empresa para anunciar peças e acessar o painel de gestão.
         </p>
         <Button asChild>
           <Link to="/cadastro/empresa">Cadastrar empresa</Link>
@@ -88,7 +88,7 @@ function PainelLayout() {
         <h1 className="text-xl font-bold">Cadastro em análise</h1>
         <p className="max-w-md text-muted-foreground">
           Sua empresa <strong>{company.name}</strong> foi cadastrada e está aguardando aprovação do
-          administrador. Assim que aprovada, você poderá anunciar equipamentos.
+          administrador. Assim que aprovada, você poderá anunciar peças.
         </p>
       </div>
     );

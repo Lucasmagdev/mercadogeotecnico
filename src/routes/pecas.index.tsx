@@ -51,14 +51,14 @@ type Search = {
 const MAX_PRICE = 2000000;
 const CONDITIONS = ["Novo", "Seminovo", "Usado"] as const;
 
-export const Route = createFileRoute("/equipamentos/")({
+export const Route = createFileRoute("/pecas/")({
   head: () => ({
     meta: [
-      { title: "Equipamentos — Mercado Geotécnico" },
+      { title: "Peças — Mercado Geotécnico" },
       {
         name: "description",
         content:
-          "Encontre equipamentos de engenharia para compra e locação: escavadeiras, geradores, guindastes e mais.",
+          "Encontre peças, ferramentas e acessórios de engenharia, novos ou usados, para compra e locação.",
       },
     ],
   }),
@@ -491,7 +491,7 @@ function EquipmentList() {
               <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-muted">
                 <SearchX className="h-7 w-7 text-muted-foreground" />
               </div>
-              <p className="text-lg font-semibold">Nenhum equipamento encontrado</p>
+              <p className="text-lg font-semibold">Nenhuma peça encontrada</p>
               <p className="mt-1 max-w-sm text-sm text-muted-foreground">
                 Não achamos resultados para essa combinação. Tente remover filtros ou buscar por
                 outro termo.

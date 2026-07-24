@@ -18,7 +18,7 @@ import { toast } from "sonner";
 import { fetchCategories, fetchEquipmentById, updateEquipment } from "@/lib/queries";
 import { brands, states } from "@/lib/mock-data";
 
-export const Route = createFileRoute("/painel/equipamentos/$id")({
+export const Route = createFileRoute("/painel/pecas/$id")({
   component: EditarEquipamento,
 });
 
@@ -110,7 +110,7 @@ function EditarEquipamento() {
       <div className="py-16 text-center">
         <p className="text-muted-foreground">Anúncio não encontrado.</p>
         <Button asChild className="mt-4">
-          <Link to="/painel/equipamentos">Voltar</Link>
+          <Link to="/painel/pecas">Voltar</Link>
         </Button>
       </div>
     );
@@ -119,8 +119,8 @@ function EditarEquipamento() {
   return (
     <div className="max-w-2xl">
       <Button variant="ghost" size="sm" asChild className="mb-4 gap-1 text-muted-foreground">
-        <Link to="/painel/equipamentos">
-          <ChevronLeft className="h-4 w-4" /> Meus equipamentos
+        <Link to="/painel/pecas">
+          <ChevronLeft className="h-4 w-4" /> Minhas peças
         </Link>
       </Button>
       <h1 className="text-2xl font-bold">Editar anúncio</h1>

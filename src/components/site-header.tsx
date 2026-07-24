@@ -21,7 +21,7 @@ import { Logo } from "@/components/logo";
 import { categories } from "@/lib/mock-data";
 
 const nav = [
-  { to: "/equipamentos", label: "Almoxarifado" },
+  { to: "/pecas", label: "Almoxarifado" },
   { to: "/servicos", label: "Serviços" },
   { to: "/empresas", label: "Empresas" },
   { to: "/fornecedores", label: "Fornecedores" },
@@ -54,7 +54,7 @@ export function SiteHeader() {
 
   function submitSearch(e: React.FormEvent) {
     e.preventDefault();
-    navigate({ to: "/equipamentos", search: headerQuery ? { q: headerQuery } : {} });
+    navigate({ to: "/pecas", search: headerQuery ? { q: headerQuery } : {} });
   }
 
   return (
@@ -76,7 +76,7 @@ export function SiteHeader() {
               <DropdownMenuSeparator />
               {categories.slice(0, 8).map((c) => (
                 <DropdownMenuItem key={c.slug} asChild>
-                  <Link to="/equipamentos" search={{ categoria: c.slug }}>
+                  <Link to="/pecas" search={{ categoria: c.slug }}>
                     {c.name}
                   </Link>
                 </DropdownMenuItem>
@@ -120,7 +120,7 @@ export function SiteHeader() {
 
           <Button asChild className="hidden gap-1.5 rounded-full md:inline-flex">
             <Link to="/publicar">
-              <Plus className="h-4 w-4" /> Anunciar Equipamento
+              <Plus className="h-4 w-4" /> Anunciar Peça
             </Link>
           </Button>
 
@@ -151,7 +151,7 @@ export function SiteHeader() {
                       <Link to="/painel">Painel</Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem asChild>
-                      <Link to="/painel/equipamentos">Meus Equipamentos</Link>
+                      <Link to="/painel/pecas">Minhas Peças</Link>
                     </DropdownMenuItem>
                     {myCompany && (
                       <DropdownMenuItem asChild>
@@ -255,7 +255,7 @@ export function SiteHeader() {
         <form onSubmit={submitSearch} className="container-page relative">
           <Search className="pointer-events-none absolute left-8 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
-            placeholder="Qual equipamento você procura?"
+            placeholder="Qual peça você procura?"
             className="h-10 rounded-full bg-muted pl-10"
             value={headerQuery}
             onChange={(e) => setHeaderQuery(e.target.value)}
