@@ -8,13 +8,12 @@ insert into public.categories (slug, name, count) values
   ('guindastes','Guindastes',208),
   ('geradores','Geradores',561),
   ('motores','Motores',389),
-  ('equipamentos-hidraulicos','Equipamentos Hidráulicos',267),
+  ('pecas-hidraulicas','Peças Hidráulicas',267),
   ('trados','Trados',98),
   ('pecas','Peças',2140),
   ('ferramentas','Ferramentas',1732),
-  ('equipamentos-fundacao','Equipamentos de Fundação',176),
-  ('equipamentos-sondagem','Equipamentos de Sondagem',121),
-  ('equipamentos-laboratorio','Equipamentos de Laboratório',89),
+  ('pecas-fundacao','Peças de Fundação',176),
+  ('pecas-sondagem','Peças de Sondagem',121),
   ('servicos','Serviços',640);
 
 -- disable guard triggers just for seeding (owner_id insert lacks an authenticated session)
