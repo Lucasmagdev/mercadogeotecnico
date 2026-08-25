@@ -1,4 +1,5 @@
-import { getCompanyImageUrl, getCompanyPhotoUrl } from "@/lib/company-images";
+import { Building2 } from "lucide-react";
+import { getCompanyImageUrl } from "@/lib/company-images";
 import { cn } from "@/lib/utils";
 
 type CompanyAvatarProps = {
@@ -8,8 +9,8 @@ type CompanyAvatarProps = {
   className?: string;
 };
 
-export function CompanyAvatar({ name, slug, logoPath, className }: CompanyAvatarProps) {
-  const photo = getCompanyImageUrl(logoPath) ?? getCompanyPhotoUrl(slug);
+export function CompanyAvatar({ name, logoPath, className }: CompanyAvatarProps) {
+  const photo = getCompanyImageUrl(logoPath);
 
   if (photo) {
     return (
@@ -23,12 +24,14 @@ export function CompanyAvatar({ name, slug, logoPath, className }: CompanyAvatar
 
   return (
     <span
+      aria-label={`${name} sem logotipo`}
+      role="img"
       className={cn(
-        "flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-secondary text-sm font-bold text-secondary-foreground",
+        "flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-secondary text-secondary-foreground",
         className,
       )}
     >
-      {name.slice(0, 2).toUpperCase()}
+      <Building2 aria-hidden="true" className="h-1/2 w-1/2" />
     </span>
   );
 }
