@@ -7,7 +7,6 @@ import {
   Globe,
   Phone,
   MessageCircle,
-  Calendar,
   ChevronLeft,
   Lock,
   Send,
@@ -128,9 +127,6 @@ function CompanyProfile() {
               <span className="flex items-center gap-1">
                 <Star className="h-3.5 w-3.5 fill-accent text-accent" /> {company.rating} ·{" "}
                 {company.reviews} avaliações
-              </span>
-              <span className="flex items-center gap-1">
-                <Calendar className="h-3.5 w-3.5" /> {company.years_on_market} anos no mercado
               </span>
             </div>
           </div>

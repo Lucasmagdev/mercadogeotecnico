@@ -362,7 +362,7 @@ function EquipmentDetail() {
                   {company.verified && <GeoSelosVerification />}
                 </div>
                 <p className="text-sm text-muted-foreground">
-                  {company.city}/{company.state} · {company.years_on_market} anos no mercado
+                  {company.city}/{company.state}
                 </p>
               </div>
             </Link>

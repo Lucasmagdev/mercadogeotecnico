@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { Building2, MailCheck, MapPin, Phone, Sparkles } from "lucide-react";
+import { Building2, ImagePlus, MailCheck, MapPin, Phone, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -13,7 +13,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useAuth } from "@/components/auth-provider";
-import { registerCompany } from "@/lib/queries";
+import { registerCompany, updateCompany } from "@/lib/queries";
+import { uploadCompanyImage } from "@/lib/company-images";
 import { supabase } from "@/lib/supabase";
 import { states } from "@/lib/mock-data";
 import { formatPhoneBR } from "@/lib/utils";
@@ -112,7 +113,7 @@ function CompanyFieldsGrid({
   );
 }
 
-function CompanyPreview({ form }: { form: CompanyFields }) {
+function CompanyPreview({ form, logoPreview }: { form: CompanyFields; logoPreview?: string | null }) {
   return (
     <div className="lg:sticky lg:top-24 lg:self-start">
       <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
@@ -121,9 +122,17 @@ function CompanyPreview({ form }: { form: CompanyFields }) {
       <div className="overflow-hidden rounded-2xl border border-border bg-card shadow-soft">
         <div className="h-16 bg-gradient-to-r from-secondary to-primary" />
         <div className="-mt-8 flex flex-col items-start gap-2 p-4">
-          <span className="flex h-14 w-14 items-center justify-center rounded-full border-4 border-card bg-secondary text-sm font-bold text-secondary-foreground">
-            {(form.companyName || "?").slice(0, 2).toUpperCase()}
-          </span>
+          {logoPreview ? (
+            <img
+              src={logoPreview}
+              alt="Logo"
+              className="h-14 w-14 rounded-full border-4 border-card object-cover"
+            />
+          ) : (
+            <span className="flex h-14 w-14 items-center justify-center rounded-full border-4 border-card bg-secondary text-sm font-bold text-secondary-foreground">
+              {(form.companyName || "?").slice(0, 2).toUpperCase()}
+            </span>
+          )}
           <h3 className="font-semibold leading-tight">
             {form.companyName || "Nome da sua empresa"}
           </h3>
@@ -157,7 +166,11 @@ function CadastroEmpresa() {
     );
   }
 
-  return session ? <EmpresaForm email={session.user.email ?? ""} /> : <SignupAndEmpresaForm />;
+  return session ? (
+    <EmpresaForm email={session.user.email ?? ""} userId={session.user.id} />
+  ) : (
+    <SignupAndEmpresaForm />
+  );
 }
 
 /** New visitor: create account + company in a single step (one email confirmation). */
@@ -302,7 +315,7 @@ function SignupAndEmpresaForm() {
 }
 
 /** Already logged in: just add the company to the existing account. */
-function EmpresaForm({ email }: { email: string }) {
+function EmpresaForm({ email, userId }: { email: string; userId: string }) {
   const navigate = useNavigate();
   const { refreshProfile } = useAuth();
   const [form, setForm] = useState<CompanyFields>({
@@ -314,6 +327,9 @@ function EmpresaForm({ email }: { email: string }) {
     whatsapp: "",
     description: "",
   });
+  const [logoFile, setLogoFile] = useState<File | null>(null);
+  const [logoPreview, setLogoPreview] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -326,7 +342,7 @@ function EmpresaForm({ email }: { email: string }) {
     setLoading(true);
     setError("");
     try {
-      await registerCompany({
+      const newId = await registerCompany({
         name: form.companyName,
         cnpj: form.cnpj,
         city: form.city,
@@ -335,6 +351,10 @@ function EmpresaForm({ email }: { email: string }) {
         whatsapp: form.whatsapp,
         description: form.description,
       });
+      if (logoFile) {
+        const path = await uploadCompanyImage(userId, logoFile, "logo");
+        await updateCompany(newId, { logo_path: path });
+      }
       await refreshProfile();
       navigate({ to: "/painel" });
     } catch (err) {
@@ -366,6 +386,43 @@ function EmpresaForm({ email }: { email: string }) {
         >
           <CompanyFieldsGrid form={form} set={set} />
 
+          <div className="space-y-2">
+            <Label>Logo da empresa (opcional)</Label>
+            <div className="flex items-center gap-3">
+              <div className="flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-full border border-border bg-muted">
+                {logoPreview ? (
+                  <img src={logoPreview} alt="Logo" className="h-full w-full object-cover" />
+                ) : (
+                  <Building2 className="h-5 w-5 text-muted-foreground" />
+                )}
+              </div>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                className="gap-1.5"
+                onClick={() => fileInputRef.current?.click()}
+              >
+                <ImagePlus className="h-4 w-4" />
+                {logoPreview ? "Trocar" : "Adicionar"}
+              </Button>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                className="hidden"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (!file) return;
+                  if (logoPreview) URL.revokeObjectURL(logoPreview);
+                  setLogoFile(file);
+                  setLogoPreview(URL.createObjectURL(file));
+                  e.target.value = "";
+                }}
+              />
+            </div>
+          </div>
+
           <div className="border-t border-border pt-4">
             <p className="mb-1 text-sm font-medium">Conta vinculada</p>
             <p className="text-sm text-muted-foreground">{email}</p>
@@ -377,7 +434,7 @@ function EmpresaForm({ email }: { email: string }) {
           </Button>
         </form>
 
-        <CompanyPreview form={form} />
+        <CompanyPreview form={form} logoPreview={logoPreview} />
       </div>
     </div>
   );

@@ -84,7 +84,13 @@ insert into public.equipment (company_id, slug, title, brand, model, category_sl
  '[{"label":"Capacidade máxima","value":"40 t"},{"label":"Lança telescópica","value":"35 m"},{"label":"Jib","value":"16 m"},{"label":"Eixos","value":"3"}]'),
 ('22222222-2222-2222-2222-222222222222','bobcat-t595','Bobcat Esteira T595','Bobcat','T595','bobcat',3400,'locacao','Novo',2024,120,'Belo Horizonte','MG','bobcat',
  'Mini carregadeira de esteira com alta tração, ideal para terrenos acidentados e obras de infraestrutura.',
- '[{"label":"Capacidade operacional","value":"998 kg"},{"label":"Potência","value":"66 HP"},{"label":"Largura","value":"1.676 mm"},{"label":"Velocidade","value":"11,4 km/h"}]');
+ '[{"label":"Capacidade operacional","value":"998 kg"},{"label":"Potência","value":"66 HP"},{"label":"Largura","value":"1.676 mm"},{"label":"Velocidade","value":"11,4 km/h"}]'),
+('55555555-5555-5555-5555-555555555555','retroescavadeira-jcb-3cx','Retroescavadeira JCB 3CX','JCB','3CX','retroescavadeiras',310000,'venda','Seminovo',2020,4300,'Belo Horizonte','MG','excavator',
+ 'Retroescavadeira versátil para escavação, carregamento e abertura de valas. Pneus novos e sistema hidráulico revisado.',
+ '[{"label":"Peso operacional","value":"8.500 kg"},{"label":"Potência","value":"109 HP"},{"label":"Profundidade de escavação","value":"5.960 mm"},{"label":"Capacidade da caçamba (carregadeira)","value":"1,0 m³"}]'),
+('66666666-6666-6666-6666-666666666666','perfuratriz-sondagem-spt','Perfuratriz para Sondagem SPT','Geomek','GM-100','perfuratrizes',89000,'venda','Novo',2024,0,'São Paulo','SP','excavator',
+ 'Perfuratriz compacta para ensaios SPT e sondagens geotécnicas, montada sobre trailer com motor a diesel.',
+ '[{"label":"Profundidade máxima","value":"30 m"},{"label":"Motor","value":"Diesel 15 HP"},{"label":"Peso","value":"680 kg"},{"label":"Torque","value":"450 N·m"}]');
 
 -- pending company example, so the admin approval queue isn't empty
 insert into public.companies (owner_id, name, slug, city, state, phone, whatsapp, description, services)

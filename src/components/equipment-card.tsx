@@ -122,19 +122,15 @@ export function EquipmentCard({
                   {company.name}
                 </span>
                 <span className="mt-0.5 flex min-w-0 items-center justify-between gap-2">
-                  <span className="flex min-w-0 items-center gap-1 text-xs text-muted-foreground">
-                    {company.rating > 0 && (
-                      <>
-                        <Star className="h-3 w-3 shrink-0 fill-amber-400 text-amber-400" />
-                        <span className="font-medium text-foreground">
-                          {company.rating.toFixed(1)}
-                        </span>
-                        {company.reviews > 0 && <span>({company.reviews})</span>}
-                        <span aria-hidden>·</span>
-                      </>
-                    )}
-                    <span className="truncate">{company.years_on_market} anos no mercado</span>
-                  </span>
+                  {company.rating > 0 && (
+                    <span className="flex min-w-0 items-center gap-1 text-xs text-muted-foreground">
+                      <Star className="h-3 w-3 shrink-0 fill-amber-400 text-amber-400" />
+                      <span className="font-medium text-foreground">
+                        {company.rating.toFixed(1)}
+                      </span>
+                      {company.reviews > 0 && <span>({company.reviews})</span>}
+                    </span>
+                  )}
                   {company.verified && <GeoSelosVerification />}
                 </span>
               </span>

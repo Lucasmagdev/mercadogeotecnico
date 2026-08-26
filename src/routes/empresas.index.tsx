@@ -70,7 +70,6 @@ function Companies() {
                     <Star className="h-3.5 w-3.5 fill-accent text-accent" /> {c.rating} ({c.reviews}
                     )
                   </span>
-                  <span>{c.years_on_market} anos</span>
                 </div>
                 <p className="mt-2 line-clamp-2 text-sm text-muted-foreground">{c.description}</p>
                 <div className="mt-3 flex flex-wrap gap-1.5">

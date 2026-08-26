@@ -25,7 +25,6 @@ import {
   ExternalLink,
   Star,
   MapPin,
-  CalendarClock,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -335,10 +334,6 @@ function Home() {
                         )}
                       </span>
                     )}
-                    <span className="flex items-center gap-1 text-muted-foreground">
-                      <CalendarClock className="h-4 w-4" />
-                      {company.years_on_market} anos
-                    </span>
                   </div>
                   {company.services.length > 0 && (
                     <div className="mt-3 flex flex-wrap gap-1.5">

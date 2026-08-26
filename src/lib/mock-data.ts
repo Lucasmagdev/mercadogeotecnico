@@ -39,7 +39,10 @@ export const brands = [
   "Cummins",
   "Stemac",
 ];
-export const states = ["SP", "RJ", "MG", "PR", "RS", "SC", "BA", "GO"];
+export const states = [
+  "AC", "AL", "AP", "AM", "BA", "CE", "DF", "ES", "GO", "MA", "MT", "MS", "MG",
+  "PA", "PB", "PR", "PE", "PI", "RJ", "RN", "RS", "RO", "RR", "SC", "SP", "SE", "TO",
+];
 
 const rentalPeriodSuffix: Record<"dia" | "semana" | "mes", string> = {
   dia: "/dia",
