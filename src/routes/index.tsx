@@ -30,6 +30,7 @@ import type { LucideIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { EquipmentCard } from "@/components/equipment-card";
+import { EquipmentBrowser } from "@/components/equipment-browser";
 import { AnimatedCounter } from "@/components/animated-counter";
 import { GeoSelosVerification } from "@/components/geoselos-verification";
 import { VerifiedSeal } from "@/components/verified-seal";
@@ -203,6 +204,11 @@ function Home() {
             })}
           </div>
         </div>
+      </section>
+
+      {/* Full browse (filters + grid) */}
+      <section className="container-page py-10">
+        <EquipmentBrowser />
       </section>
 
       {/* Recently listed — the main event */}
