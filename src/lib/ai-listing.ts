@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
-import Anthropic from "@anthropic-ai/sdk";
-import { z } from "zod/v4";
-import { zodOutputFormat } from "@anthropic-ai/sdk/helpers/zod";
+import OpenAI from "openai";
+import { z } from "zod";
+import { zodTextFormat } from "openai/helpers/zod";
 
 const ListingDraftSchema = z.object({
   category_slug: z
@@ -39,39 +39,39 @@ export const generateListingDraft = createServerFn({ method: "POST" })
     }) => data,
   )
   .handler(async ({ data }): Promise<ListingDraft> => {
-    const apiKey = process.env.ANTHROPIC_API_KEY;
+    const apiKey = process.env.OPENAI_API_KEY;
     if (!apiKey) {
-      throw new Error("ANTHROPIC_API_KEY não configurada no servidor.");
+      throw new Error("OPENAI_API_KEY não configurada no servidor.");
     }
     if (data.images.length === 0) {
       throw new Error("Envie ao menos uma foto.");
     }
 
-    const client = new Anthropic({ apiKey });
+    const client = new OpenAI({ apiKey });
     const images = data.images.slice(0, MAX_IMAGES);
     const categoryList = data.categories.map((c) => `${c.slug} (${c.name})`).join(", ");
 
-    const response = await client.messages.parse({
-      model: "claude-opus-5",
-      max_tokens: 4096,
-      system:
+    const response = await client.responses.parse({
+      model: "gpt-5.5",
+      instructions:
         "Você é um especialista técnico em máquinas, peças e ferramentas de engenharia geotécnica " +
         "e construção pesada. Analise as fotos de uma peça/equipamento à venda (incluindo qualquer " +
         "plaqueta de identificação visível) e extraia informações estruturadas para montar um anúncio. " +
         "Se não conseguir identificar algo com confiança, use string vazia ou array vazio — nunca invente " +
         "dados. Responda sempre em português do Brasil.",
-      messages: [
+      input: [
         {
           role: "user",
           content: [
             ...images.map(
-              (img): Anthropic.ImageBlockParam => ({
-                type: "image" as const,
-                source: { type: "base64", media_type: img.mediaType, data: img.base64 },
+              (img): OpenAI.Responses.ResponseInputImage => ({
+                type: "input_image" as const,
+                detail: "auto",
+                image_url: `data:${img.mediaType};base64,${img.base64}`,
               }),
             ),
             {
-              type: "text",
+              type: "input_text",
               text:
                 `Categorias válidas (use exatamente um destes slugs): ${categoryList}\n\n` +
                 (data.note.trim()
@@ -82,13 +82,11 @@ export const generateListingDraft = createServerFn({ method: "POST" })
           ],
         },
       ],
-      output_config: {
-        format: zodOutputFormat(ListingDraftSchema),
-      },
+      text: { format: zodTextFormat(ListingDraftSchema, "listing_draft") },
     });
 
-    if (!response.parsed_output) {
+    if (!response.output_parsed) {
       throw new Error("Não foi possível interpretar as fotos. Tente novamente ou preencha manualmente.");
     }
-    return response.parsed_output;
+    return response.output_parsed;
   });
