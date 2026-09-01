@@ -52,13 +52,15 @@ export const generateListingDraft = createServerFn({ method: "POST" })
     const categoryList = data.categories.map((c) => `${c.slug} (${c.name})`).join(", ");
 
     const response = await client.responses.parse({
-      model: "gpt-5.5",
+      model: "gpt-5.6-terra",
       instructions:
         "Você é um especialista técnico em máquinas, peças e ferramentas de engenharia geotécnica " +
         "e construção pesada. Analise as fotos de uma peça/equipamento à venda (incluindo qualquer " +
         "plaqueta de identificação visível) e extraia informações estruturadas para montar um anúncio. " +
-        "Se não conseguir identificar algo com confiança, use string vazia ou array vazio — nunca invente " +
-        "dados. Responda sempre em português do Brasil.",
+        "Se não conseguir identificar algo com confiança, use string vazia (\"\") ou array vazio — nunca " +
+        "invente dados nem escreva texto tipo \"não identificado\" ou \"não disponível\" nos campos; " +
+        "esses casos de incerteza vão em missing_info, não nos campos de dados. Responda sempre em " +
+        "português do Brasil.",
       input: [
         {
           role: "user",
