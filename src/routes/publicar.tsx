@@ -13,6 +13,8 @@ import {
   Upload,
   X,
   Plus,
+  Wand2,
+  AlertTriangle,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -29,8 +31,39 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useAuth } from "@/components/auth-provider";
 import { createEquipment, fetchCategories, fetchMyCompany } from "@/lib/queries";
 import { uploadEquipmentImages } from "@/lib/equipment-images";
+import { generateListingDraft } from "@/lib/ai-listing";
 import { brands, states } from "@/lib/mock-data";
 import { slugify } from "@/lib/utils";
+
+const AI_MAX_DIM = 1280;
+
+function resizeImageToBase64(file: File): Promise<{ mediaType: "image/jpeg"; base64: string }> {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    const url = URL.createObjectURL(file);
+    img.onload = () => {
+      const scale = Math.min(1, AI_MAX_DIM / Math.max(img.width, img.height));
+      const canvas = document.createElement("canvas");
+      canvas.width = Math.round(img.width * scale);
+      canvas.height = Math.round(img.height * scale);
+      const ctx = canvas.getContext("2d");
+      if (!ctx) {
+        URL.revokeObjectURL(url);
+        reject(new Error("Canvas indisponível"));
+        return;
+      }
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      const dataUrl = canvas.toDataURL("image/jpeg", 0.82);
+      URL.revokeObjectURL(url);
+      resolve({ mediaType: "image/jpeg", base64: dataUrl.split(",")[1] });
+    };
+    img.onerror = () => {
+      URL.revokeObjectURL(url);
+      reject(new Error("Não foi possível ler a imagem"));
+    };
+    img.src = url;
+  });
+}
 
 export const Route = createFileRoute("/publicar")({
   head: () => ({
@@ -84,6 +117,11 @@ function Publicar() {
   const [done, setDone] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  const [aiPhotos, setAiPhotos] = useState<File[]>([]);
+  const [aiNote, setAiNote] = useState("");
+  const [aiMissingInfo, setAiMissingInfo] = useState<string[]>([]);
+  const aiFileInputRef = useRef<HTMLInputElement>(null);
+
   function set<K extends keyof typeof form>(key: K, value: (typeof form)[K]) {
     setForm((f) => ({ ...f, [key]: value }));
   }
@@ -126,6 +164,45 @@ function Publicar() {
       return slug;
     },
     onSuccess: () => setDone(true),
+  });
+
+  const aiGenerate = useMutation({
+    mutationFn: async () => {
+      const images = await Promise.all(aiPhotos.map(resizeImageToBase64));
+      return generateListingDraft({
+        data: {
+          images,
+          note: aiNote,
+          categories: categories.map((c) => ({ slug: c.slug, name: c.name })),
+        },
+      });
+    },
+    onSuccess: (draft) => {
+      const categoryValid = categories.some((c) => c.slug === draft.category_slug);
+      const brandMatch = brands.find((b) => b.toLowerCase() === draft.brand.toLowerCase());
+      setForm((f) => ({
+        ...f,
+        category: categoryValid ? draft.category_slug : f.category,
+        title: draft.title || f.title,
+        brand: brandMatch ?? (draft.brand ? "outro" : f.brand),
+        model: draft.model || f.model,
+        condition: draft.condition,
+        description: draft.description || f.description,
+      }));
+      if (!brandMatch && draft.brand) setCustomBrand(draft.brand);
+      if (!categoryValid && draft.category_slug) {
+        setForm((f) => ({ ...f, category: "outros" }));
+        setCustomCategory(draft.category_slug);
+      }
+      const extraSpecs: Spec[] = [];
+      if (draft.part_number) extraSpecs.push({ label: "Part Number", value: draft.part_number });
+      if (draft.compatible_with.length > 0)
+        extraSpecs.push({ label: "Compatível com", value: draft.compatible_with.join(", ") });
+      const filledSpecs = [...draft.specs, ...extraSpecs].filter((s) => s.label && s.value);
+      if (filledSpecs.length > 0) setSpecs(filledSpecs);
+      setAiMissingInfo(draft.missing_info);
+      setStep(1);
+    },
   });
 
   const progress = ((step + 1) / steps.length) * 100;
@@ -249,6 +326,107 @@ function Publicar() {
           transition={{ duration: 0.3 }}
         />
       </div>
+
+      {step === 0 && (
+        <div className="mt-8 rounded-2xl border border-primary/30 bg-primary/5 p-5">
+          <div className="flex items-start gap-3">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary/15 text-primary">
+              <Wand2 className="h-4 w-4" />
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="font-semibold">Fotografe o item e a IA ajuda a criar o anúncio</p>
+              <p className="mt-0.5 text-sm text-muted-foreground">
+                Envie fotos (inclusive da plaqueta, se tiver) e conte o que sabe. A IA identifica a
+                peça, sugere categoria, marca, modelo e especificações técnicas.
+              </p>
+
+              <input
+                ref={aiFileInputRef}
+                type="file"
+                accept="image/*"
+                multiple
+                className="hidden"
+                onChange={(e) => {
+                  const incoming = Array.from(e.target.files ?? []).filter((f) =>
+                    f.type.startsWith("image/"),
+                  );
+                  setAiPhotos((prev) => [...prev, ...incoming].slice(0, 4));
+                  e.target.value = "";
+                }}
+              />
+
+              <div className="mt-3 flex flex-wrap gap-2">
+                {aiPhotos.map((file, i) => (
+                  <div key={i} className="group relative h-16 w-16 overflow-hidden rounded-lg border border-border">
+                    <img
+                      src={URL.createObjectURL(file)}
+                      alt=""
+                      className="h-full w-full object-cover"
+                    />
+                    <button
+                      type="button"
+                      aria-label="Remover foto"
+                      onClick={() => setAiPhotos((p) => p.filter((_, j) => j !== i))}
+                      className="absolute right-0.5 top-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-background/90 text-foreground"
+                    >
+                      <X className="h-2.5 w-2.5" />
+                    </button>
+                  </div>
+                ))}
+                {aiPhotos.length < 4 && (
+                  <button
+                    type="button"
+                    onClick={() => aiFileInputRef.current?.click()}
+                    className="flex h-16 w-16 items-center justify-center rounded-lg border-2 border-dashed border-border text-muted-foreground hover:border-primary/50 hover:text-primary"
+                  >
+                    <Upload className="h-4 w-4" />
+                  </button>
+                )}
+              </div>
+
+              <Textarea
+                className="mt-3"
+                rows={2}
+                placeholder='Opcional: "Era de uma Doosan 225, estava funcionando quando tiramos."'
+                value={aiNote}
+                onChange={(e) => setAiNote(e.target.value)}
+              />
+
+              {aiGenerate.isError && (
+                <p className="mt-2 text-sm text-destructive">
+                  {aiGenerate.error instanceof Error
+                    ? aiGenerate.error.message
+                    : "Não foi possível gerar o rascunho. Tente novamente."}
+                </p>
+              )}
+
+              <Button
+                type="button"
+                className="mt-3 gap-1.5"
+                disabled={aiPhotos.length === 0 || aiGenerate.isPending}
+                onClick={() => aiGenerate.mutate()}
+              >
+                <Wand2 className="h-4 w-4" />
+                {aiGenerate.isPending ? "Analisando fotos..." : "Gerar rascunho com IA"}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {aiMissingInfo.length > 0 && step > 0 && (
+        <div className="mt-8 flex items-start gap-3 rounded-2xl border border-amber-400/30 bg-amber-400/10 p-4 text-sm">
+          <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-amber-500" />
+          <div>
+            <p className="font-medium">Pra melhorar o anúncio, confirme se possível:</p>
+            <ul className="mt-1 list-inside list-disc text-muted-foreground">
+              {aiMissingInfo.map((info, i) => (
+                <li key={i}>{info}</li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      )}
 
       <motion.div
         key={step}
