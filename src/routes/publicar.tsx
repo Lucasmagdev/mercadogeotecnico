@@ -178,6 +178,7 @@ function Publicar() {
       });
     },
     onSuccess: (draft) => {
+      setPhotos((prev) => (prev.length > 0 ? prev : aiPhotos).slice(0, MAX_PHOTOS));
       const categoryValid = categories.some((c) => c.slug === draft.category_slug);
       const brandMatch = brands.find((b) => b.toLowerCase() === draft.brand.toLowerCase());
       setForm((f) => ({
@@ -384,6 +385,12 @@ function Publicar() {
                 )}
               </div>
 
+              {aiPhotos.length > 0 && (
+                <p className="mt-2 text-xs text-muted-foreground">
+                  Essas fotos já ficam salvas pro anúncio — não precisa subir de novo depois.
+                </p>
+              )}
+
               <Textarea
                 className="mt-3"
                 rows={2}
@@ -417,7 +424,7 @@ function Publicar() {
       {aiMissingInfo.length > 0 && step > 0 && (
         <div className="mt-8 flex items-start gap-3 rounded-2xl border border-amber-400/30 bg-amber-400/10 p-4 text-sm">
           <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-amber-500" />
-          <div>
+          <div className="min-w-0 flex-1">
             <p className="font-medium">Pra melhorar o anúncio, confirme se possível:</p>
             <ul className="mt-1 list-inside list-disc text-muted-foreground">
               {aiMissingInfo.map((info, i) => (
@@ -425,6 +432,14 @@ function Publicar() {
               ))}
             </ul>
           </div>
+          <button
+            type="button"
+            aria-label="Dispensar aviso"
+            onClick={() => setAiMissingInfo([])}
+            className="shrink-0 text-muted-foreground hover:text-foreground"
+          >
+            <X className="h-4 w-4" />
+          </button>
         </div>
       )}
 
