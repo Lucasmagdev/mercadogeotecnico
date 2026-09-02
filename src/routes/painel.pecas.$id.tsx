@@ -16,6 +16,8 @@ import {
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { toast } from "sonner";
 import { fetchCategories, fetchEquipmentById, updateEquipment } from "@/lib/queries";
+import { computeListingQuality } from "@/lib/listing-quality";
+import { ListingQualityMeter } from "@/components/listing-quality-meter";
 import { brands, states } from "@/lib/mock-data";
 
 export const Route = createFileRoute("/painel/pecas/$id")({
@@ -116,6 +118,19 @@ function EditarEquipamento() {
     );
   }
 
+  const listingQuality = computeListingQuality({
+    title: form.title,
+    description: form.description,
+    brand: form.brand,
+    model: form.model,
+    price: Number(form.price) || 0,
+    city: form.city,
+    state: form.state,
+    condition: form.condition,
+    photosCount: item.images.length,
+    specs,
+  });
+
   return (
     <div className="max-w-2xl">
       <Button variant="ghost" size="sm" asChild className="mb-4 gap-1 text-muted-foreground">
@@ -124,6 +139,10 @@ function EditarEquipamento() {
         </Link>
       </Button>
       <h1 className="text-2xl font-bold">Editar anúncio</h1>
+
+      <div className="mt-6">
+        <ListingQualityMeter quality={listingQuality} />
+      </div>
 
       <div className="mt-6 space-y-4 rounded-2xl border border-border bg-card p-6">
         <div className="space-y-2">

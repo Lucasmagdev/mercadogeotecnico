@@ -33,6 +33,8 @@ import { useAuth } from "@/components/auth-provider";
 import { createEquipment, fetchCategories, fetchMyCompany } from "@/lib/queries";
 import { uploadEquipmentImages } from "@/lib/equipment-images";
 import { generateListingDraft } from "@/lib/ai-listing";
+import { computeListingQuality } from "@/lib/listing-quality";
+import { ListingQualityMeter } from "@/components/listing-quality-meter";
 import { brands, states } from "@/lib/mock-data";
 import { slugify } from "@/lib/utils";
 
@@ -206,6 +208,19 @@ function Publicar() {
       setAiMissingInfo(draft.missing_info);
       setStep(1);
     },
+  });
+
+  const listingQuality = computeListingQuality({
+    title: form.title,
+    description: form.description,
+    brand: form.brand === "outro" ? customBrand : form.brand,
+    model: form.model,
+    price: Number(form.price) || 0,
+    city: form.city,
+    state: form.state,
+    condition: form.condition,
+    photosCount: photos.length,
+    specs,
   });
 
   const progress = ((step + 1) / steps.length) * 100;
@@ -808,15 +823,21 @@ function Publicar() {
         )}
 
         {step === 4 && (
-          <div className="space-y-4 text-center">
-            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-success/10">
-              <Sparkles className="h-7 w-7 text-success" />
+          <div className="space-y-4">
+            <div className="text-center">
+              <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-success/10">
+                <Sparkles className="h-7 w-7 text-success" />
+              </div>
+              <h2 className="mt-2 text-lg font-semibold">Tudo pronto!</h2>
+              <p className="text-muted-foreground">
+                {photos.length > 0 ? `${photos.length} foto(s) serão enviadas. ` : ""}
+                Revise as informações e publique seu anúncio para milhares de empresas.
+              </p>
             </div>
-            <h2 className="text-lg font-semibold">Tudo pronto!</h2>
-            <p className="text-muted-foreground">
-              {photos.length > 0 ? `${photos.length} foto(s) serão enviadas. ` : ""}
-              Revise as informações e publique seu anúncio para milhares de empresas.
-            </p>
+
+            <ListingQualityMeter quality={listingQuality} />
+
+            <div className="text-center">
             {submit.isError && (
               <p className="text-sm text-destructive">
                 {submit.error instanceof Error
@@ -832,6 +853,7 @@ function Publicar() {
             >
               {submit.isPending ? "Publicando..." : "Publicar anúncio"}
             </Button>
+            </div>
           </div>
         )}
       </motion.div>
