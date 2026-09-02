@@ -233,10 +233,21 @@ function EquipmentDetail() {
             {formatPrice(item.price, item.mode, item.rental_period)}
           </p>
 
+          {item.specs.length > 0 && (
+            <p className="mt-2 text-sm text-muted-foreground">
+              {item.specs
+                .slice(0, 3)
+                .map((s) => `${s.label}: ${s.value}`)
+                .join(" • ")}
+            </p>
+          )}
+
           <div className="mt-5 grid grid-cols-3 gap-3">
             {[
-              { icon: Calendar, label: "Ano", value: String(item.year ?? "–") },
-              { icon: Clock, label: "Horas", value: item.hours.toLocaleString("pt-BR") },
+              ...(item.year ? [{ icon: Calendar, label: "Ano", value: String(item.year) }] : []),
+              ...(item.hours > 0
+                ? [{ icon: Clock, label: "Horas", value: item.hours.toLocaleString("pt-BR") }]
+                : []),
               { icon: MapPin, label: "Local", value: `${item.city}/${item.state}` },
             ].map((s) => (
               <div

@@ -97,13 +97,27 @@ export function EquipmentCard({
             {formatPrice(item.price, item.mode, item.rental_period)}
           </p>
 
+          {item.specs.length > 0 && (
+            <div className="mt-2 flex flex-wrap gap-x-3 gap-y-1 text-xs text-muted-foreground">
+              {item.specs.slice(0, 2).map((s, i) => (
+                <span key={i} className="line-clamp-1">
+                  <span className="font-medium text-foreground">{s.label}:</span> {s.value}
+                </span>
+              ))}
+            </div>
+          )}
+
           <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1.5 text-xs text-muted-foreground">
-            <span className="flex items-center gap-1">
-              <Calendar className="h-3.5 w-3.5" /> {item.year}
-            </span>
-            <span className="flex items-center gap-1">
-              <Clock className="h-3.5 w-3.5" /> {item.hours.toLocaleString("pt-BR")} h
-            </span>
+            {!!item.year && (
+              <span className="flex items-center gap-1">
+                <Calendar className="h-3.5 w-3.5" /> {item.year}
+              </span>
+            )}
+            {item.hours > 0 && (
+              <span className="flex items-center gap-1">
+                <Clock className="h-3.5 w-3.5" /> {item.hours.toLocaleString("pt-BR")} h
+              </span>
+            )}
             <span className="flex items-center gap-1">
               <MapPin className="h-3.5 w-3.5" /> {item.city}, {item.state}
             </span>
