@@ -92,3 +92,53 @@ export const generateListingDraft = createServerFn({ method: "POST" })
     }
     return response.output_parsed;
   });
+
+const SpecSuggestionSchema = z.object({
+  specs: z
+    .array(z.object({ label: z.string(), placeholder: z.string() }))
+    .max(8)
+    .describe(
+      "At most 8 relevant technical spec field labels for this specific item type — only the most " +
+        "important ones a buyer would actually need to decide, most important first. Each with a short " +
+        "example placeholder value in Portuguese.",
+    ),
+});
+
+export type SpecSuggestion = z.infer<typeof SpecSuggestionSchema>["specs"];
+
+/** Text-only, no image: suggests which technical fields to ask for, based on category + item name. */
+export const suggestSpecFields = createServerFn({ method: "POST" })
+  .validator((data: { categoryName: string; itemName: string }) => data)
+  .handler(async ({ data }): Promise<SpecSuggestion> => {
+    const apiKey = process.env.OPENAI_API_KEY;
+    if (!apiKey) {
+      throw new Error("OPENAI_API_KEY não configurada no servidor.");
+    }
+    if (!data.itemName.trim()) {
+      throw new Error("Informe o título do anúncio primeiro.");
+    }
+
+    const client = new OpenAI({ apiKey });
+    const response = await client.responses.parse({
+      model: "gpt-5.6-luna",
+      instructions:
+        "Você é um especialista técnico em máquinas, peças e ferramentas de engenharia geotécnica " +
+        "e construção pesada. Dado o tipo de item que alguém está anunciando, sugira quais campos " +
+        "técnicos específicos fariam sentido perguntar para ESSE tipo de item — não uma lista genérica. " +
+        "Exemplo: para uma célula de carga, sugira capacidade nominal, precisão, indicador utilizado, " +
+        "última calibração; para uma bomba hidráulica, sugira vazão, pressão, cilindrada, flange, eixo, " +
+        "equipamento de origem. Responda sempre em português do Brasil.",
+      input: [
+        {
+          role: "user",
+          content: `Categoria: ${data.categoryName}\nO que está sendo vendido: "${data.itemName}"\n\nSugira os campos técnicos.`,
+        },
+      ],
+      text: { format: zodTextFormat(SpecSuggestionSchema, "spec_suggestion") },
+    });
+
+    if (!response.output_parsed) {
+      throw new Error("Não foi possível sugerir campos. Tente novamente.");
+    }
+    return response.output_parsed.specs;
+  });

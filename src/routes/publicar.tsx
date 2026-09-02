@@ -32,7 +32,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useAuth } from "@/components/auth-provider";
 import { createEquipment, fetchCategories, fetchMyCompany } from "@/lib/queries";
 import { uploadEquipmentImages } from "@/lib/equipment-images";
-import { generateListingDraft } from "@/lib/ai-listing";
+import { generateListingDraft, suggestSpecFields } from "@/lib/ai-listing";
 import { computeListingQuality } from "@/lib/listing-quality";
 import { ListingQualityMeter } from "@/components/listing-quality-meter";
 import { brands, states } from "@/lib/mock-data";
@@ -207,6 +207,28 @@ function Publicar() {
       if (filledSpecs.length > 0) setSpecs(filledSpecs);
       setAiMissingInfo(draft.missing_info);
       setStep(1);
+    },
+  });
+
+  const specSuggest = useMutation({
+    mutationFn: () => {
+      const categoryName =
+        form.category === "outros"
+          ? customCategory.trim() || "Outros"
+          : (categories.find((c) => c.slug === form.category)?.name ?? "");
+      return suggestSpecFields({ data: { categoryName, itemName: form.title } });
+    },
+    onSuccess: (suggested) => {
+      setSpecs((current) => {
+        const existingLabels = new Set(
+          current.filter((s) => s.label.trim()).map((s) => s.label.trim().toLowerCase()),
+        );
+        const newRows = suggested
+          .filter((s) => !existingLabels.has(s.label.trim().toLowerCase()))
+          .map((s) => ({ label: s.label, value: "" }));
+        const base = current.filter((s) => s.label.trim() || s.value.trim());
+        return [...base, ...newRows];
+      });
     },
   });
 
@@ -625,16 +647,36 @@ function Publicar() {
             <div className="space-y-2 border-t border-border pt-4">
               <div className="flex items-center justify-between">
                 <Label>Especificações técnicas (opcional)</Label>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  className="gap-1"
-                  onClick={() => setSpecs((s) => [...s, { label: "", value: "" }])}
-                >
-                  <Plus className="h-3.5 w-3.5" /> Adicionar
-                </Button>
+                <div className="flex gap-1.5">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className="gap-1"
+                    disabled={!form.title.trim() || specSuggest.isPending}
+                    onClick={() => specSuggest.mutate()}
+                  >
+                    <Wand2 className="h-3.5 w-3.5" />
+                    {specSuggest.isPending ? "Sugerindo..." : "Sugerir com IA"}
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className="gap-1"
+                    onClick={() => setSpecs((s) => [...s, { label: "", value: "" }])}
+                  >
+                    <Plus className="h-3.5 w-3.5" /> Adicionar
+                  </Button>
+                </div>
               </div>
+              {specSuggest.isError && (
+                <p className="text-sm text-destructive">
+                  {specSuggest.error instanceof Error
+                    ? specSuggest.error.message
+                    : "Não foi possível sugerir campos."}
+                </p>
+              )}
               <div className="space-y-2">
                 {specs.map((spec, i) => (
                   <div key={i} className="flex gap-2">
