@@ -15,6 +15,7 @@ import {
   Plus,
   Wand2,
   AlertTriangle,
+  Camera,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -121,6 +122,7 @@ function Publicar() {
   const [aiNote, setAiNote] = useState("");
   const [aiMissingInfo, setAiMissingInfo] = useState<string[]>([]);
   const aiFileInputRef = useRef<HTMLInputElement>(null);
+  const aiCameraInputRef = useRef<HTMLInputElement>(null);
 
   function set<K extends keyof typeof form>(key: K, value: (typeof form)[K]) {
     setForm((f) => ({ ...f, [key]: value }));
@@ -355,6 +357,20 @@ function Publicar() {
                   e.target.value = "";
                 }}
               />
+              <input
+                ref={aiCameraInputRef}
+                type="file"
+                accept="image/*"
+                capture="environment"
+                className="hidden"
+                onChange={(e) => {
+                  const incoming = Array.from(e.target.files ?? []).filter((f) =>
+                    f.type.startsWith("image/"),
+                  );
+                  setAiPhotos((prev) => [...prev, ...incoming].slice(0, 4));
+                  e.target.value = "";
+                }}
+              />
 
               <div className="mt-3 flex flex-wrap gap-2">
                 {aiPhotos.map((file, i) => (
@@ -375,13 +391,24 @@ function Publicar() {
                   </div>
                 ))}
                 {aiPhotos.length < 4 && (
-                  <button
-                    type="button"
-                    onClick={() => aiFileInputRef.current?.click()}
-                    className="flex h-16 w-16 items-center justify-center rounded-lg border-2 border-dashed border-border text-muted-foreground hover:border-primary/50 hover:text-primary"
-                  >
-                    <Upload className="h-4 w-4" />
-                  </button>
+                  <>
+                    <button
+                      type="button"
+                      onClick={() => aiCameraInputRef.current?.click()}
+                      className="flex h-16 w-16 flex-col items-center justify-center gap-1 rounded-lg border-2 border-dashed border-border text-muted-foreground hover:border-primary/50 hover:text-primary"
+                    >
+                      <Camera className="h-4 w-4" />
+                      <span className="text-[10px] leading-none">Câmera</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => aiFileInputRef.current?.click()}
+                      className="flex h-16 w-16 flex-col items-center justify-center gap-1 rounded-lg border-2 border-dashed border-border text-muted-foreground hover:border-primary/50 hover:text-primary"
+                    >
+                      <Upload className="h-4 w-4" />
+                      <span className="text-[10px] leading-none">Galeria</span>
+                    </button>
+                  </>
                 )}
               </div>
 
