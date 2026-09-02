@@ -51,6 +51,7 @@ function EditarEquipamento() {
     status: "active" as "active" | "paused" | "removed",
   });
   const [specs, setSpecs] = useState<{ label: string; value: string }[]>([]);
+  const [compatibleWithText, setCompatibleWithText] = useState("");
   const [saved, setSaved] = useState(false);
 
   useEffect(() => {
@@ -71,6 +72,7 @@ function EditarEquipamento() {
         status: item.status,
       });
       setSpecs(item.specs.length > 0 ? item.specs : [{ label: "", value: "" }]);
+      setCompatibleWithText(item.compatible_with.join(", "));
     }
   }, [item]);
 
@@ -95,6 +97,10 @@ function EditarEquipamento() {
         description: form.description,
         status: form.status,
         specs: specs.filter((s) => s.label.trim() && s.value.trim()),
+        compatible_with: compatibleWithText
+          .split(",")
+          .map((s) => s.trim())
+          .filter(Boolean),
       }),
     onSuccess: () => {
       setSaved(true);
@@ -129,6 +135,10 @@ function EditarEquipamento() {
     condition: form.condition,
     photosCount: item.images.length,
     specs,
+    compatibleWith: compatibleWithText
+      .split(",")
+      .map((s) => s.trim())
+      .filter(Boolean),
   });
 
   return (
@@ -272,6 +282,17 @@ function EditarEquipamento() {
               </Button>
             </div>
           ))}
+        </div>
+        <div className="space-y-2">
+          <Label>Compatível com</Label>
+          <Input
+            placeholder="Ex: Doosan DX225, Doosan DX225LC"
+            value={compatibleWithText}
+            onChange={(e) => setCompatibleWithText(e.target.value)}
+          />
+          <p className="text-xs text-muted-foreground">
+            Modelos de máquina/equipamento em que essa peça encaixa, separados por vírgula.
+          </p>
         </div>
         <div className="space-y-2">
           <Label>Modalidade</Label>

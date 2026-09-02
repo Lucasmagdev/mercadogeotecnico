@@ -412,6 +412,22 @@ function EquipmentDetail() {
               </div>
             ))}
           </div>
+
+          {item.compatible_with.length > 0 && (
+            <div className="mt-5">
+              <h3 className="text-sm font-semibold text-muted-foreground">Compatível com</h3>
+              <div className="mt-2 flex flex-wrap gap-1.5">
+                {item.compatible_with.map((m) => (
+                  <span
+                    key={m}
+                    className="rounded-full bg-muted px-2.5 py-1 text-xs font-medium text-foreground"
+                  >
+                    {m}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       </div>
 

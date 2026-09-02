@@ -40,6 +40,13 @@ import { slugify } from "@/lib/utils";
 
 const AI_MAX_DIM = 1280;
 
+function parseCompatibleWith(text: string): string[] {
+  return text
+    .split(",")
+    .map((s) => s.trim())
+    .filter(Boolean);
+}
+
 function resizeImageToBase64(file: File): Promise<{ mediaType: "image/jpeg"; base64: string }> {
   return new Promise((resolve, reject) => {
     const img = new Image();
@@ -116,6 +123,7 @@ function Publicar() {
   const [customCategory, setCustomCategory] = useState("");
   const [customBrand, setCustomBrand] = useState("");
   const [specs, setSpecs] = useState<Spec[]>([{ label: "", value: "" }]);
+  const [compatibleWithText, setCompatibleWithText] = useState("");
   const [photos, setPhotos] = useState<File[]>([]);
   const [done, setDone] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -164,6 +172,7 @@ function Publicar() {
         image_key: imagePaths.length > 0 ? null : "excavator",
         images: imagePaths,
         specs: cleanSpecs,
+        compatible_with: parseCompatibleWith(compatibleWithText),
       });
       return slug;
     },
@@ -201,10 +210,9 @@ function Publicar() {
       }
       const extraSpecs: Spec[] = [];
       if (draft.part_number) extraSpecs.push({ label: "Part Number", value: draft.part_number });
-      if (draft.compatible_with.length > 0)
-        extraSpecs.push({ label: "Compatível com", value: draft.compatible_with.join(", ") });
       const filledSpecs = [...draft.specs, ...extraSpecs].filter((s) => s.label && s.value);
       if (filledSpecs.length > 0) setSpecs(filledSpecs);
+      if (draft.compatible_with.length > 0) setCompatibleWithText(draft.compatible_with.join(", "));
       setAiMissingInfo(draft.missing_info);
       setStep(1);
     },
@@ -243,6 +251,7 @@ function Publicar() {
     condition: form.condition,
     photosCount: photos.length,
     specs,
+    compatibleWith: parseCompatibleWith(compatibleWithText),
   });
 
   const progress = ((step + 1) / steps.length) * 100;
@@ -711,6 +720,19 @@ function Publicar() {
                   </div>
                 ))}
               </div>
+            </div>
+
+            <div className="space-y-2 border-t border-border pt-4">
+              <Label>Compatível com (opcional)</Label>
+              <Input
+                placeholder="Ex: Doosan DX225, Doosan DX225LC"
+                value={compatibleWithText}
+                onChange={(e) => setCompatibleWithText(e.target.value)}
+              />
+              <p className="text-xs text-muted-foreground">
+                Modelos de máquina/equipamento em que essa peça é conhecida por encaixar. Separe por
+                vírgula — isso ajuda compradores a te encontrar buscando pela máquina deles.
+              </p>
             </div>
           </div>
         )}

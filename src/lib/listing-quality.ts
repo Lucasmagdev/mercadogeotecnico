@@ -11,6 +11,7 @@ export type ListingQualityInput = {
   condition: string;
   photosCount: number;
   specs: Spec[];
+  compatibleWith: string[];
 };
 
 export type ListingQuality = {
@@ -44,7 +45,7 @@ export function computeListingQuality(input: ListingQualityInput): ListingQualit
       suggestion: "Informe o Part Number / código da peça",
     },
     {
-      ok: hasSpecMatching(input.specs, ["compatível", "compatibilidade"]),
+      ok: input.compatibleWith.length > 0,
       suggestion: "Informe com quais equipamentos/máquinas essa peça é compatível",
     },
   ];

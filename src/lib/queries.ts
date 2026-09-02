@@ -177,6 +177,7 @@ export async function createEquipment(payload: {
   image_key: string | null;
   images: string[];
   specs: { label: string; value: string }[];
+  compatible_with: string[];
 }) {
   const { error } = await supabase.from("equipment").insert(payload);
   if (error) throw error;
@@ -284,6 +285,7 @@ export async function updateEquipment(
     description: string;
     status: "active" | "paused" | "removed";
     specs: { label: string; value: string }[];
+    compatible_with: string[];
   }>,
 ) {
   const { error } = await supabase.from("equipment").update(patch).eq("id", id);

@@ -63,6 +63,7 @@ export type EquipmentRow = {
   image_key: string | null;
   description: string | null;
   specs: { label: string; value: string }[];
+  compatible_with: string[];
   images: string[];
   status: "active" | "paused" | "removed";
   views: number;
