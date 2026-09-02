@@ -16,6 +16,8 @@ import {
   Wand2,
   AlertTriangle,
   Camera,
+  Mic,
+  Square,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -33,7 +35,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { useAuth } from "@/components/auth-provider";
 import { createEquipment, fetchCategories, fetchMyCompany } from "@/lib/queries";
 import { uploadEquipmentImages } from "@/lib/equipment-images";
-import { generateListingDraft, suggestSpecFields } from "@/lib/ai-listing";
+import { generateListingDraft, suggestSpecFields, transcribeVoiceNote } from "@/lib/ai-listing";
 import { computeListingQuality } from "@/lib/listing-quality";
 import { ListingQualityMeter } from "@/components/listing-quality-meter";
 import { brands, states } from "@/lib/mock-data";
@@ -46,6 +48,15 @@ function parseCompatibleWith(text: string): string[] {
     .split(",")
     .map((s) => s.trim())
     .filter(Boolean);
+}
+
+function blobToBase64(blob: Blob): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve((reader.result as string).split(",")[1]);
+    reader.onerror = () => reject(new Error("Não foi possível ler o áudio"));
+    reader.readAsDataURL(blob);
+  });
 }
 
 function resizeImageToBase64(file: File): Promise<{ mediaType: "image/jpeg"; base64: string }> {
@@ -138,6 +149,13 @@ function Publicar() {
   const aiFileInputRef = useRef<HTMLInputElement>(null);
   const aiCameraInputRef = useRef<HTMLInputElement>(null);
 
+  const [isRecording, setIsRecording] = useState(false);
+  const [recordSeconds, setRecordSeconds] = useState(0);
+  const [recordError, setRecordError] = useState("");
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const recordedChunksRef = useRef<Blob[]>([]);
+  const recordTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
   function set<K extends keyof typeof form>(key: K, value: (typeof form)[K]) {
     setForm((f) => ({ ...f, [key]: value }));
   }
@@ -185,6 +203,47 @@ function Publicar() {
     },
     onSuccess: () => setDone(true),
   });
+
+  const voiceNote = useMutation({
+    mutationFn: async (blob: Blob) => {
+      const base64 = await blobToBase64(blob);
+      return transcribeVoiceNote({ data: { mediaType: blob.type || "audio/webm", base64 } });
+    },
+    onSuccess: (text) => {
+      setAiNote((prev) => (prev.trim() ? `${prev.trim()} ${text}` : text));
+    },
+  });
+
+  async function startRecording() {
+    setRecordError("");
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const recorder = new MediaRecorder(stream);
+      recordedChunksRef.current = [];
+      recorder.ondataavailable = (e) => {
+        if (e.data.size > 0) recordedChunksRef.current.push(e.data);
+      };
+      recorder.onstop = () => {
+        stream.getTracks().forEach((t) => t.stop());
+        const blob = new Blob(recordedChunksRef.current, { type: recorder.mimeType });
+        voiceNote.mutate(blob);
+      };
+      recorder.start();
+      mediaRecorderRef.current = recorder;
+      setIsRecording(true);
+      setRecordSeconds(0);
+      recordTimerRef.current = setInterval(() => setRecordSeconds((s) => s + 1), 1000);
+    } catch {
+      setRecordError("Não foi possível acessar o microfone. Verifique a permissão do navegador.");
+    }
+  }
+
+  function stopRecording() {
+    mediaRecorderRef.current?.stop();
+    mediaRecorderRef.current = null;
+    setIsRecording(false);
+    if (recordTimerRef.current) clearInterval(recordTimerRef.current);
+  }
 
   const aiGenerate = useMutation({
     mutationFn: async () => {
@@ -474,10 +533,45 @@ function Publicar() {
               <Textarea
                 className="mt-3"
                 rows={2}
-                placeholder='Opcional: "Era de uma Doosan 225, estava funcionando quando tiramos."'
+                placeholder='Opcional: "Era de uma Doosan 225, estava funcionando quando tiramos." Ou grave por voz:'
                 value={aiNote}
                 onChange={(e) => setAiNote(e.target.value)}
               />
+
+              <div className="mt-2 flex items-center gap-2">
+                {!isRecording ? (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className="gap-1.5"
+                    disabled={voiceNote.isPending}
+                    onClick={startRecording}
+                  >
+                    <Mic className="h-3.5 w-3.5" />
+                    {voiceNote.isPending ? "Transcrevendo..." : "Gravar observação"}
+                  </Button>
+                ) : (
+                  <Button
+                    type="button"
+                    variant="destructive"
+                    size="sm"
+                    className="gap-1.5"
+                    onClick={stopRecording}
+                  >
+                    <Square className="h-3 w-3" />
+                    Parar ({Math.floor(recordSeconds / 60)}:{String(recordSeconds % 60).padStart(2, "0")})
+                  </Button>
+                )}
+              </div>
+              {recordError && <p className="mt-1 text-sm text-destructive">{recordError}</p>}
+              {voiceNote.isError && (
+                <p className="mt-1 text-sm text-destructive">
+                  {voiceNote.error instanceof Error
+                    ? voiceNote.error.message
+                    : "Não foi possível transcrever o áudio."}
+                </p>
+              )}
 
               {aiGenerate.isError && (
                 <p className="mt-2 text-sm text-destructive">
@@ -490,11 +584,11 @@ function Publicar() {
               <Button
                 type="button"
                 className="mt-3 gap-1.5"
-                disabled={aiPhotos.length === 0 || aiGenerate.isPending}
+                disabled={(aiPhotos.length === 0 && !aiNote.trim()) || aiGenerate.isPending}
                 onClick={() => aiGenerate.mutate()}
               >
                 <Wand2 className="h-4 w-4" />
-                {aiGenerate.isPending ? "Analisando fotos..." : "Gerar rascunho com IA"}
+                {aiGenerate.isPending ? "Analisando..." : "Gerar rascunho com IA"}
               </Button>
             </div>
           </div>

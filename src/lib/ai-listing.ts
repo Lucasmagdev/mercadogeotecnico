@@ -1,5 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
-import OpenAI from "openai";
+import OpenAI, { toFile } from "openai";
 import { z } from "zod";
 import { zodTextFormat } from "openai/helpers/zod";
 
@@ -43,8 +43,8 @@ export const generateListingDraft = createServerFn({ method: "POST" })
     if (!apiKey) {
       throw new Error("OPENAI_API_KEY não configurada no servidor.");
     }
-    if (data.images.length === 0) {
-      throw new Error("Envie ao menos uma foto.");
+    if (data.images.length === 0 && !data.note.trim()) {
+      throw new Error("Envie ao menos uma foto ou grave/escreva uma observação.");
     }
 
     const client = new OpenAI({ apiKey });
@@ -55,12 +55,13 @@ export const generateListingDraft = createServerFn({ method: "POST" })
       model: "gpt-5.6-terra",
       instructions:
         "Você é um especialista técnico em máquinas, peças e ferramentas de engenharia geotécnica " +
-        "e construção pesada. Analise as fotos de uma peça/equipamento à venda (incluindo qualquer " +
-        "plaqueta de identificação visível) e extraia informações estruturadas para montar um anúncio. " +
-        "Se não conseguir identificar algo com confiança, use string vazia (\"\") ou array vazio — nunca " +
-        "invente dados nem escreva texto tipo \"não identificado\" ou \"não disponível\" nos campos; " +
-        "esses casos de incerteza vão em missing_info, não nos campos de dados. Responda sempre em " +
-        "português do Brasil.",
+        "e construção pesada. Analise as fotos (se houver) de uma peça/equipamento à venda (incluindo " +
+        "qualquer plaqueta de identificação visível) e/ou a observação do vendedor (que pode vir de um " +
+        "áudio transcrito, então pode ter erros de transcrição — interprete pelo contexto) e extraia " +
+        "informações estruturadas para montar um anúncio. Se não conseguir identificar algo com " +
+        "confiança, use string vazia (\"\") ou array vazio — nunca invente dados nem escreva texto tipo " +
+        "\"não identificado\" ou \"não disponível\" nos campos; esses casos de incerteza vão em " +
+        "missing_info, não nos campos de dados. Responda sempre em português do Brasil.",
       input: [
         {
           role: "user",
@@ -76,10 +77,10 @@ export const generateListingDraft = createServerFn({ method: "POST" })
               type: "input_text",
               text:
                 `Categorias válidas (use exatamente um destes slugs): ${categoryList}\n\n` +
-                (data.note.trim()
-                  ? `Observação do vendedor: "${data.note.trim()}"\n\n`
-                  : "") +
-                "Analise as fotos e monte o rascunho do anúncio.",
+                (data.note.trim() ? `Observação do vendedor: "${data.note.trim()}"\n\n` : "") +
+                (images.length > 0
+                  ? "Analise as fotos e monte o rascunho do anúncio."
+                  : "Monte o rascunho do anúncio com base na observação do vendedor."),
             },
           ],
         },
@@ -141,4 +142,39 @@ export const suggestSpecFields = createServerFn({ method: "POST" })
       throw new Error("Não foi possível sugerir campos. Tente novamente.");
     }
     return response.output_parsed.specs;
+  });
+
+const AUDIO_EXTENSION_BY_MIME: Record<string, string> = {
+  "audio/webm": "webm",
+  "audio/ogg": "ogg",
+  "audio/mp4": "mp4",
+  "audio/mpeg": "mp3",
+  "audio/wav": "wav",
+  "audio/x-wav": "wav",
+};
+
+/** Transcribes a voice note recorded in the browser, for the cadastro-por-voz flow. */
+export const transcribeVoiceNote = createServerFn({ method: "POST" })
+  .validator((data: { mediaType: string; base64: string }) => data)
+  .handler(async ({ data }): Promise<string> => {
+    const apiKey = process.env.OPENAI_API_KEY;
+    if (!apiKey) {
+      throw new Error("OPENAI_API_KEY não configurada no servidor.");
+    }
+    if (!data.base64) {
+      throw new Error("Áudio vazio.");
+    }
+
+    const client = new OpenAI({ apiKey });
+    const extension = AUDIO_EXTENSION_BY_MIME[data.mediaType] ?? "webm";
+    const buffer = Buffer.from(data.base64, "base64");
+    const file = await toFile(buffer, `voice-note.${extension}`, { type: data.mediaType });
+
+    const transcription = await client.audio.transcriptions.create({
+      file,
+      model: "gpt-4o-mini-transcribe",
+      language: "pt",
+    });
+
+    return transcription.text;
   });
