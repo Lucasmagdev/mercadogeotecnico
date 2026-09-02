@@ -14,6 +14,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
 import { fetchCategories, fetchEquipmentById, updateEquipment } from "@/lib/queries";
 import { computeListingQuality } from "@/lib/listing-quality";
@@ -52,6 +53,9 @@ function EditarEquipamento() {
   });
   const [specs, setSpecs] = useState<{ label: string; value: string }[]>([]);
   const [compatibleWithText, setCompatibleWithText] = useState("");
+  const [hasInvoice, setHasInvoice] = useState(false);
+  const [hasCalibrationCert, setHasCalibrationCert] = useState(false);
+  const [maintenanceHistoryInformed, setMaintenanceHistoryInformed] = useState(false);
   const [saved, setSaved] = useState(false);
 
   useEffect(() => {
@@ -73,6 +77,9 @@ function EditarEquipamento() {
       });
       setSpecs(item.specs.length > 0 ? item.specs : [{ label: "", value: "" }]);
       setCompatibleWithText(item.compatible_with.join(", "));
+      setHasInvoice(item.has_invoice);
+      setHasCalibrationCert(item.has_calibration_cert);
+      setMaintenanceHistoryInformed(item.maintenance_history_informed);
     }
   }, [item]);
 
@@ -101,6 +108,9 @@ function EditarEquipamento() {
           .split(",")
           .map((s) => s.trim())
           .filter(Boolean),
+        has_invoice: hasInvoice,
+        has_calibration_cert: hasCalibrationCert,
+        maintenance_history_informed: maintenanceHistoryInformed,
       }),
     onSuccess: () => {
       setSaved(true);
@@ -293,6 +303,27 @@ function EditarEquipamento() {
           <p className="text-xs text-muted-foreground">
             Modelos de máquina/equipamento em que essa peça encaixa, separados por vírgula.
           </p>
+        </div>
+        <div className="space-y-2 border-t border-border pt-4">
+          <Label>Selos de confiança</Label>
+          <label className="flex items-center gap-2 text-sm">
+            <Checkbox checked={hasInvoice} onCheckedChange={(v) => setHasInvoice(v === true)} />
+            Tenho nota fiscal disponível
+          </label>
+          <label className="flex items-center gap-2 text-sm">
+            <Checkbox
+              checked={hasCalibrationCert}
+              onCheckedChange={(v) => setHasCalibrationCert(v === true)}
+            />
+            Tenho certificado de calibração disponível
+          </label>
+          <label className="flex items-center gap-2 text-sm">
+            <Checkbox
+              checked={maintenanceHistoryInformed}
+              onCheckedChange={(v) => setMaintenanceHistoryInformed(v === true)}
+            />
+            Informei o histórico de manutenção
+          </label>
         </div>
         <div className="space-y-2">
           <Label>Modalidade</Label>

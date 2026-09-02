@@ -29,6 +29,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Checkbox } from "@/components/ui/checkbox";
 import { useAuth } from "@/components/auth-provider";
 import { createEquipment, fetchCategories, fetchMyCompany } from "@/lib/queries";
 import { uploadEquipmentImages } from "@/lib/equipment-images";
@@ -124,6 +125,9 @@ function Publicar() {
   const [customBrand, setCustomBrand] = useState("");
   const [specs, setSpecs] = useState<Spec[]>([{ label: "", value: "" }]);
   const [compatibleWithText, setCompatibleWithText] = useState("");
+  const [hasInvoice, setHasInvoice] = useState(false);
+  const [hasCalibrationCert, setHasCalibrationCert] = useState(false);
+  const [maintenanceHistoryInformed, setMaintenanceHistoryInformed] = useState(false);
   const [photos, setPhotos] = useState<File[]>([]);
   const [done, setDone] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -173,6 +177,9 @@ function Publicar() {
         images: imagePaths,
         specs: cleanSpecs,
         compatible_with: parseCompatibleWith(compatibleWithText),
+        has_invoice: hasInvoice,
+        has_calibration_cert: hasCalibrationCert,
+        maintenance_history_informed: maintenanceHistoryInformed,
       });
       return slug;
     },
@@ -900,6 +907,31 @@ function Publicar() {
             </div>
 
             <ListingQualityMeter quality={listingQuality} />
+
+            <div className="space-y-2.5 rounded-2xl border border-border bg-card p-5 text-left">
+              <p className="font-semibold">Selos de confiança (opcional)</p>
+              <p className="text-sm text-muted-foreground">
+                Marque só o que for verdade — isso aparece como selo no anúncio.
+              </p>
+              <label className="flex items-center gap-2 text-sm">
+                <Checkbox checked={hasInvoice} onCheckedChange={(v) => setHasInvoice(v === true)} />
+                Tenho nota fiscal disponível
+              </label>
+              <label className="flex items-center gap-2 text-sm">
+                <Checkbox
+                  checked={hasCalibrationCert}
+                  onCheckedChange={(v) => setHasCalibrationCert(v === true)}
+                />
+                Tenho certificado de calibração disponível
+              </label>
+              <label className="flex items-center gap-2 text-sm">
+                <Checkbox
+                  checked={maintenanceHistoryInformed}
+                  onCheckedChange={(v) => setMaintenanceHistoryInformed(v === true)}
+                />
+                Informei o histórico de manutenção (na descrição/specs)
+              </label>
+            </div>
 
             <div className="text-center">
             {submit.isError && (

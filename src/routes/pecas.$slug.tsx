@@ -22,6 +22,7 @@ import { CompanyAvatar } from "@/components/company-avatar";
 import { Textarea } from "@/components/ui/textarea";
 import { EquipmentCard } from "@/components/equipment-card";
 import { GeoSelosVerification } from "@/components/geoselos-verification";
+import { ListingTrustBadges } from "@/components/listing-trust-badges";
 import { useAuth } from "@/components/auth-provider";
 import { useFavoriteToggle } from "@/hooks/use-favorite";
 import {
@@ -241,6 +242,10 @@ function EquipmentDetail() {
                 .join(" • ")}
             </p>
           )}
+
+          <div className="mt-3">
+            <ListingTrustBadges item={item} />
+          </div>
 
           <div className="mt-5 grid grid-cols-3 gap-3">
             {[

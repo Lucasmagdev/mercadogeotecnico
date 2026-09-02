@@ -64,6 +64,9 @@ export type EquipmentRow = {
   description: string | null;
   specs: { label: string; value: string }[];
   compatible_with: string[];
+  has_invoice: boolean;
+  has_calibration_cert: boolean;
+  maintenance_history_informed: boolean;
   images: string[];
   status: "active" | "paused" | "removed";
   views: number;
