@@ -34,6 +34,7 @@ import { EquipmentBrowser } from "@/components/equipment-browser";
 import { GeoSelosVerification } from "@/components/geoselos-verification";
 import { VerifiedSeal } from "@/components/verified-seal";
 import { CompanyAvatar } from "@/components/company-avatar";
+import { HeroBackgroundVideo } from "@/components/hero-background-video";
 import { fetchApprovedCompanies, fetchCategories, fetchEquipmentList } from "@/lib/queries";
 import fundaffLogo from "@/assets/verified-companies/fundaff.jpg";
 import fastengeLogo from "@/assets/verified-companies/fastenge.png";
@@ -148,6 +149,7 @@ function Home() {
     <div>
       {/* Compact search band */}
       <section className="relative overflow-hidden border-b border-border bg-card">
+        <HeroBackgroundVideo />
         <div className="bg-grid-pattern pointer-events-none absolute inset-0" aria-hidden />
         <div
           className="pointer-events-none absolute -right-32 -top-32 h-80 w-80 rounded-full bg-primary/10 blur-3xl"
