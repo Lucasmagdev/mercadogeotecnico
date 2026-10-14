@@ -42,9 +42,9 @@ const columns = [
 export function SiteFooter() {
   return (
     <footer className="mt-24 border-t border-border bg-card">
-      <div className="container-page grid grid-cols-2 gap-10 py-14 md:grid-cols-[1.4fr_1fr_1fr_1fr_1fr]">
-        <div className="col-span-2 md:col-span-1">
-          <Logo />
+      <div className="container-page grid grid-cols-2 gap-10 py-14 md:grid-cols-4 xl:grid-cols-[1.4fr_1fr_1fr_1fr_1fr]">
+        <div className="col-span-2 md:col-span-4 xl:col-span-1">
+          <Logo size="large" />
           <p className="mt-4 max-w-xs text-sm text-muted-foreground">
             O almoxarife geotécnico digital do setor de engenharia. Compre, venda, alugue peças e
             conecte-se com fornecedores confiáveis.

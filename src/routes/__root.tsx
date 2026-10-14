@@ -19,7 +19,6 @@ import { MobileNav } from "@/components/mobile-nav";
 import { CookieConsent } from "@/components/cookie-consent";
 import { Toaster } from "@/components/ui/sonner";
 import { absoluteSiteUrl } from "@/lib/site-url";
-import heroMachineryUrl from "@/assets/hero-machinery.png";
 
 function NotFoundComponent() {
   return (
@@ -113,13 +112,14 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         property: "og:url",
         content: absoluteSiteUrl(matches[matches.length - 1]?.pathname || "/"),
       },
-      { property: "og:image", content: absoluteSiteUrl(heroMachineryUrl) },
+      { property: "og:image", content: absoluteSiteUrl("/brand/mercado-geotecnico-social.png") },
       {
         property: "og:image:alt",
-        content: "Ilustração de equipamentos de construção — Mercado Geotécnico",
+        content: "Mercado Geotécnico — peças, equipamentos e serviços para sua obra",
       },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "theme-color", content: "#0A1735" },
+      { name: "twitter:image", content: absoluteSiteUrl("/brand/mercado-geotecnico-social.png") },
+      { name: "theme-color", content: "#0A2540" },
     ],
     links: [
       { rel: "canonical", href: absoluteSiteUrl(matches[matches.length - 1]?.pathname || "/") },
@@ -130,7 +130,9 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         rel: "stylesheet",
         href: "https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800&family=Geist+Mono:wght@400;500&display=swap",
       },
-      { rel: "icon", href: "/favicon.svg", type: "image/svg+xml" },
+      { rel: "icon", href: "/favicon.ico", sizes: "32x32 48x48" },
+      { rel: "icon", href: "/brand/favicon-48.png", type: "image/png", sizes: "48x48" },
+      { rel: "apple-touch-icon", href: "/brand/apple-touch-icon.png", sizes: "180x180" },
     ],
   }),
   shellComponent: RootShell,
