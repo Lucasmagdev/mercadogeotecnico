@@ -12,7 +12,7 @@ export function Logo({
   return (
     <span className={`inline-flex shrink-0 items-center gap-2.5 ${className}`}>
       <span
-        className={`flex shrink-0 items-center justify-center rounded-xl bg-white ${large ? "h-14 w-14 p-1.5" : "h-10 w-10 p-1"}`}
+        className={`flex shrink-0 items-center justify-center bg-transparent ${large ? "h-14 w-14 p-1.5" : "h-10 w-10 p-1"}`}
       >
         <img
           src="/brand/mercado-geotecnico-symbol.png"

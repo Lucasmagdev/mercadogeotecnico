@@ -4,14 +4,14 @@ A referência aprovada é o símbolo G com perfuração vertical, detalhe laranj
 
 ## Aplicações
 
-- Cabeçalho e menu do celular: símbolo com base branca discreta e nome em duas linhas, mantendo espaço para os controles.
+- Cabeçalho e menu do celular: símbolo sobre fundo transparente e nome em duas linhas, mantendo espaço para os controles.
 - Rodapé: versão maior; grade adaptada para o nome não disputar espaço com as colunas em tablets.
 - Login: versão maior com nome branco sobre o painel azul, inclusive no tema claro.
 - Navegador: favicon atualizado em ICO, PNG e SVG com imagem incorporada; ícone Apple em 180 × 180 px.
 - Compartilhamento geral: imagem PNG de 1200 × 630 px com símbolo, nome e endereço. Os anúncios e empresas mantêm suas próprias imagens de compartilhamento.
 - Instagram: avatar de 512 × 512 px com margem branca para recorte circular. A conta não foi alterada.
 
-Arquivos de entrega em [public/brand](../../../public/brand). O componente compartilhado está em [logo.tsx](../../../src/components/logo.tsx). O símbolo não foi esticado nem recolorido; o fundo branco preserva contraste das camadas escuras nos dois temas. Os arquivos SVG/ICO de favicon incorporam raster e não são um vetor mestre da marca.
+Arquivos de entrega em [public/brand](../../../public/brand). O componente compartilhado está em [logo.tsx](../../../src/components/logo.tsx). O símbolo não foi esticado nem recolorido; o componente agora preserva a transparência real do PNG, sem base branca. Os arquivos SVG/ICO de favicon incorporam raster e não são um vetor mestre da marca.
 
 ## Prompt da extração
 
