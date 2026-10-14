@@ -2,6 +2,8 @@
 
 Diagnóstico em **14/10/2026**, horário de Brasília. Objetivo confirmado: **conquistar empresas para anunciar**. Participação como visitantes, com produto e presença digital preparados para conversas e contatos.
 
+**Estado atual:** código corrigido, gates locais e remotos aprovados, SQL aplicado e jornada real por API validada na prévia. A IA ainda retorna 503 e aguarda [configuração manual do Netlify](CONFIGURAR-NETLIFY.md). Confirmação e recuperação de senha chegaram à caixa de entrada; callback e jornada completa pela interface continuam pendentes. Veja [VALIDACAO-REMOTA.md](VALIDACAO-REMOTA.md). Os achados do diagnóstico abaixo registram o estado inicial.
+
 ## Decisão sobre a arquitetura
 
 **A arquitetura é adequada para um piloto B2B e para captar anunciantes na feira.** A recomendação é manter React/TanStack Start, Supabase e Netlify e concentrar as próximas semanas em segurança, ativação de empresas, confiança e uso pelo celular.
@@ -24,7 +26,7 @@ O anúncio precisa ter informações verdadeiras, foto identificável e canal de
 
 ## Backlog prioritário
 
-P0 = resolver antes de ampliar a divulgação. P1 = condição para convidar empresas para uso real. P2 = melhorar aquisição e experiência após o fluxo essencial estar confiável. Os achados de código abaixo ainda são correções pendentes; a observação em produção está identificada quando ocorreu.
+P0 = resolver antes de ampliar a divulgação. P1 = condição para convidar empresas para uso real. P2 = melhorar aquisição e experiência após o fluxo essencial estar confiável. A tabela abaixo preserva os achados iniciais; o estado de implementação e validação está nas atualizações deste plano e em [VALIDACAO-REMOTA.md](VALIDACAO-REMOTA.md).
 
 | Prioridade | Problema e impacto | Entrega mínima e prova de conclusão | Evidência |
 | --- | --- | --- | --- |
@@ -78,7 +80,7 @@ O backlog acima registra os problemas encontrados no diagnóstico inicial. A imp
 
 Você aplicou as migrações pelo painel, e a conferência pela API confirmou catálogo público sem contato, bloqueios anônimos e cotas configuradas. **Não reaplique o SQL.** As [instruções de publicação coordenada](APLICAR-SQL.md) continuam válidas para a próxima etapa: publicar o aplicativo compatível e validar o fluxo autenticado real. O agente não executou migração remota nem deploy.
 
-A tarefa de IA está registrada em [TAREFA-IA.md](TAREFA-IA.md); ver também [operação](OPERACAO.md) e [resultados](QA.md).
+A tarefa de IA está registrada em [TAREFA-IA.md](TAREFA-IA.md); ver também [operação](OPERACAO.md), [resultados locais](QA.md) e [validação remota atual](VALIDACAO-REMOTA.md). Banco, CI remoto, prévia e jornada autenticada por API passaram; IA na prévia retornou 503 e aguarda configuração do servidor. Produção e jornada em aparelho real ainda pendentes.
 
 ## Metas sugeridas para o piloto
 
@@ -112,4 +114,4 @@ A métrica central é **empresa ativada = aprovada + primeiro anúncio publicado
 - [Proposta de logo v1](marca/logo-conceito-v1.png) e [avatar v1](marca/avatar-instagram-v1.png).
 - Prompts e verificações das imagens: [logo](marca/logo-conceito-v1-prompt.md) e [avatar](marca/avatar-instagram-v1-prompt.md).
 
-As imagens são propostas raster para revisão; a etapa de finalização inclui vetor, versões claras/escuras e regras de uso. A conta Instagram ainda precisa ser criada/configurada pelo titular. As correções do primeiro ciclo foram implementadas no workspace e testadas no escopo descrito no QA; aplicação do banco, publicação e integração real permanecem pendentes.
+As imagens são propostas raster para revisão; a etapa de finalização inclui vetor, versões claras/escuras e regras de uso. A conta Instagram ainda precisa ser criada/configurada pelo titular. As correções do primeiro ciclo foram implementadas e testadas, o SQL foi aplicado e a integração real por API passou no escopo do relatório remoto. IA funcional na prévia, publicação no domínio principal e jornada completa pela interface permanecem pendentes.

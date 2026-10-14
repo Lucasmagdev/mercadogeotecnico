@@ -1,6 +1,6 @@
 # Tarefa: proteger assistência de IA e medir uso
 
-Aberta e implementada no primeiro ciclo de 14/10/2026. **Estado: implementação local; validação real pendente.**
+Aberta e implementada no primeiro ciclo de 14/10/2026. **Estado: código e cotas validados; função autenticada na prévia retorna 503 e aguarda configuração manual do Netlify. Provedor e custo real ainda pendentes.** Veja [CONFIGURAR-NETLIFY.md](CONFIGURAR-NETLIFY.md).
 
 ## Resultado esperado
 
@@ -27,9 +27,11 @@ As taxas sintéticas dos testes não são preços comerciais. Nenhuma chamada pa
 
 - [ ] Migração aplicada e segredos disponíveis apenas no servidor.
 - [ ] Anônimo, sessão inválida e empresa não aprovada recusados no domínio publicado.
-- [ ] Cota respeitada em chamadas concorrentes no Supabase real.
+- [x] Cota respeitada em chamadas concorrentes no Supabase real: sete reservas simultâneas, seis aceitas e uma recusada, sem chamar provedor pago; registros temporários removidos.
 - [ ] Uma execução controlada real registra duração, tokens/áudio e custo com preço verificado.
 - [ ] Falha de rede/limite/timeouts permite continuar manualmente com os dados já preenchidos.
 - [ ] Lucas recebe alertas operacionais de erros/cotas/orçamento pelo canal configurado.
 
 Configuração, limites e recuperação estão em [OPERACAO.md](OPERACAO.md). Aplicação manual em [APLICAR-SQL.md](APLICAR-SQL.md).
+
+Atualização: SQL aplicado e conferido; endpoints anônimos da prévia recusam com 401. A chamada autenticada da conta aprovada retornou 503, portanto a configuração do servidor e o funcionamento pago da IA ainda não estão validados. Ver [ensaio remoto](VALIDACAO-REMOTA.md).

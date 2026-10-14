@@ -2,6 +2,8 @@
 
 Atualizado em 14/10/2026, horário de São Paulo. Preparação para visitar a Megaobra em 24–26/11/2026, sem estande.
 
+**Estado mais recente:** migrações aplicadas pelo titular, CI remoto aprovado e prévia no ar. A jornada real de Auth/PostgREST passou com contas temporárias e limpeza. IA autenticada na prévia retornou 503 e aguarda conferir ambiente do Netlify. Evidências consolidadas em [VALIDACAO-REMOTA.md](VALIDACAO-REMOTA.md).
+
 ## Gate de código
 
 Ambiente reproduzível: Node 24.15.0 e Bun 1.3.14, com dependências no `bun.lock`. Bun executa os testes unitários; PGlite 0.5.9 foi acrescentado como dependência de desenvolvimento para executar SQL real em banco descartável.
@@ -21,7 +23,7 @@ bun run check
 
 O ESLint exclui somente `.codex-tmp/`, `.netlify/`, `dist/`, `outputs/`, `.output/` e `.vinxi/`, além das exclusões padrão de dependências do ESLint. Nenhum componente, rota, biblioteca ou arquivo gerado dentro de `src` foi excluído para esconder falhas.
 
-O workflow [check.yml](../../.github/workflows/check.yml) executa o mesmo comando em pushes e pull requests, com instalação congelada. Utiliza placeholders locais de Supabase, sem segredos de produção, e não publica o projeto. O arquivo local ainda precisa ser enviado ao repositório para existir uma execução real do GitHub Actions. As versões das ações seguem suas documentações oficiais: [checkout](https://github.com/actions/checkout), [setup-node](https://github.com/actions/setup-node) e [setup-bun](https://github.com/oven-sh/setup-bun).
+O workflow [check.yml](../../.github/workflows/check.yml) executa o mesmo comando em pushes e pull requests, com instalação congelada. Utiliza placeholders locais de Supabase, sem segredos de produção, e não publica o projeto. O código já foi enviado; os checks do push e da PR passaram, conforme [VALIDACAO-REMOTA.md](VALIDACAO-REMOTA.md). As versões das ações seguem suas documentações oficiais: [checkout](https://github.com/actions/checkout), [setup-node](https://github.com/actions/setup-node) e [setup-bun](https://github.com/oven-sh/setup-bun).
 
 As suítes SQL exercitam regras PostgreSQL/RLS reais, incluindo A/B/anônimo/admin. Auth/Storage são simulações mínimas no runner; os testes HTTP usam respostas sintéticas. Isso não substitui JWT/PostgREST/Storage/SMTP reais ou concorrência entre workers hospedados. Aprovar o gate não significa que as migrações foram aplicadas ou que o ambiente publicado está pronto.
 
@@ -33,10 +35,10 @@ As suítes SQL exercitam regras PostgreSQL/RLS reais, incluindo A/B/anônimo/adm
 | Docker | CLI disponível; Desktop foi iniciado, mas API do engine respondeu 500 e depois expirou | Supabase local completo não pôde ser usado; SQL foi executado em PGlite. |
 | CLI Supabase / psql / CLI Netlify | Não encontrados no PATH | Não houve dump nem aplicação de migração remota. |
 | Configuração Supabase local | `supabase/config.toml` ausente | Falta preparar ambiente isolado para integração. |
-| Vínculo Netlify | `.netlify/state.json` presente | Há vínculo local; não comprova acesso ao painel nem deploy atual. |
-| GitHub | CLI `gh` disponível | Autenticação, proteção de branch e execução remota de CI não verificadas. |
-| Credenciais | Utilizadas internamente para consultas remotas autorizadas e teste de e-mail | Nenhum segredo foi impresso ou copiado para documento. Views/cotas novas estão ausentes no banco remoto; conta controlada já confirmada. |
-| Painel Supabase | Sessão Chrome estava em organização com outros projetos; acesso ao identificador conectado redirecionou | Usuário escolheu aplicar o SQL manualmente pelo painel; agente não alterou banco remoto. |
+| Vínculo Netlify | Estado local presente, sem `siteId`; integração GitHub gerou a prévia do projeto `mercadogeotecnico` | Prévia validada; painel deslogado e publicação no domínio principal pendente. |
+| GitHub | CLI autenticada, permissão administrativa no repositório; PR em rascunho e dois checks remotos aprovados | Proteção de branch e merge/publicação ainda não foram executados. |
+| Credenciais | Utilizadas internamente para consultas, teste de e-mail e ensaio autenticado autorizado | Nenhum segredo impresso ou publicado. Views/cotas novas estão aplicadas; sessões e contas temporárias de QA foram encerradas/removidas. |
+| Painel Supabase | Sessão Chrome estava em organização com outros projetos; acesso ao identificador conectado redirecionou | Usuário aplicou o SQL manualmente; agente validou APIs e removeu os registros temporários do ensaio. |
 | Responsável | Lucas, `lucasemb999@gmail.com`, WhatsApp `5531991666106`, conforme autorizado | Contatos inseridos em suporte, aprovação, rodapé e política. |
 
 Nomes encontrados em `.env`: `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`, `keysender`, `OPENAI_API_KEY`. Nome encontrado em `.env.local`: `SUPABASE_SERVICE_ROLE_KEY`. Não foram encontrados nomes de conexão direta PostgreSQL, SMTP ou monitoramento nos arquivos inspecionados. Presença de um nome não comprova validade, permissões, entrega de e-mail ou configuração equivalente no Netlify.
@@ -55,7 +57,7 @@ O primeiro ciclo passa a exigir sessão válida, empresa aprovada e reserva dur�
 
 Formato de `AI_MODEL_PRICES_JSON`: objeto `modelo -> { inputUsdPerMillion, cachedInputUsdPerMillion?, outputUsdPerMillion, audioUsdPerMinute? }`. Preencher com preços oficiais verificados na data da operação. Sem preço/uso compatível, custo estimado deve permanecer desconhecido; não tratar ausência como custo zero.
 
-A migração [20261014000002_ai_request_limits.sql](../../supabase/migrations/20261014000002_ai_request_limits.sql) define `ai_limits`, `ai_request_usage`, `reserve_ai_request` e `finish_ai_request`, com acesso privilegiado restrito ao servidor. Defaults locais do SQL: 6 requisições/minuto por usuário, 60 unidades/dia por usuário e 1.200 unidades/dia global, com virada diária em UTC. São unidades operacionais, não dólares. O controle `ai_limits.enabled` permite suspender a assistência. Aplicação da migração em produção e ensaio desse controle permanecem pendentes.
+A migração [20261014000002_ai_request_limits.sql](../../supabase/migrations/20261014000002_ai_request_limits.sql) define `ai_limits`, `ai_request_usage`, `reserve_ai_request` e `finish_ai_request`, com acesso privilegiado restrito ao servidor. Foi aplicada pelo titular e conferida no projeto conectado: 6 requisições/minuto por usuário, 60 unidades/dia por usuário e 1.200 unidades/dia global, com virada diária em UTC. São unidades operacionais, não dólares. O controle `ai_limits.enabled` permite suspender a assistência; o ensaio hospedado dessa suspensão continua pendente. Para ajustar o servidor, siga [CONFIGURAR-NETLIFY.md](CONFIGURAR-NETLIFY.md).
 
 Logs estruturados previstos no servidor: `ai_reservation_denied`, `ai_provider_usage` e `ai_operation`, com identificador da requisição, operação, duração, status e uso quando informado pelo provedor. Não registrar token de sessão, chave, áudio ou conteúdo de anúncio. Coleta, retenção, destinatário de alertas e orçamento diário em USD ainda precisam de configuração operacional.
 
@@ -72,13 +74,13 @@ Próximo ensaio deve usar Supabase local ou projeto de homologação isolado. A 
 5. Provar reserva simultânea de IA em mais de um worker, esgotamento por usuário e global, falha do provedor e tentativa de chamada por empresa pendente. Falhas e timeouts não podem devolver unidades de modo que permita contornar a cota.
 6. Exercitar cadastro, confirmação de e-mail, recuperação de senha e callback. Localmente, o Supabase oferece Mailpit para inspecionar os e-mails sem destinatário real: [testes locais](https://supabase.com/docs/guides/local-development/cli/testing-and-linting).
 
-O runner local executou todas as 20 migrações com pré-requisitos sintéticos da antiga migração de demonstração, 55 verificações de acesso e 27 de cotas; fixtures das duas suítes foram revertidas. Não foram criados anúncios de teste em produção. A integração HTTP real, Storage, SMTP de confirmação e concorrência hospedada continuam pendentes. Nenhuma migração remota foi aplicada neste ciclo.
+O runner local executou todas as 20 migrações com pré-requisitos sintéticos da antiga migração de demonstração, 55 verificações de acesso e 27 de cotas; fixtures das duas suítes foram revertidas. Depois da aplicação manual do SQL, o ensaio real de Auth/PostgREST criou contas e um anúncio temporários explicitamente identificados como QA, validou autorização, lead/mensagem, avaliação, suspensão e seis reservas simultâneas permitidas com uma recusada. Todos esses registros foram removidos e a limpeza foi verificada. Storage real, jornada completa pela interface e concorrência entre workers de IA permanecem pendentes. Veja [VALIDACAO-REMOTA.md](VALIDACAO-REMOTA.md).
 
 ## E-mail de autenticação
 
 O SMTP padrão do Supabase não é destinado à produção e restringe destinatários a endereços autorizados da equipe. Isso afeta diretamente cadastros feitos após a feira. Confirmar configuração de SMTP próprio no painel, domínio remetente, autenticação DNS, URLs de redirecionamento e limites de envio antes de convidar empresas externas. [Fonte oficial](https://supabase.com/docs/guides/auth/auth-smtp).
 
-`keysender` é apenas um nome encontrado no ambiente local; não foi encontrado uso no código inspecionado e ele não comprova a configuração de SMTP do Supabase Auth. Um envio de recuperação pelo Auth remoto foi aceito (HTTP 200) e Lucas confirmou chegada na caixa de entrada de `lucasemb999@gmail.com`; nenhuma senha foi alterada. Isso não comprova confirmação de cadastro nem entrega a endereços externos à equipe. O painel de SMTP/redirects ainda precisa ser verificado.
+`keysender` é apenas um nome encontrado no ambiente local; não foi encontrado uso no código inspecionado e ele não comprova a configuração de SMTP do Supabase Auth. Lucas confirmou chegada na caixa de entrada tanto da recuperação para `lucasemb999@gmail.com` quanto da confirmação para o alias temporário de cadastro. Nenhuma senha do titular foi alterada. O callback da confirmação e a entrega a endereços externos à equipe continuam pendentes. O painel de SMTP/redirects ainda precisa ser verificado.
 
 ## Deploy, rollback e alertas
 
@@ -89,7 +91,7 @@ Rollback do aplicativo não desfaz schema nem dados do Supabase. Para cada migra
 Pendências operacionais antes da feira:
 
 - Confirmar acesso dos responsáveis aos painéis e configurar proteção do branch com o gate obrigatório.
-- Aplicar e ensaiar migrações em homologação, incluindo políticas e cota; só depois preparar execução em produção.
+- Manter migrações já aplicadas; preparar ambiente de homologação separado e ensaio de recuperação sem reaplicar o pacote de criação no projeto conectado.
 - Validar SMTP, confirmação e recuperação de senha a partir do domínio final.
 - Configurar monitoramento de disponibilidade, erros de servidor, falhas de e-mail, rejeições de cota e consumo/custo de IA, com canal e responsável definidos.
 - Definir orçamento de IA e limiares de alerta; preço estimado em log não bloqueia gastos por si só.

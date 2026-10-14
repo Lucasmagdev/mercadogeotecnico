@@ -1,6 +1,6 @@
 # Verificações do diagnóstico — 14/10/2026
 
-**Atualização:** o primeiro ciclo foi implementado no workspace; o gate completo passou. O usuário aplicou as migrações e a API confirmou as novas views, cotas e restrições anônimas. A publicação do aplicativo compatível ainda está em preparação. Os registros do diagnóstico inicial abaixo permanecem para comparação.
+**Atualização:** o gate local e o CI remoto passaram; o usuário aplicou as migrações, e a prévia compatível está no ar. A jornada autenticada por API passou com contas temporárias, incluindo lead/mensagem, cota simultânea e suspensão. A IA na prévia retornou 503 e aguarda conferir configuração. Produção ainda pendente. O estado mais recente está em [VALIDACAO-REMOTA.md](VALIDACAO-REMOTA.md); os registros iniciais abaixo permanecem para comparação.
 
 ## Escopo do diagnóstico inicial
 
