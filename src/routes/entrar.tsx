@@ -83,7 +83,7 @@ function Entrar() {
             aria-hidden
           />
           <div className="relative">
-            <Logo />
+            <Logo size="large" inverse />
           </div>
           <div className="relative">
             <h2 className="text-2xl font-bold leading-snug">
