@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { motion } from "framer-motion";
@@ -8,8 +8,6 @@ import {
   ChevronRight,
   Sparkles,
   Building2,
-  Clock,
-  ShieldAlert,
   Upload,
   X,
   Plus,
@@ -38,10 +36,20 @@ import { uploadEquipmentImages } from "@/lib/equipment-images";
 import { generateListingDraft, suggestSpecFields, transcribeVoiceNote } from "@/lib/ai-listing";
 import { computeListingQuality } from "@/lib/listing-quality";
 import { ListingQualityMeter } from "@/components/listing-quality-meter";
+import { CompanyApproval } from "@/components/company-approval";
+import {
+  AI_MAX_AUDIO_BYTES,
+  AI_MAX_IMAGE_BYTES,
+  AI_MAX_TOTAL_IMAGE_BYTES,
+  AI_MAX_NOTE_LENGTH,
+  AI_MAX_RECORD_SECONDS,
+  decodedBase64Bytes,
+} from "@/lib/ai-validation";
 import { brands, states } from "@/lib/mock-data";
 import { slugify } from "@/lib/utils";
 
-const AI_MAX_DIM = 1280;
+const AI_MAX_DIM = 2048;
+const AI_JPEG_QUALITY = 0.9;
 
 function parseCompatibleWith(text: string): string[] {
   return text
@@ -59,7 +67,10 @@ function blobToBase64(blob: Blob): Promise<string> {
   });
 }
 
-function resizeImageToBase64(file: File): Promise<{ mediaType: "image/jpeg"; base64: string }> {
+function resizeImageToBase64(
+  file: File,
+  maxBytes = AI_MAX_IMAGE_BYTES,
+): Promise<{ mediaType: "image/jpeg"; base64: string }> {
   return new Promise((resolve, reject) => {
     const img = new Image();
     const url = URL.createObjectURL(file);
@@ -75,9 +86,22 @@ function resizeImageToBase64(file: File): Promise<{ mediaType: "image/jpeg"; bas
         return;
       }
       ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-      const dataUrl = canvas.toDataURL("image/jpeg", 0.82);
+      let quality = AI_JPEG_QUALITY;
+      let base64 = canvas.toDataURL("image/jpeg", quality).split(",")[1];
+      while (decodedBase64Bytes(base64) > maxBytes && quality > 0.4) {
+        quality -= 0.1;
+        base64 = canvas.toDataURL("image/jpeg", quality).split(",")[1];
+      }
       URL.revokeObjectURL(url);
-      resolve({ mediaType: "image/jpeg", base64: dataUrl.split(",")[1] });
+      if (decodedBase64Bytes(base64) > maxBytes) {
+        reject(
+          new Error(
+            "A foto ficou grande para a análise. Use uma imagem menor ou preencha manualmente.",
+          ),
+        );
+        return;
+      }
+      resolve({ mediaType: "image/jpeg", base64 });
     };
     img.onerror = () => {
       URL.revokeObjectURL(url);
@@ -107,7 +131,12 @@ type Spec = { label: string; value: string };
 
 function Publicar() {
   const { session, loading } = useAuth();
-  const { data: company, isLoading: companyLoading } = useQuery({
+  const {
+    data: company,
+    isLoading: companyLoading,
+    refetch: refreshCompany,
+    isFetching: companyFetching,
+  } = useQuery({
     queryKey: ["my-company", session?.user.id],
     queryFn: () => fetchMyCompany(session!.user.id),
     enabled: !!session,
@@ -146,6 +175,7 @@ function Publicar() {
   const [aiPhotos, setAiPhotos] = useState<File[]>([]);
   const [aiNote, setAiNote] = useState("");
   const [aiMissingInfo, setAiMissingInfo] = useState<string[]>([]);
+  const [showAiAssistant, setShowAiAssistant] = useState(true);
   const aiFileInputRef = useRef<HTMLInputElement>(null);
   const aiCameraInputRef = useRef<HTMLInputElement>(null);
 
@@ -155,6 +185,24 @@ function Publicar() {
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const recordedChunksRef = useRef<Blob[]>([]);
   const recordTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  useEffect(
+    () => () => {
+      if (recordTimerRef.current) clearInterval(recordTimerRef.current);
+      const recorder = mediaRecorderRef.current;
+      if (recorder) {
+        recorder.onstop = null;
+        if (recorder.state !== "inactive") recorder.stop();
+        recorder.stream.getTracks().forEach((track) => track.stop());
+      }
+    },
+    [],
+  );
+
+  function aiHeaders() {
+    if (!session?.access_token) throw new Error("Entre novamente para usar a assistência de IA.");
+    return { Authorization: `Bearer ${session.access_token}` };
+  }
 
   function set<K extends keyof typeof form>(key: K, value: (typeof form)[K]) {
     setForm((f) => ({ ...f, [key]: value }));
@@ -191,7 +239,7 @@ function Publicar() {
         city: form.city,
         state: form.state,
         description: form.description,
-        image_key: imagePaths.length > 0 ? null : "excavator",
+        image_key: null,
         images: imagePaths,
         specs: cleanSpecs,
         compatible_with: parseCompatibleWith(compatibleWithText),
@@ -206,11 +254,18 @@ function Publicar() {
 
   const voiceNote = useMutation({
     mutationFn: async (blob: Blob) => {
+      if (blob.size > AI_MAX_AUDIO_BYTES)
+        throw new Error("O áudio deve ter até 3 MB. Grave uma observação menor ou digite o texto.");
       const base64 = await blobToBase64(blob);
-      return transcribeVoiceNote({ data: { mediaType: blob.type || "audio/webm", base64 } });
+      return transcribeVoiceNote({
+        headers: aiHeaders(),
+        data: { mediaType: blob.type || "audio/webm", base64 },
+      });
     },
     onSuccess: (text) => {
-      setAiNote((prev) => (prev.trim() ? `${prev.trim()} ${text}` : text));
+      setAiNote((prev) =>
+        (prev.trim() ? `${prev.trim()} ${text}` : text).slice(0, AI_MAX_NOTE_LENGTH),
+      );
     },
   });
 
@@ -222,24 +277,34 @@ function Publicar() {
       recordedChunksRef.current = [];
       recorder.ondataavailable = (e) => {
         if (e.data.size > 0) recordedChunksRef.current.push(e.data);
+        if (
+          recordedChunksRef.current.reduce((total, chunk) => total + chunk.size, 0) >=
+          AI_MAX_AUDIO_BYTES
+        )
+          stopRecording();
       };
       recorder.onstop = () => {
         stream.getTracks().forEach((t) => t.stop());
         const blob = new Blob(recordedChunksRef.current, { type: recorder.mimeType });
         voiceNote.mutate(blob);
       };
-      recorder.start();
+      recorder.start(250);
       mediaRecorderRef.current = recorder;
       setIsRecording(true);
       setRecordSeconds(0);
-      recordTimerRef.current = setInterval(() => setRecordSeconds((s) => s + 1), 1000);
+      const recordingStarted = Date.now();
+      recordTimerRef.current = setInterval(() => {
+        const seconds = Math.floor((Date.now() - recordingStarted) / 1000);
+        setRecordSeconds(seconds);
+        if (seconds >= AI_MAX_RECORD_SECONDS) stopRecording();
+      }, 1000);
     } catch {
       setRecordError("Não foi possível acessar o microfone. Verifique a permissão do navegador.");
     }
   }
 
   function stopRecording() {
-    mediaRecorderRef.current?.stop();
+    if (mediaRecorderRef.current?.state === "recording") mediaRecorderRef.current.stop();
     mediaRecorderRef.current = null;
     setIsRecording(false);
     if (recordTimerRef.current) clearInterval(recordTimerRef.current);
@@ -247,8 +312,16 @@ function Publicar() {
 
   const aiGenerate = useMutation({
     mutationFn: async () => {
-      const images = await Promise.all(aiPhotos.map(resizeImageToBase64));
+      const headers = aiHeaders();
+      const bytesPerImage = Math.min(
+        AI_MAX_IMAGE_BYTES,
+        Math.floor(AI_MAX_TOTAL_IMAGE_BYTES / Math.max(aiPhotos.length, 1)),
+      );
+      const images = await Promise.all(
+        aiPhotos.map((file) => resizeImageToBase64(file, bytesPerImage)),
+      );
       return generateListingDraft({
+        headers,
         data: {
           images,
           note: aiNote,
@@ -266,7 +339,7 @@ function Publicar() {
         title: draft.title || f.title,
         brand: brandMatch ?? (draft.brand ? "outro" : f.brand),
         model: draft.model || f.model,
-        condition: draft.condition,
+        condition: draft.condition || f.condition,
         description: draft.description || f.description,
       }));
       if (!brandMatch && draft.brand) setCustomBrand(draft.brand);
@@ -290,7 +363,10 @@ function Publicar() {
         form.category === "outros"
           ? customCategory.trim() || "Outros"
           : (categories.find((c) => c.slug === form.category)?.name ?? "");
-      return suggestSpecFields({ data: { categoryName, itemName: form.title } });
+      return suggestSpecFields({
+        headers: aiHeaders(),
+        data: { categoryName, itemName: form.title },
+      });
     },
     onSuccess: (suggested) => {
       setSpecs((current) => {
@@ -336,7 +412,9 @@ function Publicar() {
           Você precisa de uma conta de empresa aprovada para publicar anúncios.
         </p>
         <Button asChild>
-          <Link to="/entrar">Entrar</Link>
+          <Link to="/entrar" search={{ redirect: "/publicar" }}>
+            Entrar
+          </Link>
         </Button>
       </div>
     );
@@ -359,24 +437,13 @@ function Publicar() {
 
   if (company.status !== "approved") {
     return (
-      <div className="container-page flex min-h-[60vh] flex-col items-center justify-center gap-3 text-center">
-        {company.status === "pending" ? (
-          <>
-            <Clock className="h-10 w-10 text-accent" />
-            <h1 className="text-xl font-bold">Cadastro em análise</h1>
-            <p className="max-w-md text-muted-foreground">
-              Sua empresa ainda está aguardando aprovação do administrador para poder anunciar.
-            </p>
-          </>
-        ) : (
-          <>
-            <ShieldAlert className="h-10 w-10 text-destructive" />
-            <h1 className="text-xl font-bold">Cadastro não aprovado</h1>
-            <p className="max-w-md text-muted-foreground">
-              Fale com o suporte para mais informações.
-            </p>
-          </>
-        )}
+      <div className="container-page py-12">
+        <CompanyApproval
+          status={company.status}
+          companyName={company.name}
+          onRefresh={() => void refreshCompany()}
+          refreshing={companyFetching}
+        />
       </div>
     );
   }
@@ -414,6 +481,20 @@ function Publicar() {
       <p className="mt-1 text-muted-foreground">
         Preencha as informações para publicar seu anúncio.
       </p>
+      {step === 0 && (
+        <div className="mt-3 flex flex-wrap items-center gap-3">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => setShowAiAssistant((shown) => !shown)}
+          >
+            {showAiAssistant ? "Preencher manualmente" : "Usar assistência de IA"}
+          </Button>
+          <p className="text-sm text-muted-foreground">
+            A IA é opcional. Revise as informações antes de publicar.
+          </p>
+        </div>
+      )}
 
       {/* Steps */}
       <div className="mt-8 flex items-center justify-between">
@@ -442,7 +523,7 @@ function Publicar() {
         />
       </div>
 
-      {step === 0 && (
+      {step === 0 && showAiAssistant && (
         <div className="mt-8 rounded-2xl border border-primary/30 bg-primary/5 p-5">
           <div className="flex items-start gap-3">
             <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary/15 text-primary">
@@ -453,6 +534,10 @@ function Publicar() {
               <p className="mt-0.5 text-sm text-muted-foreground">
                 Envie fotos (inclusive da plaqueta, se tiver) e conte o que sabe. A IA identifica a
                 peça, sugere categoria, marca, modelo e especificações técnicas.
+              </p>
+              <p className="mt-2 text-xs text-muted-foreground">
+                Para identificar melhor, envie: 1 foto do item inteiro, 1 da plaqueta ou código e 1
+                dos encaixes, conexões ou extremidades.
               </p>
 
               <input
@@ -486,7 +571,10 @@ function Publicar() {
 
               <div className="mt-3 flex flex-wrap gap-2">
                 {aiPhotos.map((file, i) => (
-                  <div key={i} className="group relative h-16 w-16 overflow-hidden rounded-lg border border-border">
+                  <div
+                    key={i}
+                    className="group relative h-16 w-16 overflow-hidden rounded-lg border border-border"
+                  >
                     <img
                       src={URL.createObjectURL(file)}
                       alt=""
@@ -533,7 +621,7 @@ function Publicar() {
               <Textarea
                 className="mt-3"
                 rows={2}
-                placeholder='Opcional: "Era de uma Doosan 225, estava funcionando quando tiramos." Ou grave por voz:'
+                maxLength={AI_MAX_NOTE_LENGTH}
                 value={aiNote}
                 onChange={(e) => setAiNote(e.target.value)}
               />
@@ -560,7 +648,8 @@ function Publicar() {
                     onClick={stopRecording}
                   >
                     <Square className="h-3 w-3" />
-                    Parar ({Math.floor(recordSeconds / 60)}:{String(recordSeconds % 60).padStart(2, "0")})
+                    Parar ({Math.floor(recordSeconds / 60)}:
+                    {String(recordSeconds % 60).padStart(2, "0")})
                   </Button>
                 )}
               </div>
@@ -654,11 +743,7 @@ function Publicar() {
             {form.category === "outros" && (
               <div className="space-y-2">
                 <Label>Descreva a categoria</Label>
-                <Input
-                  placeholder="Ex: Compactador de solo"
-                  value={customCategory}
-                  onChange={(e) => setCustomCategory(e.target.value)}
-                />
+                <Input value={customCategory} onChange={(e) => setCustomCategory(e.target.value)} />
                 <p className="text-xs text-muted-foreground">
                   Seu anúncio fica na categoria "Outros"; essa descrição aparece nos detalhes do
                   anúncio.
@@ -675,17 +760,12 @@ function Publicar() {
               <Label>
                 Título do anúncio <span className="text-destructive">*</span>
               </Label>
-              <Input
-                placeholder="Ex: Escavadeira Hidráulica CAT 320"
-                value={form.title}
-                onChange={(e) => set("title", e.target.value)}
-              />
+              <Input value={form.title} onChange={(e) => set("title", e.target.value)} />
             </div>
             <div className="space-y-2">
               <Label>Descrição</Label>
               <Textarea
                 rows={4}
-                placeholder="Descreva o estado, histórico de manutenção e diferenciais."
                 value={form.description}
                 onChange={(e) => set("description", e.target.value)}
               />
@@ -697,7 +777,7 @@ function Publicar() {
                 </Label>
                 <Select value={form.brand} onValueChange={(v) => set("brand", v)}>
                   <SelectTrigger>
-                    <SelectValue placeholder="Selecione" />
+                    <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
                     {brands.map((b) => (
@@ -711,7 +791,6 @@ function Publicar() {
                 {form.brand === "outro" && (
                   <Input
                     className="mt-2"
-                    placeholder="Digite a marca"
                     value={customBrand}
                     onChange={(e) => setCustomBrand(e.target.value)}
                   />
@@ -719,17 +798,12 @@ function Publicar() {
               </div>
               <div className="space-y-2">
                 <Label>Modelo</Label>
-                <Input
-                  placeholder="Ex: 320 GC"
-                  value={form.model}
-                  onChange={(e) => set("model", e.target.value)}
-                />
+                <Input value={form.model} onChange={(e) => set("model", e.target.value)} />
               </div>
               <div className="space-y-2">
                 <Label>Ano</Label>
                 <Input
                   type="number"
-                  placeholder="2021"
                   value={form.year}
                   onChange={(e) => set("year", e.target.value)}
                 />
@@ -743,7 +817,7 @@ function Publicar() {
                   onValueChange={(v) => set("condition", v as typeof form.condition)}
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="Selecione" />
+                    <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="Novo">Novo</SelectItem>
@@ -791,7 +865,6 @@ function Publicar() {
                 {specs.map((spec, i) => (
                   <div key={i} className="flex gap-2">
                     <Input
-                      placeholder="Ex: Potência"
                       value={spec.label}
                       onChange={(e) =>
                         setSpecs((s) =>
@@ -800,7 +873,6 @@ function Publicar() {
                       }
                     />
                     <Input
-                      placeholder="Ex: 122 HP"
                       value={spec.value}
                       onChange={(e) =>
                         setSpecs((s) =>
@@ -826,7 +898,6 @@ function Publicar() {
             <div className="space-y-2 border-t border-border pt-4">
               <Label>Compatível com (opcional)</Label>
               <Input
-                placeholder="Ex: Doosan DX225, Doosan DX225LC"
                 value={compatibleWithText}
                 onChange={(e) => setCompatibleWithText(e.target.value)}
               />
@@ -863,7 +934,6 @@ function Publicar() {
                 </Label>
                 <Input
                   type="number"
-                  placeholder="685000"
                   value={form.price}
                   onChange={(e) => set("price", e.target.value)}
                 />
@@ -892,11 +962,7 @@ function Publicar() {
                 <Label>
                   Cidade <span className="text-destructive">*</span>
                 </Label>
-                <Input
-                  placeholder="São Paulo"
-                  value={form.city}
-                  onChange={(e) => set("city", e.target.value)}
-                />
+                <Input value={form.city} onChange={(e) => set("city", e.target.value)} />
               </div>
               <div className="space-y-2">
                 <Label>
@@ -904,7 +970,7 @@ function Publicar() {
                 </Label>
                 <Select value={form.state} onValueChange={(v) => set("state", v)}>
                   <SelectTrigger>
-                    <SelectValue placeholder="UF" />
+                    <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
                     {states.map((s) => (
@@ -981,7 +1047,7 @@ function Publicar() {
             )}
             {photos.length === 0 && (
               <p className="text-sm text-muted-foreground">
-                Sem fotos, o anúncio usa uma imagem ilustrativa padrão.
+                Sem fotos, o anúncio será identificado como “Foto não informada”.
               </p>
             )}
           </div>
@@ -996,7 +1062,7 @@ function Publicar() {
               <h2 className="mt-2 text-lg font-semibold">Tudo pronto!</h2>
               <p className="text-muted-foreground">
                 {photos.length > 0 ? `${photos.length} foto(s) serão enviadas. ` : ""}
-                Revise as informações e publique seu anúncio para milhares de empresas.
+                Revise as informações e publique seu anúncio para outras empresas do setor.
               </p>
             </div>
 
@@ -1028,21 +1094,21 @@ function Publicar() {
             </div>
 
             <div className="text-center">
-            {submit.isError && (
-              <p className="text-sm text-destructive">
-                {submit.error instanceof Error
-                  ? submit.error.message
-                  : "Erro ao publicar. Tente novamente."}
-              </p>
-            )}
-            <Button
-              size="lg"
-              className="mt-2"
-              onClick={() => submit.mutate()}
-              disabled={submit.isPending}
-            >
-              {submit.isPending ? "Publicando..." : "Publicar anúncio"}
-            </Button>
+              {submit.isError && (
+                <p className="text-sm text-destructive">
+                  {submit.error instanceof Error
+                    ? submit.error.message
+                    : "Erro ao publicar. Tente novamente."}
+                </p>
+              )}
+              <Button
+                size="lg"
+                className="mt-2"
+                onClick={() => submit.mutate()}
+                disabled={submit.isPending}
+              >
+                {submit.isPending ? "Publicando..." : "Publicar anúncio"}
+              </Button>
             </div>
           </div>
         )}

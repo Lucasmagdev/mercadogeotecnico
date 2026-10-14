@@ -1,8 +1,15 @@
 import { createFileRoute } from "@tanstack/react-router";
 import type {} from "@tanstack/react-start";
 import { fetchApprovedCompanies, fetchEquipmentList } from "@/lib/queries";
+import { absoluteSiteUrl } from "@/lib/site-url";
 
-const BASE_URL = "";
+function xmlText(value: string) {
+  return value.replace(
+    /[<>&"']/g,
+    (character) =>
+      ({ "<": "&lt;", ">": "&gt;", "&": "&amp;", '"': "&quot;", "'": "&apos;" })[character]!,
+  );
+}
 
 interface SitemapEntry {
   path: string;
@@ -39,7 +46,7 @@ export const Route = createFileRoute("/sitemap.xml")({
         const urls = entries.map((e) =>
           [
             `  <url>`,
-            `    <loc>${BASE_URL}${e.path}</loc>`,
+            `    <loc>${xmlText(absoluteSiteUrl(e.path))}</loc>`,
             e.changefreq ? `    <changefreq>${e.changefreq}</changefreq>` : null,
             e.priority ? `    <priority>${e.priority}</priority>` : null,
             `  </url>`,

@@ -27,9 +27,7 @@ export function ListingTrustBadges({ item }: { item: EquipmentRow }) {
     ...(item.maintenance_history_informed
       ? [{ icon: Wrench, label: "Histórico de manutenção informado" }]
       : []),
-    ...(quality.score >= 90
-      ? [{ icon: CircleCheck, label: "Anúncio tecnicamente completo" }]
-      : []),
+    ...(quality.score >= 90 ? [{ icon: CircleCheck, label: "Anúncio tecnicamente completo" }] : []),
   ];
 
   if (badges.length === 0) return null;

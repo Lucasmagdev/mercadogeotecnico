@@ -1,5 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { Logo } from "@/components/logo";
+import { SupportContact } from "@/components/support-contact";
 
 const columns = [
   {
@@ -67,9 +68,12 @@ export function SiteFooter() {
           </div>
         ))}
       </div>
+      <div className="container-page pb-8 text-center">
+        <SupportContact />
+      </div>
       <div className="border-t border-border">
         <div className="container-page flex flex-col items-center justify-between gap-3 py-6 text-sm text-muted-foreground sm:flex-row">
-          <p>© 2025 Mercado Geotécnico. Todos os direitos reservados.</p>
+          <p>Mercado Geotécnico. Todos os direitos reservados.</p>
         </div>
       </div>
     </footer>

@@ -6,8 +6,6 @@ import {
   Settings,
   MessageSquare,
   Bell,
-  Clock,
-  ShieldAlert,
   Building2,
   BarChart3,
   ClipboardList,
@@ -15,6 +13,8 @@ import {
 import { useAuth } from "@/components/auth-provider";
 import { fetchMyCompany } from "@/lib/queries";
 import { Button } from "@/components/ui/button";
+import { CompanyApproval } from "@/components/company-approval";
+import { SupportContact } from "@/components/support-contact";
 
 export const Route = createFileRoute("/painel")({
   head: () => ({
@@ -40,7 +40,13 @@ const nav = [
 function PainelLayout() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const { session, profile, loading } = useAuth();
-  const { data: company, isLoading: companyLoading } = useQuery({
+  const {
+    data: company,
+    isLoading: companyLoading,
+    isError,
+    isFetching,
+    refetch,
+  } = useQuery({
     queryKey: ["my-company", session?.user.id],
     queryFn: () => fetchMyCompany(session!.user.id),
     enabled: !!session,
@@ -60,8 +66,24 @@ function PainelLayout() {
           Entre com sua conta de empresa para acessar o painel.
         </p>
         <Button asChild>
-          <Link to="/entrar">Entrar</Link>
+          <Link to="/entrar" search={{ redirect: pathname }}>
+            Entrar
+          </Link>
         </Button>
+      </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <div className="container-page flex min-h-[60vh] flex-col items-center justify-center gap-4 py-10 text-center">
+        <p role="alert">
+          Não foi possível carregar sua empresa. Confira sua conexão e tente novamente.
+        </p>
+        <Button onClick={() => void refetch()} disabled={isFetching}>
+          Tentar novamente
+        </Button>
+        <SupportContact />
       </div>
     );
   }
@@ -81,29 +103,14 @@ function PainelLayout() {
     );
   }
 
-  if (company.status === "pending") {
+  if (company.status === "pending" || company.status === "rejected") {
     return (
-      <div className="container-page flex min-h-[60vh] flex-col items-center justify-center gap-3 text-center">
-        <Clock className="h-10 w-10 text-accent" />
-        <h1 className="text-xl font-bold">Cadastro em análise</h1>
-        <p className="max-w-md text-muted-foreground">
-          Sua empresa <strong>{company.name}</strong> foi cadastrada e está aguardando aprovação do
-          administrador. Assim que aprovada, você poderá anunciar peças.
-        </p>
-      </div>
-    );
-  }
-
-  if (company.status === "rejected") {
-    return (
-      <div className="container-page flex min-h-[60vh] flex-col items-center justify-center gap-3 text-center">
-        <ShieldAlert className="h-10 w-10 text-destructive" />
-        <h1 className="text-xl font-bold">Cadastro não aprovado</h1>
-        <p className="max-w-md text-muted-foreground">
-          O cadastro da sua empresa não foi aprovado pelo administrador. Entre em contato com o
-          suporte para mais informações.
-        </p>
-      </div>
+      <CompanyApproval
+        status={company.status}
+        companyName={company.name}
+        onRefresh={() => void refetch()}
+        refreshing={isFetching}
+      />
     );
   }
 

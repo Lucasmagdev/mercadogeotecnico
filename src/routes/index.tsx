@@ -31,7 +31,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { EquipmentCard } from "@/components/equipment-card";
 import { EquipmentBrowser } from "@/components/equipment-browser";
-import { AnimatedCounter } from "@/components/animated-counter";
 import { GeoSelosVerification } from "@/components/geoselos-verification";
 import { VerifiedSeal } from "@/components/verified-seal";
 import { CompanyAvatar } from "@/components/company-avatar";
@@ -69,17 +68,11 @@ const geoselosCompanies = [
   { name: "Geoteste", logo: geotesteLogo },
 ];
 
-const stats = [
-  { value: 9430, suffix: "+", label: "anúncios ativos" },
-  { value: 1240, suffix: "+", label: "empresas verificadas" },
-  { value: 870, suffix: "", label: "negócios por mês" },
-];
-
 const steps = [
   {
     icon: UserPlus,
     title: "Crie sua conta",
-    desc: "Cadastre sua empresa em minutos e ganhe o selo de verificação após a análise.",
+    desc: "Cadastre sua empresa, confirme o e-mail e acompanhe a análise do cadastro.",
   },
   {
     icon: Search,
@@ -89,7 +82,7 @@ const steps = [
   {
     icon: Handshake,
     title: "Negocie direto",
-    desc: "Converse pelo chat, receba propostas e feche negócio sem intermediários.",
+    desc: "Converse com os interessados pelo chat ou compartilhe seu contato para negociar.",
   },
 ];
 
@@ -129,8 +122,12 @@ function Home() {
     queryFn: fetchCategories,
   });
   const { data: equipmentData = [], isLoading } = useQuery({
-    queryKey: ["equipment"],
-    queryFn: () => fetchEquipmentList(),
+    queryKey: ["equipment-home-recent"],
+    queryFn: () => fetchEquipmentList({}, 8),
+  });
+  const { data: rentalData = [] } = useQuery({
+    queryKey: ["equipment-home-rentals"],
+    queryFn: () => fetchEquipmentList({ modos: ["locacao"] }, 8),
   });
   const { data: companies = [] } = useQuery({
     queryKey: ["companies-approved"],
@@ -138,7 +135,7 @@ function Home() {
   });
 
   const recent = equipmentData.slice(0, 8);
-  const rentals = equipmentData.filter((e) => e.mode === "locacao").slice(0, 8);
+  const rentals = rentalData;
   const topCompanies = [...companies].sort((a, b) => b.rating - a.rating).slice(0, 4);
   const categoryName = (slug: string | null) => categories.find((c) => c.slug === slug)?.name;
 
@@ -168,6 +165,19 @@ function Home() {
             </h1>
             <p className="mt-2 text-muted-foreground">
               Negocie peças e ferramentas com outras empresas do setor geotécnico.
+            </p>
+            <div className="mt-5 flex flex-wrap justify-center gap-3">
+              <Button asChild className="rounded-full">
+                <Link to="/cadastro/empresa">
+                  Cadastrar minha empresa <ArrowRight className="h-4 w-4" />
+                </Link>
+              </Button>
+              <Button asChild variant="outline" className="rounded-full">
+                <Link to="/publicar">Já sou anunciante</Link>
+              </Button>
+            </div>
+            <p className="mt-3 text-xs text-muted-foreground">
+              Confirme o e-mail e acompanhe a aprovação antes de publicar.
             </p>
             <form
               onSubmit={submitHeroSearch}
@@ -480,7 +490,9 @@ function Home() {
       <section className="container-page py-14">
         <div className="mx-auto max-w-2xl text-center">
           <h2 className="text-xl font-bold sm:text-2xl">Como funciona</h2>
-          <p className="mt-2 text-sm text-muted-foreground">Transforme itens sem uso em dinheiro.</p>
+          <p className="mt-2 text-sm text-muted-foreground">
+            Transforme itens sem uso em dinheiro.
+          </p>
         </div>
         <div className="relative mt-10 grid gap-6 md:grid-cols-3">
           <div
@@ -509,7 +521,7 @@ function Home() {
         </div>
       </section>
 
-      {/* CTA with stats */}
+      {/* Invitation for companies */}
       <section className="container-page pb-16">
         <div className="relative overflow-hidden rounded-3xl bg-secondary px-8 py-14 text-center text-secondary-foreground sm:px-16">
           <div
@@ -526,26 +538,16 @@ function Home() {
               Anuncie e alcance outras empresas do setor geotécnico
             </h2>
             <p className="mx-auto mt-4 max-w-xl text-secondary-foreground/80">
-              Encontre peças novas ou usadas no almoxarifado de outras empresas.
+              Cadastre sua empresa e, após a aprovação, publique itens do seu estoque com fotos
+              reais e informações técnicas. Acompanhe os interessados pelo painel.
             </p>
-            <dl className="mx-auto mt-8 flex max-w-xl flex-wrap justify-center gap-x-12 gap-y-4">
-              {stats.map((s) => (
-                <div key={s.label}>
-                  <dt className="sr-only">{s.label}</dt>
-                  <dd className="text-2xl font-bold sm:text-3xl">
-                    <AnimatedCounter value={s.value} suffix={s.suffix} />
-                  </dd>
-                  <p className="text-sm text-secondary-foreground/70">{s.label}</p>
-                </div>
-              ))}
-            </dl>
             <div className="mt-8 flex flex-wrap justify-center gap-3">
               <Button
                 asChild
                 size="lg"
                 className="rounded-full transition-transform hover:-translate-y-0.5"
               >
-                <Link to="/publicar">Anunciar Peça</Link>
+                <Link to="/cadastro/empresa">Cadastrar minha empresa</Link>
               </Button>
               <Button
                 asChild

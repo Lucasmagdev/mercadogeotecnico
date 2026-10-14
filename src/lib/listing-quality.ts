@@ -36,10 +36,16 @@ export function computeListingQuality(input: ListingQualityInput): ListingQualit
     { ok: input.brand.trim().length > 0, suggestion: "Informe a marca ou fabricante" },
     { ok: input.model.trim().length > 0, suggestion: "Informe o modelo" },
     { ok: input.price > 0, suggestion: "Informe o preço" },
-    { ok: input.city.trim().length > 0 && input.state.trim().length > 0, suggestion: "Informe a localização" },
+    {
+      ok: input.city.trim().length > 0 && input.state.trim().length > 0,
+      suggestion: "Informe a localização",
+    },
     { ok: input.condition.trim().length > 0, suggestion: "Informe o estado de conservação" },
     { ok: input.photosCount > 0, suggestion: "Adicione ao menos uma foto" },
-    { ok: input.specs.filter((s) => s.label.trim() && s.value.trim()).length >= 2, suggestion: "Adicione especificações técnicas" },
+    {
+      ok: input.specs.filter((s) => s.label.trim() && s.value.trim()).length >= 2,
+      suggestion: "Adicione especificações técnicas",
+    },
     {
       ok: hasSpecMatching(input.specs, ["part number", "código da peça", "código"]),
       suggestion: "Informe o Part Number / código da peça",

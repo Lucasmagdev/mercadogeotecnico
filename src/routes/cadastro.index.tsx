@@ -9,6 +9,7 @@ export const Route = createFileRoute("/cadastro/")({
 });
 
 function Cadastro() {
+  const { redirect } = Route.useSearch();
   return (
     <div className="container-page flex min-h-[70vh] items-center justify-center py-12">
       <div className="w-full max-w-2xl text-center">
@@ -18,6 +19,7 @@ function Cadastro() {
         <div className="mt-8 grid gap-4 sm:grid-cols-2">
           <Link
             to="/cadastro/usuario"
+            search={{ redirect }}
             className="flex flex-col items-center rounded-2xl border border-border bg-card p-8 text-center transition-all hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-lift"
           >
             <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-primary/10 text-primary">
@@ -31,6 +33,7 @@ function Cadastro() {
 
           <Link
             to="/cadastro/empresa"
+            search={{ redirect }}
             className="flex flex-col items-center rounded-2xl border border-border bg-card p-8 text-center transition-all hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-lift"
           >
             <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-secondary/10 text-secondary">
@@ -45,7 +48,11 @@ function Cadastro() {
 
         <p className="mt-6 text-sm text-muted-foreground">
           Já tem conta?{" "}
-          <Link to="/entrar" className="font-medium text-primary hover:underline">
+          <Link
+            to="/entrar"
+            search={{ redirect }}
+            className="font-medium text-primary hover:underline"
+          >
             Entrar
           </Link>
         </p>

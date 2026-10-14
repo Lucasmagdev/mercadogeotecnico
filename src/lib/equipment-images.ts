@@ -1,19 +1,17 @@
 import { supabase, type EquipmentRow } from "@/lib/supabase";
-import { equipmentImages } from "@/lib/mock-data";
 
 const BUCKET = "equipment-images";
 const MAX_FILE_SIZE = 8 * 1024 * 1024;
 const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp"];
 
-/** All display URLs for a listing: uploaded photos first, stock fallback otherwise. */
+/** Uploaded listing photos, or an explicit placeholder when no photo was supplied. */
 export function getEquipmentImageUrls(item: Pick<EquipmentRow, "images" | "image_key">): string[] {
   if (item.images && item.images.length > 0) {
     return item.images.map(
       (path) => supabase.storage.from(BUCKET).getPublicUrl(path).data.publicUrl,
     );
   }
-  const key = (item.image_key ?? "excavator") as keyof typeof equipmentImages;
-  return [equipmentImages[key] ?? equipmentImages.excavator];
+  return ["/listing-placeholder.svg"];
 }
 
 export function getEquipmentCoverUrl(item: Pick<EquipmentRow, "images" | "image_key">): string {

@@ -29,28 +29,61 @@ import {
   fetchCategories,
   fetchEquipmentBySlug,
   fetchRelatedEquipment,
+  getWhatsAppHref,
   incrementEquipmentViews,
   startConversation,
   unlockEquipmentContact,
+  type EquipmentContact,
 } from "@/lib/queries";
 import { formatPrice } from "@/lib/mock-data";
 import { getEquipmentImageUrls } from "@/lib/equipment-images";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
+import { absoluteSiteUrl } from "@/lib/site-url";
 
 export const Route = createFileRoute("/pecas/$slug")({
-  head: () => ({
-    meta: [{ title: "Peça — Mercado Geotécnico" }],
-  }),
+  loader: ({ params }) => fetchEquipmentBySlug(params.slug),
+  head: ({ loaderData: item, params }) => {
+    const title = item
+      ? `${item.title} — Mercado Geotécnico`
+      : "Peça não encontrada — Mercado Geotécnico";
+    const description =
+      item?.description?.slice(0, 200) ||
+      "Consulte informações, fotos e disponibilidade de peças do setor geotécnico.";
+    const image = item ? getEquipmentImageUrls(item)[0] : "/listing-placeholder.svg";
+    return {
+      meta: [
+        { title },
+        { name: "description", content: description },
+        { property: "og:title", content: title },
+        { property: "og:description", content: description },
+        { property: "og:url", content: absoluteSiteUrl(`/pecas/${params.slug}`) },
+        {
+          property: "og:image",
+          content: image.startsWith("http") ? image : absoluteSiteUrl(image),
+        },
+        {
+          property: "og:image:alt",
+          content: item?.images.length ? item.title : "Foto não informada",
+        },
+        ...(!item ? [{ name: "robots", content: "noindex" }] : []),
+      ],
+    };
+  },
   component: EquipmentDetail,
 });
 
 function EquipmentDetail() {
   const { slug } = Route.useParams();
+  const initialItem = Route.useLoaderData();
   const { session } = useAuth();
   const navigate = useNavigate();
   const [active, setActive] = useState(0);
-  const [contact, setContact] = useState<{ phone: string; whatsapp: string } | null>(null);
+  const [unlockedContact, setUnlockedContact] = useState<{
+    userId: string;
+    equipmentId: string;
+    data: EquipmentContact;
+  } | null>(null);
   const [copied, setCopied] = useState(false);
   const [messageDraft, setMessageDraft] = useState("");
   const [messageSent, setMessageSent] = useState(false);
@@ -58,6 +91,7 @@ function EquipmentDetail() {
   const { data: item, isLoading } = useQuery({
     queryKey: ["equipment", slug],
     queryFn: () => fetchEquipmentBySlug(slug),
+    initialData: initialItem ?? undefined,
   });
   const { data: categories = [] } = useQuery({
     queryKey: ["categories"],
@@ -81,10 +115,18 @@ function EquipmentDetail() {
   }, [item]);
 
   const unlock = useMutation({
-    mutationFn: () => unlockEquipmentContact(item!.id),
-    onSuccess: (data) => setContact(data),
+    mutationFn: ({ equipmentId }: { equipmentId: string; userId: string }) =>
+      unlockEquipmentContact(equipmentId),
+    onSuccess: (data, variables) => setUnlockedContact({ ...variables, data }),
     onError: () => toast.error("Não foi possível liberar o contato. Tente novamente."),
   });
+  const contact =
+    session &&
+    unlockedContact?.userId === session.user.id &&
+    unlockedContact.equipmentId === item?.id
+      ? unlockedContact.data
+      : null;
+  const whatsAppHref = getWhatsAppHref(contact?.whatsapp ?? null);
 
   const sendMessage = useMutation({
     mutationFn: () => startConversation(item!.company_id, item!.id, messageDraft.trim()),
@@ -270,26 +312,33 @@ function EquipmentDetail() {
             {contact ? (
               <div className="flex flex-col gap-2 rounded-xl border border-success/40 bg-success/5 p-3">
                 <p className="flex items-center gap-2 text-sm font-medium">
-                  <Phone className="h-4 w-4 text-success" /> {contact.phone}
+                  <Phone className="h-4 w-4 text-success" />
+                  {contact.phone || contact.whatsapp || "Telefone não informado"}
                 </p>
-                <Button
-                  variant="outline"
-                  asChild
-                  className="gap-2 border-success/40 text-success hover:bg-success/10"
-                >
-                  <a href={`https://wa.me/${contact.whatsapp}`} target="_blank" rel="noreferrer">
-                    <MessageCircle className="h-4 w-4" /> Chamar no WhatsApp
-                  </a>
-                </Button>
+                {whatsAppHref && (
+                  <Button
+                    variant="outline"
+                    asChild
+                    className="gap-2 border-success/40 text-success hover:bg-success/10"
+                  >
+                    <a href={whatsAppHref} target="_blank" rel="noreferrer">
+                      <MessageCircle className="h-4 w-4" /> Chamar no WhatsApp
+                    </a>
+                  </Button>
+                )}
               </div>
             ) : session ? (
-              <Button className="gap-2" onClick={() => unlock.mutate()} disabled={unlock.isPending}>
+              <Button
+                className="gap-2"
+                onClick={() => unlock.mutate({ equipmentId: item.id, userId: session.user.id })}
+                disabled={unlock.isPending}
+              >
                 <Phone className="h-4 w-4" />{" "}
                 {unlock.isPending ? "Desbloqueando..." : "Ver contato"}
               </Button>
             ) : (
               <Button asChild className="gap-2">
-                <Link to="/entrar">
+                <Link to="/entrar" search={{ redirect: `/pecas/${encodeURIComponent(slug)}` }}>
                   <Lock className="h-4 w-4" /> Entrar para ver o contato
                 </Link>
               </Button>
@@ -299,7 +348,10 @@ function EquipmentDetail() {
                 variant="outline"
                 onClick={() => {
                   if (!loggedIn) {
-                    navigate({ to: "/entrar" });
+                    navigate({
+                      to: "/entrar",
+                      search: { redirect: `/pecas/${encodeURIComponent(slug)}` },
+                    });
                     return;
                   }
                   toggleFavorite();

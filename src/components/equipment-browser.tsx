@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
-import { SlidersHorizontal, Search, X, LayoutGrid, List, SearchX } from "lucide-react";
+import { SlidersHorizontal, Search, X, LayoutGrid, List, SearchX, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -110,6 +110,10 @@ export function EquipmentBrowser({
   const {
     data: pages,
     isLoading,
+    isError,
+    isFetching,
+    isFetchNextPageError,
+    refetch,
     isFetchingNextPage,
     hasNextPage,
     fetchNextPage,
@@ -470,6 +474,20 @@ export function EquipmentBrowser({
                 </div>
               ))}
             </div>
+          ) : isError && filtered.length === 0 ? (
+            <div
+              role="alert"
+              className="flex flex-col items-center gap-3 rounded-2xl border border-destructive/30 px-6 py-16 text-center"
+            >
+              <AlertCircle className="h-8 w-8 text-destructive" />
+              <p className="text-lg font-semibold">Não foi possível carregar as peças</p>
+              <p className="max-w-sm text-sm text-muted-foreground">
+                Confira sua conexão e tente novamente. Sua busca e seus filtros serão mantidos.
+              </p>
+              <Button variant="outline" onClick={() => void refetch()} disabled={isFetching}>
+                {isFetching ? "Tentando novamente..." : "Tentar novamente"}
+              </Button>
+            </div>
           ) : filtered.length === 0 ? (
             <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-border px-6 py-24 text-center">
               <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-muted">
@@ -511,7 +529,26 @@ export function EquipmentBrowser({
                   />
                 ))}
               </div>
-              {hasNextPage && (
+              {isError && (
+                <div
+                  role="alert"
+                  className="mt-6 space-y-3 rounded-xl border border-destructive/30 p-4 text-center text-sm"
+                >
+                  <p>
+                    Não foi possível{" "}
+                    {isFetchNextPageError ? "carregar mais peças" : "atualizar o catálogo"}. Os
+                    resultados já carregados continuam disponíveis.
+                  </p>
+                  <Button
+                    variant="outline"
+                    disabled={isFetching}
+                    onClick={() => void (isFetchNextPageError ? fetchNextPage() : refetch())}
+                  >
+                    {isFetching ? "Tentando novamente..." : "Tentar novamente"}
+                  </Button>
+                </div>
+              )}
+              {hasNextPage && !isError && (
                 <div className="mt-8 text-center">
                   <Button
                     variant="outline"

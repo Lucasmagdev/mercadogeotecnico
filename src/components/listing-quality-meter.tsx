@@ -4,14 +4,8 @@ import { cn } from "@/lib/utils";
 
 export function ListingQualityMeter({ quality }: { quality: ListingQuality }) {
   const { score, suggestions } = quality;
-  const tone =
-    score >= 80
-      ? "text-success"
-      : score >= 50
-        ? "text-accent"
-        : "text-destructive";
-  const barTone =
-    score >= 80 ? "bg-success" : score >= 50 ? "bg-accent" : "bg-destructive";
+  const tone = score >= 80 ? "text-success" : score >= 50 ? "text-accent" : "text-destructive";
+  const barTone = score >= 80 ? "bg-success" : score >= 50 ? "bg-accent" : "bg-destructive";
 
   return (
     <div className="rounded-2xl border border-border bg-card p-5">

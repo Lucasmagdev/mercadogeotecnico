@@ -120,11 +120,7 @@ export function GeoSelosVerification({
               asChild
               className="w-full rounded-full bg-[#14265C] text-white hover:bg-[#1b3475]"
             >
-              <a
-                href="https://geoselos.com/"
-                target="_blank"
-                rel="noreferrer"
-              >
+              <a href="https://geoselos.com/" target="_blank" rel="noreferrer">
                 Solicite sua verificação GeoSelos
                 <ExternalLink className="h-4 w-4" />
               </a>
