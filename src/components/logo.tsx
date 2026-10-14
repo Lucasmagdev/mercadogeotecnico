@@ -19,7 +19,7 @@ export function Logo({
           alt=""
           width={128}
           height={128}
-          className="h-full w-full object-contain"
+          className="h-full w-full -translate-x-[2%] -translate-y-[2%] object-contain"
           decoding="async"
         />
       </span>
