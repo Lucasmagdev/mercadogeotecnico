@@ -1,6 +1,8 @@
 import { useRef, useState } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { Building2, ImagePlus, MailCheck, MapPin, Phone, Sparkles } from "lucide-react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { Building2, ImagePlus, MapPin, Phone, Sparkles } from "lucide-react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -13,11 +15,15 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useAuth } from "@/components/auth-provider";
-import { registerCompany, updateCompany } from "@/lib/queries";
+import { fetchMyCompany, registerCompany, updateCompany } from "@/lib/queries";
 import { uploadCompanyImage } from "@/lib/company-images";
 import { supabase } from "@/lib/supabase";
 import { states } from "@/lib/mock-data";
 import { formatPhoneBR } from "@/lib/utils";
+import { EmailConfirmation } from "@/components/email-confirmation";
+import { CompanyApproval } from "@/components/company-approval";
+import { SupportContact } from "@/components/support-contact";
+import { confirmationRedirectUrl, safeInternalRedirect } from "@/lib/auth-redirect";
 
 export const Route = createFileRoute("/cadastro/empresa")({
   head: () => ({
@@ -113,7 +119,13 @@ function CompanyFieldsGrid({
   );
 }
 
-function CompanyPreview({ form, logoPreview }: { form: CompanyFields; logoPreview?: string | null }) {
+function CompanyPreview({
+  form,
+  logoPreview,
+}: {
+  form: CompanyFields;
+  logoPreview?: string | null;
+}) {
   return (
     <div className="lg:sticky lg:top-24 lg:self-start">
       <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
@@ -159,10 +171,61 @@ function CompanyPreview({ form, logoPreview }: { form: CompanyFields; logoPrevie
 
 function CadastroEmpresa() {
   const { session, loading } = useAuth();
+  const {
+    data: company,
+    isLoading: companyLoading,
+    isError,
+    isFetching,
+    refetch,
+  } = useQuery({
+    queryKey: ["my-company", session?.user.id],
+    queryFn: () => fetchMyCompany(session!.user.id),
+    enabled: !!session,
+  });
 
-  if (loading) {
+  if (loading || (session && companyLoading)) {
     return (
       <div className="container-page py-16 text-center text-muted-foreground">Carregando...</div>
+    );
+  }
+
+  if (session && isError) {
+    return (
+      <div className="container-page flex min-h-[60vh] flex-col items-center justify-center gap-4 py-10 text-center">
+        <p role="alert">Não foi possível consultar o cadastro da empresa. Confira sua conexão.</p>
+        <Button onClick={() => void refetch()} disabled={isFetching}>
+          Tentar novamente
+        </Button>
+        <SupportContact />
+      </div>
+    );
+  }
+
+  if (company?.status === "pending" || company?.status === "rejected") {
+    return (
+      <CompanyApproval
+        status={company.status}
+        companyName={company.name}
+        onRefresh={() => void refetch()}
+        refreshing={isFetching}
+      />
+    );
+  }
+
+  if (company) {
+    return (
+      <div className="container-page flex min-h-[60vh] flex-col items-center justify-center gap-4 py-10 text-center">
+        <h1 className="text-xl font-bold">Sua empresa já está cadastrada</h1>
+        <p className="max-w-md text-muted-foreground">
+          {company.name} está aprovada. Publique um item com fotos reais e informações técnicas.
+        </p>
+        <Button asChild>
+          <Link to="/publicar">Publicar anúncio</Link>
+        </Button>
+        <Button asChild variant="outline">
+          <Link to="/painel">Acessar painel</Link>
+        </Button>
+      </div>
     );
   }
 
@@ -175,6 +238,8 @@ function CadastroEmpresa() {
 
 /** New visitor: create account + company in a single step (one email confirmation). */
 function SignupAndEmpresaForm() {
+  const search = Route.useSearch();
+  const redirect = safeInternalRedirect(search.redirect, "/painel");
   const [form, setForm] = useState<CompanyFields>({
     companyName: "",
     cnpj: "",
@@ -199,50 +264,39 @@ function SignupAndEmpresaForm() {
     e.preventDefault();
     setLoading(true);
     setError("");
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        emailRedirectTo: `${window.location.origin}/entrar`,
-        data: {
-          account_type: "company",
-          full_name: fullName,
-          company_name: form.companyName,
-          cnpj: form.cnpj,
-          city: form.city,
-          state: form.state,
-          phone: form.phone,
-          whatsapp: form.whatsapp,
-          description: form.description,
+    try {
+      const { error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          emailRedirectTo: confirmationRedirectUrl(redirect),
+          data: {
+            account_type: "company",
+            full_name: fullName,
+            company_name: form.companyName,
+            cnpj: form.cnpj,
+            city: form.city,
+            state: form.state,
+            phone: form.phone,
+            whatsapp: form.whatsapp,
+            description: form.description,
+          },
         },
-      },
-    });
-    setLoading(false);
-    if (error) {
-      setError(error.message);
-      return;
+      });
+      if (error) {
+        setError(error.message);
+        return;
+      }
+      setSent(true);
+    } catch {
+      setError("Não foi possível concluir agora. Confira sua conexão e tente novamente.");
+    } finally {
+      setLoading(false);
     }
-    setSent(true);
   }
 
   if (sent) {
-    return (
-      <div className="container-page flex min-h-[70vh] items-center justify-center py-12">
-        <div className="w-full max-w-md rounded-2xl border border-border bg-card p-6 text-center shadow-soft">
-          <div className="mx-auto mb-3 flex h-11 w-11 items-center justify-center rounded-xl bg-success/10 text-success">
-            <MailCheck className="h-5 w-5" />
-          </div>
-          <h1 className="text-lg font-bold">Confirme seu e-mail</h1>
-          <p className="mt-2 text-sm text-muted-foreground">
-            Enviamos um link de confirmação para <strong>{email}</strong>. Depois de confirmar,
-            entre na sua conta — sua empresa já estará cadastrada e aguardando aprovação.
-          </p>
-          <Button asChild className="mt-5 w-full">
-            <Link to="/entrar">Ir para o login</Link>
-          </Button>
-        </div>
-      </div>
-    );
+    return <EmailConfirmation email={email} redirect={redirect} company />;
   }
 
   return (
@@ -305,7 +359,11 @@ function SignupAndEmpresaForm() {
 
       <p className="mt-5 text-center text-sm text-muted-foreground">
         Já tem conta?{" "}
-        <Link to="/entrar" className="font-medium text-primary hover:underline">
+        <Link
+          to="/entrar"
+          search={{ redirect: "/cadastro/empresa" }}
+          className="font-medium text-primary hover:underline"
+        >
           Entrar
         </Link>{" "}
         e cadastre sua empresa depois de logar.
@@ -317,6 +375,7 @@ function SignupAndEmpresaForm() {
 /** Already logged in: just add the company to the existing account. */
 function EmpresaForm({ email, userId }: { email: string; userId: string }) {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const { refreshProfile } = useAuth();
   const [form, setForm] = useState<CompanyFields>({
     companyName: "",
@@ -341,8 +400,9 @@ function EmpresaForm({ email, userId }: { email: string; userId: string }) {
     e.preventDefault();
     setLoading(true);
     setError("");
+    let newId: string;
     try {
-      const newId = await registerCompany({
+      newId = await registerCompany({
         name: form.companyName,
         cnpj: form.cnpj,
         city: form.city,
@@ -351,12 +411,6 @@ function EmpresaForm({ email, userId }: { email: string; userId: string }) {
         whatsapp: form.whatsapp,
         description: form.description,
       });
-      if (logoFile) {
-        const path = await uploadCompanyImage(userId, logoFile, "logo");
-        await updateCompany(newId, { logo_path: path });
-      }
-      await refreshProfile();
-      navigate({ to: "/painel" });
     } catch (err) {
       setError(
         err instanceof Error && err.message === "company_already_exists"
@@ -364,7 +418,24 @@ function EmpresaForm({ email, userId }: { email: string; userId: string }) {
           : "Não foi possível cadastrar a empresa. Tente novamente.",
       );
       setLoading(false);
+      return;
     }
+
+    if (logoFile) {
+      try {
+        const path = await uploadCompanyImage(userId, logoFile, "logo");
+        await updateCompany(newId, { logo_path: path });
+      } catch {
+        toast.warning(
+          "Empresa cadastrada. O logo não foi enviado; você pode adicioná-lo depois em Configurações.",
+        );
+      }
+    }
+    await Promise.allSettled([
+      refreshProfile(),
+      queryClient.invalidateQueries({ queryKey: ["my-company", userId] }),
+    ]);
+    void navigate({ to: "/painel" });
   }
 
   return (

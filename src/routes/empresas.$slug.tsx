@@ -26,27 +26,59 @@ import {
   fetchCategories,
   fetchCompanyBySlug,
   fetchCompanyEquipment,
+  getWhatsAppHref,
   startConversation,
   unlockCompanyContact,
+  type CompanyContact,
 } from "@/lib/queries";
+import { absoluteSiteUrl } from "@/lib/site-url";
 
 export const Route = createFileRoute("/empresas/$slug")({
-  head: () => ({ meta: [{ title: "Empresa — Mercado Geotécnico" }] }),
+  loader: ({ params }) => fetchCompanyBySlug(params.slug),
+  head: ({ loaderData: company, params }) => {
+    const title = company
+      ? `${company.name} — Mercado Geotécnico`
+      : "Empresa não encontrada — Mercado Geotécnico";
+    const description =
+      company?.description?.slice(0, 200) ||
+      "Conheça a empresa e os anúncios disponíveis no Mercado Geotécnico.";
+    const image = company?.logo_path ? getCompanyImageUrl(company.logo_path) : null;
+    return {
+      meta: [
+        { title },
+        { name: "description", content: description },
+        { property: "og:title", content: title },
+        { property: "og:description", content: description },
+        { property: "og:url", content: absoluteSiteUrl(`/empresas/${params.slug}`) },
+        ...(image
+          ? [
+              { property: "og:image", content: image },
+              { property: "og:image:alt", content: company!.name },
+            ]
+          : []),
+        ...(!company ? [{ name: "robots", content: "noindex" }] : []),
+      ],
+    };
+  },
   component: CompanyProfile,
 });
 
 function CompanyProfile() {
   const { slug } = Route.useParams();
+  const initialCompany = Route.useLoaderData();
   const { session } = useAuth();
-  const [contact, setContact] = useState<{ phone: string; whatsapp: string; site: string } | null>(
-    null,
-  );
+  const [unlockedContact, setUnlockedContact] = useState<{
+    userId: string;
+    companyId: string;
+    data: CompanyContact;
+  } | null>(null);
   const [messageDraft, setMessageDraft] = useState("");
   const [messageSent, setMessageSent] = useState(false);
 
   const { data: company, isLoading } = useQuery({
     queryKey: ["company", slug],
     queryFn: () => fetchCompanyBySlug(slug),
+    initialData: initialCompany ?? undefined,
   });
   const { data: categories = [] } = useQuery({
     queryKey: ["categories"],
@@ -59,10 +91,18 @@ function CompanyProfile() {
   });
 
   const unlock = useMutation({
-    mutationFn: () => unlockCompanyContact(company!.id),
-    onSuccess: (data) => setContact(data),
+    mutationFn: ({ companyId }: { companyId: string; userId: string }) =>
+      unlockCompanyContact(companyId),
+    onSuccess: (data, variables) => setUnlockedContact({ ...variables, data }),
     onError: () => toast.error("Não foi possível liberar o contato. Tente novamente."),
   });
+  const contact =
+    session &&
+    unlockedContact?.userId === session.user.id &&
+    unlockedContact.companyId === company?.id
+      ? unlockedContact.data
+      : null;
+  const whatsAppHref = getWhatsAppHref(contact?.whatsapp ?? null);
 
   const sendMessage = useMutation({
     mutationFn: () => startConversation(company!.id, null, messageDraft.trim()),
@@ -131,24 +171,32 @@ function CompanyProfile() {
             </div>
           </div>
           <div className="flex gap-2 pb-1">
-            {contact ? (
+            {contact && whatsAppHref ? (
               <Button
                 variant="outline"
                 asChild
                 className="gap-2 border-success/40 text-success hover:bg-success/10"
               >
-                <a href={`https://wa.me/${contact.whatsapp}`} target="_blank" rel="noreferrer">
-                  <MessageCircle className="h-4 w-4" /> {contact.phone}
+                <a href={whatsAppHref} target="_blank" rel="noreferrer">
+                  <MessageCircle className="h-4 w-4" /> {contact.phone || contact.whatsapp}
                 </a>
               </Button>
+            ) : contact ? (
+              <p className="self-center text-sm text-muted-foreground">
+                {contact.phone || "Telefone não informado"}
+              </p>
             ) : session ? (
-              <Button className="gap-2" onClick={() => unlock.mutate()} disabled={unlock.isPending}>
+              <Button
+                className="gap-2"
+                onClick={() => unlock.mutate({ companyId: company.id, userId: session.user.id })}
+                disabled={unlock.isPending}
+              >
                 <Phone className="h-4 w-4" />{" "}
                 {unlock.isPending ? "Desbloqueando..." : "Ver contato"}
               </Button>
             ) : (
               <Button asChild className="gap-2">
-                <Link to="/entrar">
+                <Link to="/entrar" search={{ redirect: `/empresas/${encodeURIComponent(slug)}` }}>
                   <Lock className="h-4 w-4" /> Entrar para ver o contato
                 </Link>
               </Button>
@@ -210,22 +258,31 @@ function CompanyProfile() {
               <h3 className="mb-3 font-semibold">Contato</h3>
               {contact ? (
                 <div className="space-y-2 text-muted-foreground">
+                  {contact.site && (
+                    <p className="flex items-center gap-2">
+                      <Globe className="h-4 w-4" /> {contact.site}
+                    </p>
+                  )}
                   <p className="flex items-center gap-2">
-                    <Globe className="h-4 w-4" /> {contact.site}
+                    <Phone className="h-4 w-4" />
+                    {contact.phone || contact.whatsapp || "Telefone não informado"}
                   </p>
-                  <p className="flex items-center gap-2">
-                    <Phone className="h-4 w-4" /> {contact.phone}
-                  </p>
-                  <p className="flex items-center gap-2">
-                    <MessageCircle className="h-4 w-4" /> WhatsApp disponível
-                  </p>
+                  {whatsAppHref && (
+                    <p className="flex items-center gap-2">
+                      <MessageCircle className="h-4 w-4" /> WhatsApp disponível
+                    </p>
+                  )}
                 </div>
               ) : (
                 <p className="text-muted-foreground">
                   {session ? (
                     'Clique em "Ver contato" para revelar.'
                   ) : (
-                    <Link to="/entrar" className="font-medium text-primary hover:underline">
+                    <Link
+                      to="/entrar"
+                      search={{ redirect: `/empresas/${encodeURIComponent(slug)}` }}
+                      className="font-medium text-primary hover:underline"
+                    >
                       Entre
                     </Link>
                   )}
@@ -237,7 +294,7 @@ function CompanyProfile() {
               <h3 className="mb-3 font-semibold">Enviar mensagem</h3>
               {!session ? (
                 <Button asChild variant="outline" className="w-full gap-2">
-                  <Link to="/entrar">
+                  <Link to="/entrar" search={{ redirect: `/empresas/${encodeURIComponent(slug)}` }}>
                     <Lock className="h-4 w-4" /> Entrar para enviar mensagem
                   </Link>
                 </Button>

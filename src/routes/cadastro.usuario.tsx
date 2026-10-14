@@ -1,10 +1,12 @@
 import { useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { User, MailCheck } from "lucide-react";
+import { User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/lib/supabase";
+import { EmailConfirmation } from "@/components/email-confirmation";
+import { confirmationRedirectUrl, safeInternalRedirect } from "@/lib/auth-redirect";
 
 export const Route = createFileRoute("/cadastro/usuario")({
   head: () => ({
@@ -17,6 +19,8 @@ export const Route = createFileRoute("/cadastro/usuario")({
 });
 
 function CadastroUsuario() {
+  const search = Route.useSearch();
+  const redirect = safeInternalRedirect(search.redirect);
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -28,49 +32,29 @@ function CadastroUsuario() {
     e.preventDefault();
     setLoading(true);
     setError("");
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: { data: { full_name: fullName, account_type: "user" } },
-    });
-    setLoading(false);
-    if (error) {
-      setError(error.message);
-      return;
+    try {
+      const { error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          emailRedirectTo: confirmationRedirectUrl(redirect),
+          data: { full_name: fullName, account_type: "user" },
+        },
+      });
+      if (error) {
+        setError(error.message);
+        return;
+      }
+      setSent(true);
+    } catch {
+      setError("Não foi possível concluir agora. Confira sua conexão e tente novamente.");
+    } finally {
+      setLoading(false);
     }
-    setSent(true);
   }
 
   if (sent) {
-    return (
-      <div className="container-page flex min-h-[70vh] items-center justify-center py-12">
-        <div className="w-full max-w-sm rounded-2xl border border-border bg-card p-6 text-center shadow-soft">
-          <div className="mx-auto mb-3 flex h-11 w-11 items-center justify-center rounded-xl bg-success/10 text-success">
-            <MailCheck className="h-5 w-5" />
-          </div>
-          <h1 className="text-lg font-bold">Confirme seu e-mail</h1>
-          <p className="mt-2 text-sm text-muted-foreground">
-            Enviamos um link de confirmação para <strong>{email}</strong>. Confirme para ativar sua
-            conta e entrar.
-          </p>
-          <Button asChild className="mt-5 w-full">
-            <Link to="/entrar">Ir para o login</Link>
-          </Button>
-          <div className="mt-4 rounded-xl bg-secondary/10 p-3 text-left">
-            <p className="text-sm font-medium text-secondary">É dono de uma empresa?</p>
-            <p className="mt-0.5 text-xs text-muted-foreground">
-              Depois de entrar, cadastre sua empresa e comece a anunciar peças.
-            </p>
-            <Link
-              to="/cadastro/empresa"
-              className="mt-1.5 inline-block text-xs font-semibold text-secondary hover:underline"
-            >
-              Cadastrar minha empresa →
-            </Link>
-          </div>
-        </div>
-      </div>
-    );
+    return <EmailConfirmation email={email} redirect={redirect} />;
   }
 
   return (
@@ -113,7 +97,11 @@ function CadastroUsuario() {
 
         <p className="mt-5 text-center text-sm text-muted-foreground">
           Já tem conta?{" "}
-          <Link to="/entrar" className="font-medium text-primary hover:underline">
+          <Link
+            to="/entrar"
+            search={{ redirect }}
+            className="font-medium text-primary hover:underline"
+          >
             Entrar
           </Link>
         </p>

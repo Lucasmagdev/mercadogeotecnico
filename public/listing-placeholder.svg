@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 480" role="img" aria-labelledby="title description">
+  <title id="title">Foto não informada</title>
+  <desc id="description">O anunciante ainda não adicionou uma foto real deste item.</desc>
+  <rect width="640" height="480" fill="#e8eef3"/>
+  <g fill="none" stroke="#0f4c81" stroke-width="8" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="265" y="145" width="110" height="95" rx="12"/>
+    <circle cx="340" cy="174" r="9"/>
+    <path d="m270 225 28-29 22 19 17-14 33 30"/>
+  </g>
+  <text x="320" y="295" text-anchor="middle" fill="#0a2540" font-family="Arial, sans-serif" font-size="27" font-weight="700">Foto não informada</text>
+  <text x="320" y="330" text-anchor="middle" fill="#475569" font-family="Arial, sans-serif" font-size="19">Peça fotos reais ao anunciante.</text>
+</svg>

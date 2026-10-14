@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { SupportContact } from "@/components/support-contact";
 
 export const Route = createFileRoute("/privacidade")({
   head: () => ({
@@ -41,7 +42,7 @@ const sections = [
   },
   {
     title: "7. Contato",
-    body: "Dúvidas sobre esta política ou sobre o tratamento dos seus dados podem ser enviadas ao nosso encarregado de dados (DPO) pelo canal de suporte da plataforma.",
+    body: "Dúvidas sobre esta política e solicitações sobre seus dados podem ser enviadas ao suporte pelos contatos abaixo.",
   },
 ];
 
@@ -49,7 +50,7 @@ function Privacidade() {
   return (
     <div className="container-page max-w-3xl py-12">
       <h1 className="text-3xl font-bold">Política de Privacidade</h1>
-      <p className="mt-2 text-sm text-muted-foreground">Última atualização: julho de 2026</p>
+      <p className="mt-2 text-sm text-muted-foreground">Última atualização: outubro de 2026</p>
       <div className="mt-8 space-y-8">
         {sections.map((s) => (
           <section key={s.title}>
@@ -57,6 +58,9 @@ function Privacidade() {
             <p className="mt-2 leading-relaxed text-muted-foreground">{s.body}</p>
           </section>
         ))}
+      </div>
+      <div className="mt-8 rounded-xl border border-border p-5 text-center">
+        <SupportContact />
       </div>
     </div>
   );

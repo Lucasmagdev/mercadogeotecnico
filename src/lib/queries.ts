@@ -27,8 +27,11 @@ export type EquipmentFilters = {
   maxPrice?: number;
 };
 
-export async function fetchEquipmentList(filters: EquipmentFilters = {}): Promise<EquipmentRow[]> {
-  let query = supabase.from("equipment").select("*, companies(*)").eq("status", "active");
+export async function fetchEquipmentList(
+  filters: EquipmentFilters = {},
+  limit?: number,
+): Promise<EquipmentRow[]> {
+  let query = supabase.from("equipment_public").select("*").eq("status", "active");
 
   if (filters.q) query = query.ilike("title", `%${filters.q}%`);
   if (filters.categorias?.length) query = query.in("category_slug", filters.categorias);
@@ -38,6 +41,7 @@ export async function fetchEquipmentList(filters: EquipmentFilters = {}): Promis
   if (filters.estado && filters.estado !== "todos") query = query.eq("state", filters.estado);
   if (filters.minPrice !== undefined) query = query.gte("price", filters.minPrice);
   if (filters.maxPrice !== undefined) query = query.lte("price", filters.maxPrice);
+  if (limit !== undefined) query = query.limit(limit);
 
   const { data, error } = await query.order("created_at", { ascending: false });
   if (error) throw error;
@@ -53,8 +57,8 @@ export async function fetchEquipmentPage(
   page: number,
 ): Promise<{ items: EquipmentRow[]; total: number }> {
   let query = supabase
-    .from("equipment")
-    .select("*, companies(*)", { count: "exact" })
+    .from("equipment_public")
+    .select("*", { count: "exact" })
     .eq("status", "active");
 
   if (filters.q)
@@ -82,8 +86,8 @@ export async function fetchEquipmentPage(
 
 export async function fetchEquipmentBySlug(slug: string): Promise<EquipmentRow | null> {
   const { data, error } = await supabase
-    .from("equipment")
-    .select("*, companies(*)")
+    .from("equipment_public")
+    .select("*")
     .eq("slug", slug)
     .maybeSingle();
   if (error) throw error;
@@ -95,8 +99,8 @@ export async function fetchRelatedEquipment(
   excludeId: string,
 ): Promise<EquipmentRow[]> {
   const { data, error } = await supabase
-    .from("equipment")
-    .select("*, companies(*)")
+    .from("equipment_public")
+    .select("*")
     .eq("category_slug", categorySlug)
     .eq("status", "active")
     .neq("id", excludeId)
@@ -107,7 +111,7 @@ export async function fetchRelatedEquipment(
 
 export async function fetchApprovedCompanies(): Promise<Company[]> {
   const { data, error } = await supabase
-    .from("companies")
+    .from("companies_public")
     .select("*")
     .eq("status", "approved")
     .order("name")
@@ -118,7 +122,7 @@ export async function fetchApprovedCompanies(): Promise<Company[]> {
 
 export async function fetchCompanyBySlug(slug: string): Promise<Company | null> {
   const { data, error } = await supabase
-    .from("companies")
+    .from("companies_public")
     .select("*")
     .eq("slug", slug)
     .maybeSingle();
@@ -128,8 +132,8 @@ export async function fetchCompanyBySlug(slug: string): Promise<Company | null> 
 
 export async function fetchCompanyEquipment(companyId: string): Promise<EquipmentRow[]> {
   const { data, error } = await supabase
-    .from("equipment")
-    .select("*, companies(*)")
+    .from("equipment_public")
+    .select("*")
     .eq("company_id", companyId)
     .eq("status", "active")
     .order("created_at", { ascending: false })
@@ -228,19 +232,26 @@ export async function setCompanyStatus(id: string, status: "approved" | "rejecte
   if (error) throw error;
 }
 
-export async function unlockEquipmentContact(
-  equipmentId: string,
-): Promise<{ phone: string; whatsapp: string }> {
+export type EquipmentContact = { phone: string | null; whatsapp: string | null };
+export type CompanyContact = EquipmentContact & { site: string | null };
+
+export function getWhatsAppHref(value: string | null): string | null {
+  const digits = (value ?? "").replace(/\D/g, "");
+  const international = digits.length === 10 || digits.length === 11 ? `55${digits}` : digits;
+  return /^[1-9]\d{7,14}$/.test(international) ? `https://wa.me/${international}` : null;
+}
+
+export async function unlockEquipmentContact(equipmentId: string): Promise<EquipmentContact> {
   const { data, error } = await supabase.rpc("unlock_equipment_contact", { eq_id: equipmentId });
   if (error) throw error;
+  if (!data?.[0]) throw new Error("Contato indisponível.");
   return data[0];
 }
 
-export async function unlockCompanyContact(
-  companyId: string,
-): Promise<{ phone: string; whatsapp: string; site: string }> {
+export async function unlockCompanyContact(companyId: string): Promise<CompanyContact> {
   const { data, error } = await supabase.rpc("unlock_company_contact", { comp_id: companyId });
   if (error) throw error;
+  if (!data?.[0]) throw new Error("Contato indisponível.");
   return data[0];
 }
 
@@ -327,11 +338,23 @@ export async function fetchFavoriteIds(userId: string): Promise<Set<string>> {
 export async function fetchFavoriteEquipment(userId: string): Promise<EquipmentRow[]> {
   const { data, error } = await supabase
     .from("favorites")
-    .select("equipment:equipment_id(*, companies(*))")
+    .select("equipment_id")
     .eq("user_id", userId)
     .order("created_at", { ascending: false });
   if (error) throw error;
-  return (data ?? []).map((f) => f.equipment).filter(Boolean) as unknown as EquipmentRow[];
+  const ids = (data ?? []).map((favorite) => favorite.equipment_id);
+  if (ids.length === 0) return [];
+  // Batch IDs to keep PostgREST URLs bounded even for large favorite lists.
+  const items = new Map<string, EquipmentRow>();
+  for (let offset = 0; offset < ids.length; offset += 100) {
+    const { data: rows, error: rowsError } = await supabase
+      .from("equipment_public")
+      .select("*")
+      .in("id", ids.slice(offset, offset + 100));
+    if (rowsError) throw rowsError;
+    for (const row of (rows ?? []) as EquipmentRow[]) items.set(row.id, row);
+  }
+  return ids.flatMap((id) => (items.has(id) ? [items.get(id)!] : []));
 }
 
 export async function addFavorite(userId: string, equipmentId: string) {
@@ -380,26 +403,26 @@ export async function markAllNotificationsRead(userId: string) {
 
 // ---------- messaging ----------
 
-export async function fetchConversations(userId: string): Promise<ConversationRow[]> {
+export async function fetchConversations(_userId: string): Promise<ConversationRow[]> {
   const { data, error } = await supabase
     .from("conversations")
-    .select("*, companies(*), buyer:buyer_id(*), equipment:equipment_id(*)")
-    .or(`buyer_id.eq.${userId}`)
+    .select("*, buyer:buyer_id(*), equipment:equipment_id(*)")
     .order("last_message_at", { ascending: false });
   if (error) throw error;
-
-  const { data: asOwner, error: error2 } = await supabase
-    .from("conversations")
-    .select("*, companies!inner(*), buyer:buyer_id(*), equipment:equipment_id(*)")
-    .eq("companies.owner_id", userId)
-    .order("last_message_at", { ascending: false });
-  if (error2) throw error2;
-
-  const merged = [...(data ?? []), ...(asOwner ?? [])];
-  const byId = new Map(merged.map((c) => [c.id, c]));
-  return Array.from(byId.values()).sort(
-    (a, b) => new Date(b.last_message_at).getTime() - new Date(a.last_message_at).getTime(),
-  ) as unknown as ConversationRow[];
+  // Conversation RLS selects buyer/owner rows. Company joins must use the
+  // public projection so opening messages never reveals a contact implicitly.
+  const rows = (data ?? []) as unknown as ConversationRow[];
+  const ids = [...new Set(rows.map((row) => row.company_id))];
+  const companies = new Map<string, Company>();
+  for (let offset = 0; offset < ids.length; offset += 100) {
+    const { data: companyRows, error: companyError } = await supabase
+      .from("companies_public")
+      .select("*")
+      .in("id", ids.slice(offset, offset + 100));
+    if (companyError) throw companyError;
+    for (const company of (companyRows ?? []) as Company[]) companies.set(company.id, company);
+  }
+  return rows.map((row) => ({ ...row, companies: companies.get(row.company_id) }));
 }
 
 export async function fetchMessages(conversationId: string): Promise<MessageRow[]> {

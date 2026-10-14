@@ -18,6 +18,8 @@ import { SiteFooter } from "@/components/site-footer";
 import { MobileNav } from "@/components/mobile-nav";
 import { CookieConsent } from "@/components/cookie-consent";
 import { Toaster } from "@/components/ui/sonner";
+import { absoluteSiteUrl } from "@/lib/site-url";
+import heroMachineryUrl from "@/assets/hero-machinery.png";
 
 function NotFoundComponent() {
   return (
@@ -84,7 +86,7 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
 }
 
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
-  head: () => ({
+  head: ({ matches }) => ({
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
@@ -106,10 +108,21 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       },
       { property: "og:type", content: "website" },
       { property: "og:locale", content: "pt_BR" },
+      { property: "og:site_name", content: "Mercado Geotécnico" },
+      {
+        property: "og:url",
+        content: absoluteSiteUrl(matches[matches.length - 1]?.pathname || "/"),
+      },
+      { property: "og:image", content: absoluteSiteUrl(heroMachineryUrl) },
+      {
+        property: "og:image:alt",
+        content: "Ilustração de equipamentos de construção — Mercado Geotécnico",
+      },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "theme-color", content: "#0A1735" },
     ],
     links: [
+      { rel: "canonical", href: absoluteSiteUrl(matches[matches.length - 1]?.pathname || "/") },
       { rel: "stylesheet", href: appCss },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },

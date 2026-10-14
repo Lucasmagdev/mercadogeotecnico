@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { Eye, EyeOff, ShieldCheck, Zap, MessagesSquare } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -6,8 +6,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Logo } from "@/components/logo";
 import { supabase } from "@/lib/supabase";
+import { useAuth } from "@/components/auth-provider";
+import { ResendConfirmation } from "@/components/email-confirmation";
+import { safeInternalRedirect, validateAuthSearch } from "@/lib/auth-redirect";
 
 export const Route = createFileRoute("/entrar")({
+  validateSearch: validateAuthSearch,
   head: () => ({
     meta: [{ title: "Entrar — Mercado Geotécnico" }, { name: "robots", content: "noindex" }],
   }),
@@ -16,29 +20,49 @@ export const Route = createFileRoute("/entrar")({
 
 const highlights = [
   { icon: ShieldCheck, text: "Empresas verificadas com selo de confiança" },
-  { icon: Zap, text: "Busca técnica por milhares de peças" },
+  { icon: Zap, text: "Busca por peças e equipamentos do setor" },
   { icon: MessagesSquare, text: "Negociação direta, sem intermediários" },
 ];
 
 function Entrar() {
   const navigate = useNavigate();
+  const { session, loading: authLoading } = useAuth();
+  const search = Route.useSearch();
+  const redirect = safeInternalRedirect(search.redirect);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [needsConfirmation, setNeedsConfirmation] = useState(false);
+
+  useEffect(() => {
+    if (!authLoading && session) void navigate({ href: redirect, replace: true });
+  }, [authLoading, session, redirect, navigate]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
     setError("");
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-    setLoading(false);
-    if (error) {
-      setError("E-mail ou senha inválidos.");
-      return;
+    setNeedsConfirmation(false);
+    try {
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error) {
+        const unconfirmed = error.code === "email_not_confirmed";
+        setNeedsConfirmation(unconfirmed);
+        setError(
+          unconfirmed
+            ? "Confirme seu e-mail antes de entrar."
+            : "Não foi possível entrar. Confira os dados e sua conexão e tente novamente.",
+        );
+        return;
+      }
+      void navigate({ href: redirect, replace: true });
+    } catch {
+      setError("Não foi possível entrar agora. Confira sua conexão e tente novamente.");
+    } finally {
+      setLoading(false);
     }
-    navigate({ to: "/" });
   }
 
   return (
@@ -63,7 +87,7 @@ function Entrar() {
           </div>
           <div className="relative">
             <h2 className="text-2xl font-bold leading-snug">
-              O maior ecossistema de engenharia do Brasil.
+              Peças e equipamentos para geotecnia e fundações.
             </h2>
             <ul className="mt-6 space-y-4">
               {highlights.map((h) => (
@@ -79,7 +103,7 @@ function Entrar() {
               ))}
             </ul>
           </div>
-          <p className="relative text-xs text-secondary-foreground/60">© 2025 Mercado Geotécnico</p>
+          <p className="relative text-xs text-secondary-foreground/60">Mercado Geotécnico</p>
         </div>
 
         {/* Form */}
@@ -130,6 +154,7 @@ function Entrar() {
                 {error}
               </p>
             )}
+            {needsConfirmation && <ResendConfirmation email={email} redirect={redirect} />}
             <Button type="submit" className="w-full" disabled={loading}>
               {loading ? "Entrando..." : "Entrar"}
             </Button>
@@ -145,7 +170,11 @@ function Entrar() {
 
           <div className="mt-6 border-t border-border pt-5 text-center text-sm text-muted-foreground">
             Não tem conta?{" "}
-            <Link to="/cadastro" className="font-medium text-primary hover:underline">
+            <Link
+              to="/cadastro"
+              search={{ redirect }}
+              className="font-medium text-primary hover:underline"
+            >
               Cadastre-se grátis
             </Link>
           </div>
