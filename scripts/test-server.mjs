@@ -65,15 +65,17 @@ try {
   process.env.SUPABASE_URL = "https://auth.test.invalid";
   process.env.SUPABASE_ANON_KEY = "test-anon";
   process.env.SUPABASE_SERVICE_ROLE_KEY = "test-server";
+  process.env.GEMINI_API_KEY = "test-free-provider";
   process.env.OPENAI_API_KEY = "test-provider";
   process.env.AI_MODEL_PRICES_JSON = JSON.stringify({
+    "gemini-3.1-flash-lite": { inputUsdPerMillion: 0, outputUsdPerMillion: 0 },
     "gpt-5.6-luna": { inputUsdPerMillion: 2, outputUsdPerMillion: 8 },
   });
   console.info = (line) => events.push(JSON.parse(line));
   console.warn = (line) => events.push(JSON.parse(line));
   console.error = (line) => events.push(JSON.parse(line));
   let scenario = "expired";
-  let providerCalls = 0;
+  const providerCalls = [];
   const finished = [];
   const json = (value, status = 200) =>
     new Response(JSON.stringify(value), {
@@ -108,38 +110,44 @@ try {
         return new Response(null, { status: 204 });
       }
     }
-    if (url.hostname === "api.openai.com" && url.pathname === "/v1/responses") {
-      providerCalls++;
+    const gemini =
+      url.hostname === "generativelanguage.googleapis.com" &&
+      url.pathname === "/v1beta/openai/chat/completions";
+    const openai = url.hostname === "api.openai.com" && url.pathname === "/v1/chat/completions";
+    if (gemini || openai) {
       const payload = await request.json();
-      assert.equal(payload.max_output_tokens, 1200);
+      providerCalls.push(payload.model);
+      assert.equal(payload.max_completion_tokens, 1200);
+      assert.equal(gemini, payload.model.startsWith("gemini-"));
       if (scenario === "provider-failure")
         return json({ error: { message: "synthetic outage", type: "server_error" } }, 500);
+      if (scenario === "free-quota" && gemini)
+        return payload.model === "gemini-3.1-flash-lite"
+          ? json({ error: { message: "quota exhausted", code: 429 } }, 429)
+          : json({ error: { message: "high demand", code: 503 } }, 503);
       return json({
-        id: "response-fixture",
-        object: "response",
-        status: "completed",
-        model: "gpt-5.6-luna",
-        output: [
+        id: "completion-fixture",
+        object: "chat.completion",
+        created: 0,
+        model: payload.model,
+        choices: [
           {
-            type: "message",
-            role: "assistant",
-            status: "completed",
-            content: [
-              {
-                type: "output_text",
-                text: JSON.stringify({
-                  specs: [{ label: "Pressão", placeholder: "Ex.: 200 bar" }],
-                }),
-                annotations: [],
-              },
-            ],
+            index: 0,
+            finish_reason: "stop",
+            message: {
+              role: "assistant",
+              content: JSON.stringify({
+                specs: [{ label: "Pressão", placeholder: "Ex.: 200 bar" }],
+              }),
+              refusal: null,
+            },
           },
         ],
         usage: {
-          input_tokens: 100,
-          output_tokens: 20,
+          prompt_tokens: 100,
+          completion_tokens: 20,
           total_tokens: 120,
-          input_tokens_details: { cached_tokens: 0 },
+          prompt_tokens_details: { cached_tokens: 0 },
         },
       });
     }
@@ -152,6 +160,7 @@ try {
     ["quota", 429],
     ["approved", 200],
     ["provider-failure", 502],
+    ["free-quota", 200],
   ]) {
     scenario = name;
     const response = await server.fetch(
@@ -168,18 +177,30 @@ try {
     assert.equal(response.status, expectedStatus, `Controlled HTTP scenario ${name}`);
     authorizedResults.push({ scenario: name, status: response.status });
   }
-  assert.equal(
+  // Free models first; a 500 must not fall through, only not-served errors (429/503) may.
+  assert.deepEqual(
     providerCalls,
-    2,
-    "Only approved reservations may reach provider; automatic retries are disabled",
+    [
+      "gemini-3.1-flash-lite",
+      "gemini-3.1-flash-lite",
+      "gemini-3.1-flash-lite",
+      "gemini-3.5-flash-lite",
+      "gpt-5.6-luna",
+    ],
+    "Only approved reservations may reach providers; paid fallback only after free 429/503",
   );
-  assert.equal(finished.length, 2);
+  assert.equal(finished.length, 3);
   assert.equal(finished[0].p_status, "succeeded");
   assert.equal(finished[0].p_input_tokens, 100);
   assert.equal(finished[0].p_output_tokens, 20);
-  assert.ok(Math.abs(finished[0].p_estimated_cost_usd - 0.00036) < 1e-10);
+  assert.equal(finished[0].p_estimated_cost_usd, 0);
   assert.equal(finished[1].p_status, "failed");
   assert.equal(finished[1].p_estimated_cost_usd, null);
+  assert.equal(finished[2].p_status, "succeeded");
+  assert.ok(Math.abs(finished[2].p_estimated_cost_usd - 0.00036) < 1e-10);
+  assert.ok(
+    events.some((event) => event.event === "ai_provider_fallback" && event.to === "gpt-5.6-luna"),
+  );
   assert.ok(events.some((event) => event.event === "ai_provider_usage" && event.durationMs >= 0));
   const companyFixture = {
     id: "b0000000-0000-4000-8000-000000000002",
