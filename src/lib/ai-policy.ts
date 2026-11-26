@@ -67,11 +67,15 @@ export function estimateAiCost(usage: AiUsage, price: AiPrice | undefined): numb
 }
 
 export function providerUsage(response: unknown): AiUsage | null {
+  // Accepts both Responses (input_/output_tokens) and Chat Completions (prompt_/completion_tokens).
   const value = response as {
     usage?: {
       input_tokens?: number;
       output_tokens?: number;
       input_tokens_details?: { cached_tokens?: number };
+      prompt_tokens?: number;
+      completion_tokens?: number;
+      prompt_tokens_details?: { cached_tokens?: number };
       type?: string;
       seconds?: number;
     };
@@ -79,9 +83,10 @@ export function providerUsage(response: unknown): AiUsage | null {
   const usage = value.usage;
   if (!usage) return null;
   return {
-    inputTokens: usage?.input_tokens ?? 0,
-    cachedInputTokens: usage?.input_tokens_details?.cached_tokens ?? 0,
-    outputTokens: usage?.output_tokens ?? 0,
+    inputTokens: usage.input_tokens ?? usage.prompt_tokens ?? 0,
+    cachedInputTokens:
+      usage.input_tokens_details?.cached_tokens ?? usage.prompt_tokens_details?.cached_tokens ?? 0,
+    outputTokens: usage.output_tokens ?? usage.completion_tokens ?? 0,
     audioSeconds: usage?.type === "duration" ? (usage.seconds ?? 0) : 0,
   };
 }

@@ -133,4 +133,16 @@ describe("AI usage and cost reporting", () => {
       }),
     ).toBeCloseTo(0.003, 8);
   });
+
+  test("extracts Chat Completions usage from OpenAI-compatible providers", () => {
+    expect(
+      providerUsage({
+        usage: {
+          prompt_tokens: 900,
+          completion_tokens: 150,
+          prompt_tokens_details: { cached_tokens: 100 },
+        },
+      }),
+    ).toEqual({ inputTokens: 900, cachedInputTokens: 100, outputTokens: 150, audioSeconds: 0 });
+  });
 });

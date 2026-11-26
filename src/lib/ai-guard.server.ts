@@ -4,8 +4,14 @@ import {
   setResponseHeaders,
   setResponseStatus,
 } from "@tanstack/react-start/server";
-import OpenAI from "openai";
 import { z } from "zod";
+import {
+  aiProviders,
+  shouldTryNextProvider,
+  type AiCall,
+  type AiCapability,
+  type AiProvider,
+} from "./ai-providers.server";
 import {
   AiAccessError,
   bearerToken,
@@ -29,13 +35,15 @@ const PriceSchema = z.record(
 // 60s synchronous limit for bounded telemetry and the HTTP response.
 const TOTAL_TIMEOUT_MS = 45_000;
 
+const CAPABILITY: Record<AiOperation, AiCapability> = {
+  draft: "vision",
+  specs: "text",
+  transcribe: "audio",
+};
+
 export async function runAiOperation<T>(
   operation: AiOperation,
-  execute: (context: {
-    client: OpenAI;
-    signal: AbortSignal;
-    measure: <R>(stage: string, model: string, call: () => Promise<R>) => Promise<R>;
-  }) => Promise<T>,
+  execute: (context: { call: AiCall; signal: AbortSignal }) => Promise<T>,
 ): Promise<T> {
   const startedAt = Date.now();
   const deadline = AbortSignal.timeout(TOTAL_TIMEOUT_MS);
@@ -50,8 +58,8 @@ export async function runAiOperation<T>(
   const url = process.env.SUPABASE_URL || import.meta.env.VITE_SUPABASE_URL;
   const anonKey = process.env.SUPABASE_ANON_KEY || import.meta.env.VITE_SUPABASE_ANON_KEY;
   const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  const apiKey = process.env.OPENAI_API_KEY;
-  if (!url || !anonKey || !serviceKey || !apiKey) {
+  const providers = aiProviders(CAPABILITY[operation], process.env, TOTAL_TIMEOUT_MS);
+  if (!url || !anonKey || !serviceKey || providers.length === 0) {
     setResponseStatus(503);
     throw new Error("Assistência de IA indisponível. Você pode preencher o anúncio manualmente.");
   }
@@ -124,7 +132,6 @@ export async function runAiOperation<T>(
   } catch {
     console.warn(JSON.stringify({ event: "ai_price_config_invalid" }));
   }
-  const client = new OpenAI({ apiKey, timeout: 45_000, maxRetries: 0 });
   const totals: AiUsage = {
     inputTokens: 0,
     cachedInputTokens: 0,
@@ -133,13 +140,17 @@ export async function runAiOperation<T>(
   };
   let estimatedCostUsd: number | null = 0;
   let status = "failed";
-  const measure = async <R>(stage: string, model: string, call: () => Promise<R>): Promise<R> => {
+  const measure = async <R>(
+    stage: string,
+    provider: AiProvider,
+    run: (provider: AiProvider) => Promise<R>,
+  ): Promise<R> => {
     const callStarted = Date.now();
-    const response = await call();
+    const response = await run(provider);
     const usage = providerUsage(response);
     if (usage)
       for (const key of Object.keys(totals) as (keyof AiUsage)[]) totals[key] += usage[key];
-    const cost = usage ? estimateAiCost(usage, prices[model]) : null;
+    const cost = usage ? estimateAiCost(usage, prices[provider.model]) : null;
     estimatedCostUsd = estimatedCostUsd === null || cost === null ? null : estimatedCostUsd + cost;
     console.info(
       JSON.stringify({
@@ -147,7 +158,8 @@ export async function runAiOperation<T>(
         requestId: authorization.requestId,
         operation,
         stage,
-        model,
+        provider: provider.name,
+        model: provider.model,
         durationMs: Date.now() - callStarted,
         usageReported: !!usage,
         ...usage,
@@ -156,8 +168,30 @@ export async function runAiOperation<T>(
     );
     return response;
   };
+  // Free tiers answer 429/503 or stall when quota or capacity runs out; only then is the next
+  // (paid) provider tried. Any other failure ends the operation: no silent paid retries.
+  const call: AiCall = async (stage, run) => {
+    for (const [index, provider] of providers.entries()) {
+      try {
+        return await measure(stage, provider, run);
+      } catch (error) {
+        if (index === providers.length - 1 || !shouldTryNextProvider(error)) throw error;
+        console.warn(
+          JSON.stringify({
+            event: "ai_provider_fallback",
+            requestId: authorization.requestId,
+            operation,
+            stage,
+            from: provider.model,
+            to: providers[index + 1].model,
+          }),
+        );
+      }
+    }
+    throw new Error("No AI provider configured");
+  };
   try {
-    const result = await execute({ client, signal: deadline, measure });
+    const result = await execute({ call, signal: deadline });
     status = "succeeded";
     return result;
   } catch (error) {
