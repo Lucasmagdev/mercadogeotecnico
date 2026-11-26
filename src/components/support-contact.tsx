@@ -4,7 +4,7 @@ import { support } from "@/lib/support";
 export function SupportContact() {
   return (
     <div className="space-y-2 text-sm">
-      <p className="font-medium">Precisa de ajuda? Fale com {support.name}.</p>
+      <p className="font-medium">Precisa de ajuda? Fale com o suporte.</p>
       <div className="flex flex-wrap justify-center gap-x-4 gap-y-2">
         <a
           href={`https://wa.me/${support.whatsapp}`}
